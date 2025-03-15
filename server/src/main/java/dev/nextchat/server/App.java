@@ -24,6 +24,18 @@ public class App {
             while (resultSet.next()) {
                 System.out.println(resultSet.getString("username") + ": " + resultSet.getString("user_password"));
             }
+            
+            String username = "phuc"; 
+            String password = "phuc123"; 
+
+            try {
+                statement.executeUpdate("INSERT INTO user_account (username, user_password) VALUES ('" + username + "', '" + password + "')");
+            } 
+            catch (SQLIntegrityConstraintViolationException e) {
+                System.out.println("Username already exists");
+            }
+            
+            connection.close(); 
         } 
         catch (Exception e) {
             e.printStackTrace();
