@@ -4,32 +4,41 @@
 package dev.nextchat.server;
 
 import java.sql.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class App {
     public String getGreeting() {
         return "Hello World!";
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        ServerSocket ss = new ServerSocket(1234);
+        System.out.println("Server started. Waiting for client to connect...");
+        
+        Socket con = ss.accept();
+        System.out.println("Client connected.");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream())); 
+        PrintWriter out = new PrintWriter(con.getOutputStream(), true);
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in)); 
+
+        String username = in.readLine();
+        String password = in.readLine();
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/chatdb",
                 "root", "aio2024");
 
-            Statement statement = connection.createStatement();
-
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM user_account"); 
-
-            while (resultSet.next()) {
-                System.out.println(resultSet.getString("username") + ": " + resultSet.getString("user_password"));
-            }
-            
-            String username = "fatpig"; 
-            String password = "phuc123"; 
+            Statement statement = connection.createStatement(); 
 
             MessageDigest md = MessageDigest.getInstance("SHA-256"); 
             md.update(password.getBytes());
@@ -41,6 +50,12 @@ public class App {
             } 
             catch (SQLIntegrityConstraintViolationException e) {
                 System.out.println("Username already exists");
+            }
+
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM user_account"); 
+
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString("username") + ": " + resultSet.getString("user_password"));
             }
             
             connection.close(); 
