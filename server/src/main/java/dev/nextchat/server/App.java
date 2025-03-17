@@ -4,6 +4,9 @@
 package dev.nextchat.server;
 
 import java.sql.*;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class App {
     public String getGreeting() {
@@ -25,11 +28,16 @@ public class App {
                 System.out.println(resultSet.getString("username") + ": " + resultSet.getString("user_password"));
             }
             
-            String username = "phuc"; 
+            String username = "fatpig"; 
             String password = "phuc123"; 
 
+            MessageDigest md = MessageDigest.getInstance("SHA-256"); 
+            md.update(password.getBytes());
+            byte[] digest = md.digest();
+            String hashedPassword = String.format("%064x", new BigInteger(1, digest));
+
             try {
-                statement.executeUpdate("INSERT INTO user_account (username, user_password) VALUES ('" + username + "', '" + password + "')");
+                statement.executeUpdate("INSERT INTO user_account (username, user_password) VALUES ('" + username + "', '" + hashedPassword + "')");
             } 
             catch (SQLIntegrityConstraintViolationException e) {
                 System.out.println("Username already exists");
