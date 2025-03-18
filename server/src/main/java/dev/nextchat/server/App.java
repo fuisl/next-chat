@@ -12,13 +12,14 @@ import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class App {
     public String getGreeting() {
         return "Hello World!";
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         ServerSocket ss = new ServerSocket(1234);
         System.out.println("Server started. Waiting for client to connect...");
         
@@ -27,38 +28,73 @@ public class App {
 
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream())); 
         PrintWriter out = new PrintWriter(con.getOutputStream(), true);
+
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in)); 
 
-        String username = in.readLine();
-        String password = in.readLine();
+        String choice = in.readLine().trim(); 
+        System.out.println("Client choice: " + choice);
+
+        String username = in.readLine().trim();
+        System.out.println("Username received"); 
+
+        String password = in.readLine().trim();
+        System.out.println("Password received"); 
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256"); 
+        md.update(password.getBytes());
+        byte[] digest = md.digest();
+        String hashedPassword = String.format("%064x", new BigInteger(1, digest));
+
+        System.out.println("Successful hash"); 
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/chatdb",
                 "root", "aio2024");
+            
+            System.out.println("Connected to database....");
 
             Statement statement = connection.createStatement(); 
 
-            MessageDigest md = MessageDigest.getInstance("SHA-256"); 
-            md.update(password.getBytes());
-            byte[] digest = md.digest();
-            String hashedPassword = String.format("%064x", new BigInteger(1, digest));
+            if (choice.equals("2")) {
+                try {
+                    System.out.println("Creating account...");
 
-            try {
-                statement.executeUpdate("INSERT INTO user_account (username, user_password) VALUES ('" + username + "', '" + hashedPassword + "')");
-            } 
-            catch (SQLIntegrityConstraintViolationException e) {
-                System.out.println("Username already exists");
+                    statement.executeUpdate("INSERT INTO user_account (username, user_password) VALUES ('" + username + "', '" + hashedPassword + "')");
+                    out.println("Account created successfully");
+
+                    System.out.println("Account created successfully");
+                } 
+                catch (SQLIntegrityConstraintViolationException e) {
+                    out.println("Username already exists");
+                }
             }
+            else if (choice.equals("1")) {
+                System.out.println("Logging in...");
 
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM user_account"); 
+                ResultSet resultSet = statement.executeQuery("SELECT user_password FROM user_account WHERE username = '" + username + "'"); 
+                if (resultSet.next()) {
+                    System.out.println("Username exists");
 
-            while (resultSet.next()) {
-                System.out.println(resultSet.getString("username") + ": " + resultSet.getString("user_password"));
+                    if (resultSet.getString("user_password").equals(hashedPassword)) {
+                        System.out.println("Login successful");
+
+                        out.println("Login successful");
+                    }
+                    else {
+                        System.out.println("Incorrect password");
+
+                        out.println("Incorrect password");
+                    }
+                }
+                else {
+                    System.out.println("Username does not exists");
+
+                    out.println("Username does not exists");
+                }
             }
-            
-            connection.close(); 
+             
         } 
         catch (Exception e) {
             e.printStackTrace();

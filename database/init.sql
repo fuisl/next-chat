@@ -10,7 +10,7 @@ CREATE TABLE user_account (
 );
 
 CREATE TABLE chat_group (
-    group_id VARCHAR(36) PRIMARY KEY DEFAULT (UUID())chat_group,
+    group_id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     user_id VARCHAR(36) NOT NULL,
     group_name VARCHAR(50) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -23,13 +23,27 @@ public class App {
             PrintWriter out = new PrintWriter(s.getOutputStream(), true); 
             BufferedReader input = new BufferedReader(new InputStreamReader(System.in)); 
 
+            // This is the purpose of test and simulation only 
+            System.out.println("Please type 1 to sign-in or 2 to sign-up: ");
+
+            String choice = input.readLine().trim();
+
+            while ( !(choice.equals("1") || choice.equals("2")) ) {
+                System.out.println("Invalid input. Please type 1 to sign-in or 2 to sign-up: "); 
+                choice = input.readLine().trim();
+            }
+
+            out.println(choice); 
+
+
             System.out.println("Please type in your username: ");
             out.println(input.readLine()); 
 
             System.out.println("Please type in your password: ");
             out.println(input.readLine());
 
-            s.close();
+            String response = in.readLine();
+            System.out.println("Server response: " + response);            
         } 
         
         catch (Exception e) 
