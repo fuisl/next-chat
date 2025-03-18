@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<AnchorPane prefHeight="750.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.ChatsController">
+   <children>
+      <VBox prefHeight="743.0" prefWidth="317.0" styleClass="left_ctn" stylesheets="@../Styles/Chats.css" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Pane prefHeight="54.0" prefWidth="289.0" styleClass="header">
+               <children>
+                  <Text fx:id="user_name" layoutX="59.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hi, AndrwPham">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Text>
+                  <Button fx:id="dots_btn" layoutX="278.0" layoutY="16.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="19.0">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="ELLIPSIS_V" size="16" />
+                     </graphic>
+                  </Button>
+                  <Circle fill="#f2f2f2" layoutX="36.0" layoutY="26.0" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
+               </children>
+            </Pane>
+            <VBox prefHeight="139.0" prefWidth="315.0" styleClass="mid_ctn">
+               <children>
+                  <Label prefHeight="19.0" prefWidth="53.0" text="Chats" />
+                  <TextField prefHeight="26.0" prefWidth="258.0" />
+                  <HBox prefHeight="72.0" prefWidth="317.0" styleClass="mid_ctn">
+                     <children>
+                        <Button fx:id="all_btn" mnemonicParsing="false" text="All" />
+                        <Button fx:id="groups_btn" mnemonicParsing="false" text="Groups" />
+                        <Button fx:id="fav_btn" mnemonicParsing="false" text="Favourite" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox prefHeight="579.0" prefWidth="317.0" styleClass="chat_list">
+               <children>
+                  <Button fx:id="chats_btn" mnemonicParsing="false" prefHeight="62.0" prefWidth="366.0">
+                     <graphic>
+                        <Pane prefHeight="62.0" prefWidth="366.0">
+                           <children>
+                              <HBox prefHeight="46.0" prefWidth="202.0">
+                                 <children>
+                                    <Label styleClass="profile-icon" />
+                                    <VBox prefHeight="53.0" prefWidth="147.0">
+                                       <children>
+                                          <Label fx:id="fusername" styleClass="chat-name" text="Fuisloy" />
+                                          <Label fx:id="text_msg" styleClass="chat-message" text="Làm lại đi cu" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <Label fx:id="sent_date" layoutX="234.0" layoutY="6.0" styleClass="chat-date" text="18/3/2025" />
+                           </children>
+                        </Pane>
+                     </graphic></Button>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

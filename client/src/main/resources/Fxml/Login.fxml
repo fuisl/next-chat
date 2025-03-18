@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../Styles/login.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.LoginController">
+   <children>
+      <VBox prefHeight="400.0" prefWidth="205.0" styleClass="logo_ctn" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView fitHeight="86.0" fitWidth="68.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../Images/logo-removebg-preview.png" />
+               </image>
+            </ImageView>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Java based Chat system" textAlignment="CENTER" wrappingWidth="158.16015625" />
+         </children>
+      </VBox>
+      <VBox layoutX="228.0" layoutY="20.0" prefHeight="358.0" prefWidth="350.0" styleClass="login_form_ctn" AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="20.0">
+         <children>
+            <Label text="Username:" />
+            <TextField fx:id="username" prefHeight="19.0" prefWidth="243.0" styleClass="input_field" />
+            <Label text="Password:" />
+            <TextField fx:id="password" styleClass="input_field" />
+            <Button fx:id="login_btn" mnemonicParsing="false" text="Log in" textAlignment="CENTER" />
+            <Label fx:id="error_lbl" prefHeight="21.0" prefWidth="58.0" styleClass="error_lbl">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
