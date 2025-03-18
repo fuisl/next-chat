@@ -8,6 +8,8 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 repositories {
@@ -16,6 +18,15 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Core
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // Spring Boot Web (for REST APIs)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Spring Boot with MongoDB
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
 
