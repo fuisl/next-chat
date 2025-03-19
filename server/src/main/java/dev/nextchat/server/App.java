@@ -20,32 +20,21 @@ public class App {
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        ServerSocket ss = new ServerSocket(1234);
-        System.out.println("Server started. Waiting for client to connect...");
         
+        ServerSocket ss = new ServerSocket(1234);
         Socket con = ss.accept();
-        System.out.println("Client connected.");
 
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream())); 
         PrintWriter out = new PrintWriter(con.getOutputStream(), true);
 
-        BufferedReader input = new BufferedReader(new InputStreamReader(System.in)); 
-
         String choice = in.readLine().trim(); 
-        System.out.println("Client choice: " + choice);
-
         String username = in.readLine().trim();
-        System.out.println("Username received"); 
-
         String password = in.readLine().trim();
-        System.out.println("Password received"); 
 
         MessageDigest md = MessageDigest.getInstance("SHA-256"); 
         md.update(password.getBytes());
         byte[] digest = md.digest();
         String hashedPassword = String.format("%064x", new BigInteger(1, digest));
-
-        System.out.println("Successful hash"); 
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -55,42 +44,39 @@ public class App {
             
             System.out.println("Connected to database....");
 
-            Statement statement = connection.createStatement(); 
-
             if (choice.equals("2")) {
                 try {
-                    System.out.println("Creating account...");
+                    String query = "INSERT INTO user_account (username, user_password) VALUES (?, ?)";
 
-                    statement.executeUpdate("INSERT INTO user_account (username, user_password) VALUES ('" + username + "', '" + hashedPassword + "')");
+                    PreparedStatement statement = connection.prepareStatement(query);
+
+                    statement.setString(1, username);
+                    statement.setString(2, hashedPassword);
+                    statement.executeUpdate();
+
                     out.println("Account created successfully");
-
-                    System.out.println("Account created successfully");
                 } 
                 catch (SQLIntegrityConstraintViolationException e) {
                     out.println("Username already exists");
                 }
             }
             else if (choice.equals("1")) {
-                System.out.println("Logging in...");
+                String query = "SELECT user_password FROM user_account WHERE username = ?";
 
-                ResultSet resultSet = statement.executeQuery("SELECT user_password FROM user_account WHERE username = '" + username + "'"); 
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, username);
+
+                ResultSet resultSet = statement.executeQuery();
+
                 if (resultSet.next()) {
-                    System.out.println("Username exists");
-
                     if (resultSet.getString("user_password").equals(hashedPassword)) {
-                        System.out.println("Login successful");
-
                         out.println("Login successful");
                     }
                     else {
-                        System.out.println("Incorrect password");
-
                         out.println("Incorrect password");
                     }
                 }
                 else {
-                    System.out.println("Username does not exists");
-
                     out.println("Username does not exists");
                 }
             }
