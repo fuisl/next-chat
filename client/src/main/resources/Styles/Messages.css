@@ -1,0 +1,32 @@
+.header_ctn{
+    -fx-background-color: #f0f2f5;
+}
+.header_ctn Label {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+.header_ctn Button {
+    -fx-background-color: #f0f2f5;
+    -fx-background-radius: 50%;
+}
+.header_ctn Button:hover{
+    -fx-background-color: #d9dbdf;
+}
+.chat_box{
+    -fx-background-color: #E2F8DC;
+}
+
+/* Bubble container styling */
+.message-bubble {
+    -fx-alignment: CENTER_RIGHT;
+    -fx-padding: 8 12;
+}
+
+/* Actual message label styling */
+.message-label {
+    -fx-background-color: #DCF8C6;   /* Light green bubble color */
+    -fx-padding: 8 12;
+    -fx-background-radius: 12;
+    -fx-wrap-text: true;
+    -fx-font-size: 14px;
+}

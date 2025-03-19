@@ -2,6 +2,8 @@ package dev.nextchat.client.views;
 
 import dev.nextchat.client.controllers.ClientController;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
@@ -10,9 +12,17 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class ViewFactory {
+    private final StringProperty clientSelectedChat;
     private AnchorPane chatsView;
+    private AnchorPane msgView;
 
-    public ViewFactory() {}
+    public ViewFactory() {
+        this.clientSelectedChat = new SimpleStringProperty(" ");
+    }
+
+    public StringProperty getClientSelectedChat() {
+        return clientSelectedChat;
+    }
 
     public AnchorPane getChatsView() {
         if (chatsView == null) {
@@ -23,6 +33,17 @@ public class ViewFactory {
             }
         }
         return chatsView;
+    }
+
+    public AnchorPane getMsgView() {
+        if (msgView == null) {
+            try{
+                msgView = new FXMLLoader(getClass().getResource("/Fxml/Messages.fxml")).load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return msgView;
     }
 
     public void showLoginWindow() {
