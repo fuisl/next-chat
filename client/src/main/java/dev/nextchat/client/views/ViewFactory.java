@@ -27,7 +27,7 @@ public class ViewFactory {
     public AnchorPane getChatsView() {
         if (chatsView == null) {
             try {
-                chatsView = new FXMLLoader(getClass().getResource("/Fxml/Chats.fxml")).load();
+                chatsView = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Chats.fxml")).load();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -38,7 +38,7 @@ public class ViewFactory {
     public AnchorPane getMsgView() {
         if (msgView == null) {
             try{
-                msgView = new FXMLLoader(getClass().getResource("/Fxml/Messages.fxml")).load();
+                msgView = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Messages.fxml")).load();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -47,7 +47,7 @@ public class ViewFactory {
     }
 
     public void showLoginWindow() {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Login.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Login.fxml"));
         Scene scene = null;
         try {
             scene = new Scene(loader.load());
@@ -61,7 +61,7 @@ public class ViewFactory {
     }
 
     public void showClientWindow() {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Client.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Client.fxml"));
         ClientController clientController = new ClientController();
         loader.setController(clientController);
         Scene scene = null;
