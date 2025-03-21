@@ -45,7 +45,7 @@
 
 .login_form_ctn Button:hover {
     -fx-cursor: hand;
-    -fx-background-color: blue;
+    -fx-background-color: #177D38;
 }
 
 .error_lbl {

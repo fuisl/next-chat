@@ -1,6 +1,7 @@
 .mainmenu_ctn {
     -fx-background-color: #EEEEEE;
     -fx-alignment: center;
+    -fx-padding: 0 10 0 10;
 }
 
 .left_ctn {
