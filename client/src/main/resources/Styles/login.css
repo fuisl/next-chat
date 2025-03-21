@@ -1,5 +1,5 @@
 .login_ctn {
-    -fx-background-color: #EEEEEE;
+    -fx-background-color: #f4f4f4;
 }
 
 .logo_ctn {
@@ -11,8 +11,12 @@
     -fx-fill: #ECF39f;
 }
 
-.logo_ctn FontAwesomeIcon {
-    -fx-fill: #ECF39f;
+.signuphere_btn {
+    -fx-background-color: #f4f4f4;
+    -fx-text-fill:black;
+    -fx-font-size: 15px;}
+.signuphere_btn:hover{
+    -fx-text-fill: green;
 }
 
 
@@ -35,7 +39,7 @@
     -fx-font-size: 1.2em;
 }
 
-.login_form_ctn Button {
+.login_button {
     -fx-background-color: #132A13;
     -fx-text-fill: white;
     -fx-pref-height: 35;
@@ -43,7 +47,7 @@
     -fx-font-size: 1.2em;
 }
 
-.login_form_ctn Button:hover {
+.login_button:hover {
     -fx-cursor: hand;
     -fx-background-color: #177D38;
 }

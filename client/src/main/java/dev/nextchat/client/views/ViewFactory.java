@@ -44,7 +44,22 @@ public class ViewFactory {
             }
         }
         return msgView;
+
     }
+    public void showSignupWindow(){
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Signup.fxml"));
+        Scene scene = null;
+        try {
+            scene = new Scene(loader.load());
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Signup");
+        stage.show();
+    }
+
 
     public void showLoginWindow() {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Login.fxml"));
