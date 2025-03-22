@@ -1,0 +1,32 @@
+[
+    {
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "groupId": "123e4567-e89b-12d3-a456-556642440000",
+      "message": "Hey, are you available for a call?",
+      "timestamp": "2025-03-17T14:30:00Z"
+    },
+    {
+      "userId": "c0a80101-3b9d-410f-8000-000000000001",
+      "groupId": "b0a80101-3b9d-410f-8000-000000000002",
+      "message": "Meeting rescheduled to 3 PM.",
+      "timestamp": "2025-03-17T14:35:00Z"
+    },
+    {
+      "userId": "d3f29e5d-6f25-4a3b-bc9c-5e7760e9f5f3",
+      "groupId": "c1e29d4b-7c9d-4f3e-99d2-a7f30d3c5d7e",
+      "message": "Can you send me the project files?",
+      "timestamp": "2025-03-17T14:40:00Z"
+    },
+    {
+      "userId": "6e4d6f9a-31b2-4c9f-9881-4a7f5e6c3d7b",
+      "groupId": "fa9c5e6d-2b3e-4d9f-87a1-3f7c2e5b4d6a",
+      "message": "Let's meet at the usual place.",
+      "timestamp": "2025-03-17T14:45:00Z"
+    },
+    {
+      "userId": "8a3b7c6d-4e5f-9a1b-3d2f-6c7e5b4d9f8a",
+      "groupId": "b2c3d4e5-6f7a-8b9c-1d2e-3f4a5b6d7e8c",
+      "message": "Your order is out for delivery.",
+      "timestamp": "2025-03-17T14:50:00Z"
+    }
+  ]
