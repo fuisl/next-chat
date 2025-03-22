@@ -1,0 +1,26 @@
+.main_ctn{
+    -fx-background-color: white;
+}
+.main_ctn TextField {
+}
+.main_ctn VBox{
+    -fx-background-color: white;
+    -fx-padding: 10 0 0 10;
+}
+.main_ctn Button{
+    -fx-background-color: white;
+}
+.main_ctn Button:hover{
+    -fx-background-color: #f4f4f4;
+}
+.main_ctn HBox{
+    -fx-alignment: center_left;
+    -fx-spacing: 5;
+}
+.search-bar {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 20;
+    -fx-padding: 5 10;
+}

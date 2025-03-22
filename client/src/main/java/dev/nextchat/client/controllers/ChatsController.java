@@ -27,8 +27,18 @@ public class ChatsController implements Initializable {
         addListeners();
     }
     private void addListeners() {
+        newMess.setOnAction(event -> {
+            createNewMsgBox();
+        });
+
     }
+
+    private void createNewMsgBox() {
+        Model.getInstance().getViewFactory().getClientSelection().set("New Message");
+    }
+
     private void onChatMess() {
         Model.getInstance().getViewFactory().getClientSelectedChat().set("Messages");
     }
+
 }

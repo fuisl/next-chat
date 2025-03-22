@@ -15,13 +15,20 @@ public class ViewFactory {
     private final StringProperty clientSelectedChat;
     private AnchorPane chatsView;
     private AnchorPane msgView;
+    private AnchorPane newMsgView;
+    private final StringProperty clientSelection;
 
     public ViewFactory() {
         this.clientSelectedChat = new SimpleStringProperty(" ");
+        this.clientSelection = new SimpleStringProperty(" ");
     }
 
     public StringProperty getClientSelectedChat() {
         return clientSelectedChat;
+    }
+
+    public StringProperty getClientSelection(){
+        return clientSelection;
     }
 
     public AnchorPane getChatsView() {
@@ -90,6 +97,18 @@ public class ViewFactory {
         stage.setTitle("Chats");
         stage.show();
     }
+
+    public AnchorPane getNewMsgWindow() {
+        if (newMsgView == null) {
+            try{
+                newMsgView = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/NewMsgBox.fxml")).load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return newMsgView;
+    }
+
     public void closeStage(Stage stage) {
         stage.close();
     }
