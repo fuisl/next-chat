@@ -3,17 +3,14 @@
  */
 package dev.nextchat.client;
 
-import org.springframework.boot.SpringApplication;
+import javafx.application.Application;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
-public class Client {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+@SpringBootApplication(proxyBeanMethods = false)
 
+public class Client {
     public static void main(String[] args) {
-        SpringApplication.run(Client.class, args);
-        System.out.println(new Client().getGreeting());
+        Application.launch(App.class, args);
     }
 }
+

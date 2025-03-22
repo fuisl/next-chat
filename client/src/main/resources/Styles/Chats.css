@@ -1,0 +1,89 @@
+.left_ctn {
+    -fx-background-color: white;
+    -fx-spacing: 10;
+}
+.header {
+    -fx-background-color: white;
+    -fx-padding: 10px;
+    -fx-border-color: #132A13;
+    -fx-border-width: 0 0 1px 0;
+}
+.header Text {
+    -fx-font-size: 16px;
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+}
+.header Button {
+    -fx-background-color: White;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+}
+.header Button:hover {
+    -fx-background-color: gray;
+}
+.mid_ctn {
+    -fx-padding: 5 15 0 15;
+}
+.mid_ctn Label {
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+}
+.mid_ctn HBox {
+    -fx-padding: 5 5 0 5;
+    -fx-spacing: 5px;
+}
+.mid_ctn Button {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 15px; /* Controls the overall size */
+    -fx-border-radius: 20px; /* Large value makes it oval */
+    -fx-background-radius: 20px;
+
+}
+.mid_ctn Button:hover{
+    -fx-background-color: gray;
+}
+.chat_list {
+    -fx-background-color: white;
+}
+.chat_list Button {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-text-fill: black;
+    -fx-alignment: center-left;
+}
+.chat_list Button:hover {
+    -fx-background-color: gray;
+}
+.chat_list HBox {
+    -fx-padding: 5px;
+    -fx-spacing: 5px;
+}
+.chat-name {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.profile-icon {
+    -fx-background-color: white;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-background-radius: 50%;
+}
+
+/* Chat Message */
+.chat-message {
+    -fx-font-size: 12px;
+    -fx-text-fill: #aaaaaa;
+}
+
+/* Chat Date */
+.chat-date {
+    -fx-font-size: 12px;
+    -fx-text-fill: #aaaaaa;
+}
+
+.chat_list VBox {
+    -fx-spacing: 5px;
+}
