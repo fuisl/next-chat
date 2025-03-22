@@ -1,15 +1,10 @@
 package dev.nextchat.server.util;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.ParseException;
+
 import java.time.Instant;
-import java.util.Scanner;
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
@@ -17,16 +12,20 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Service;
 
+import dev.nextchat.server.model.PendingMessage;
 import dev.nextchat.server.model.ReceivedMessage;
+import dev.nextchat.server.repository.PendingMessageRepository;
 import dev.nextchat.server.repository.ReceivedMessageRepository;
 
 @Service
 public class InitiateMessageDB {
     
-    private final ReceivedMessageRepository messageRepository;
+    private final ReceivedMessageRepository receivedRepository;
+    private final PendingMessageRepository pendingRepository;
 
-    public InitiateMessageDB(ReceivedMessageRepository repository) {
-        this.messageRepository = repository;
+    public InitiateMessageDB(ReceivedMessageRepository received_repo, PendingMessageRepository pending_repo) {
+        this.receivedRepository = received_repo;
+        this.pendingRepository = pending_repo;
     }
 
     private Object loadJsonFromResources(String filePath) {
@@ -49,8 +48,6 @@ public class InitiateMessageDB {
 
     public void loadMessagesFromJson(String filePath) {
 
-        System.out.println("Loading sample data...");
-
         Object jsonObj = this.loadJsonFromResources(filePath);
 
         if (jsonObj instanceof JSONArray) {
@@ -61,21 +58,21 @@ public class InitiateMessageDB {
                 JSONObject messageObj = (JSONObject) obj;
 
                 // Extract values
-                UUID senderId = UUID.fromString((String) messageObj.get("senderId"));
+                UUID userId = UUID.fromString((String) messageObj.get("userId"));
                 UUID groupId = UUID.fromString((String) messageObj.get("groupId"));
                 String message = (String) messageObj.get("message");
                 String timestamp = (String) messageObj.get("timestamp");
 
-                // Print or process data
-                System.out.println("Sender: " + senderId);
-                System.out.println("Group: " + groupId);
-                System.out.println("Message: " + message);
-                System.out.println("Timestamp: " + timestamp);
-                System.out.println("----------------------------");
-
-                ReceivedMessage receivedMessage = new ReceivedMessage(senderId, groupId, message, Instant.parse(timestamp));
-                messageRepository.save(receivedMessage);
-            }
+                if (filePath.contains("received_message")) {
+                    ReceivedMessage messageDocument = new ReceivedMessage(userId, groupId, message, Instant.parse(timestamp));
+                    receivedRepository.save(messageDocument);
+                } 
+                
+                if (filePath.contains("pending_message")) {
+                    PendingMessage messageDocument = new PendingMessage(userId, groupId, message, Instant.parse(timestamp));
+                    pendingRepository.save(messageDocument);
+                }
+           }
         }
     }
 }

@@ -1,30 +1,30 @@
 [
     {
-      "senderId": "550e8400-e29b-41d4-a716-446655440000",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
       "groupId": "c0a80101-0000-4000-a000-000000000001",
       "message": "Hello, how are you?",
       "timestamp": "2025-03-17T12:00:00Z"
     },
     {
-      "senderId": "550e8400-e29b-41d4-a716-446655440001",
+      "userId": "550e8400-e29b-41d4-a716-446655440001",
       "groupId": "c0a80101-0000-4000-a000-000000000002",
       "message": "Meeting at 3 PM, don't forget!",
       "timestamp": "2025-03-17T12:30:00Z"
     },
     {
-      "senderId": "550e8400-e29b-41d4-a716-446655440002",
+      "userId": "550e8400-e29b-41d4-a716-446655440002",
       "groupId": "c0a80101-0000-4000-a000-000000000003",
       "message": "See you at the event tonight!",
       "timestamp": "2025-03-17T13:00:00Z"
     },
     {
-      "senderId": "550e8400-e29b-41d4-a716-446655440003",
+      "userId": "550e8400-e29b-41d4-a716-446655440003",
       "groupId": "c0a80101-0000-4000-a000-000000000004",
       "message": "The project deadline has been extended.",
       "timestamp": "2025-03-17T14:00:00Z"
     },
     {
-      "senderId": "550e8400-e29b-41d4-a716-446655440004",
+      "userId": "550e8400-e29b-41d4-a716-446655440004",
       "groupId": "c0a80101-0000-4000-a000-000000000005",
       "message": "Let's grab lunch later.",
       "timestamp": "2025-03-17T14:45:00Z"

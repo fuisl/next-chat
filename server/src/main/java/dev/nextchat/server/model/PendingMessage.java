@@ -5,16 +5,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 import java.util.UUID;
 
-@Document(collection = "received_message")
-public class ReceivedMessage extends Message {
+@Document(collection = "pending_message")
+public class PendingMessage extends Message{
     
-    private UUID senderId;
+    private UUID receiverId;
 
     // Constructors
-    public ReceivedMessage() {}
-    public ReceivedMessage(UUID senderId, UUID groupId, String message, Instant timestamp) {
+    public PendingMessage() {}
+    public PendingMessage(UUID receiverId, UUID groupId, String message, Instant timestamp) {
         this.id = UUID.randomUUID();
-        this.senderId = senderId;
+        this.receiverId = receiverId;
         this.groupId = groupId;
         this.message = message;
         this.timestamp = timestamp;
@@ -22,7 +22,7 @@ public class ReceivedMessage extends Message {
 
     // Getters & Setters
     public UUID getId() { return id; }
-    public UUID getSenderId() { return senderId; }
+    public UUID getSenderId() { return receiverId; }
     public UUID getGroupId() { return groupId; }
     public String getMessage() { return message; }
     public Instant getTimestamp() { return timestamp; }
