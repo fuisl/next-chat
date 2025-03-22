@@ -9,8 +9,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface PendingMessageRepository extends MongoRepository<PendingMessage, UUID> {
 
-    // Find messages by sender
-    List<PendingMessage> findBySenderId(UUID senderId);
+    // Find messages by receiver
+    List<PendingMessage> findByReceiverId(UUID receiverId);
 
     // Find messages in a group
     List<PendingMessage> findByGroupId(UUID groupId);
