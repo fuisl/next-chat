@@ -5,6 +5,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Model for working with received_message collection in message_db.
+ * The empty constructor is provided solely for typing, it should 
+ * not be used during deployment. The added attribute is the
+ * {@code senderId}.
+ */
 @Document(collection = "received_message")
 public class ReceivedMessage extends Message {
     

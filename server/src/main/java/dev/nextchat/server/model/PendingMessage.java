@@ -5,6 +5,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Model for working with pending_message collection in message_db.
+ * The empty constructor is provided solely for typing, it should 
+ * not be used during deployment. The added attribute is the
+ * {@code receiverId}
+ */
 @Document(collection = "pending_message")
 public class PendingMessage extends Message{
     

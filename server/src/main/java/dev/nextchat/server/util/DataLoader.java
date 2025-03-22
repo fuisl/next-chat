@@ -5,6 +5,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * A helper class used for adding sample data and/or create {@code message_db} 
+ * database with its necessary collections by using {@code InitiateMessageDB}.
+ * This class main function is to run immediately after start-up the method 
+ * {@link InitiateMessageDB#loadMessagesFromJson(String)} with a provided
+ * {@code JSON} file path. The data are only added when the collections does
+ * not exist.
+ */
 @Component
 public class DataLoader implements CommandLineRunner {
     private final InitiateMessageDB InitiateMessageDB;

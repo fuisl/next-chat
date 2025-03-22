@@ -17,6 +17,13 @@ import dev.nextchat.server.model.ReceivedMessage;
 import dev.nextchat.server.repository.PendingMessageRepository;
 import dev.nextchat.server.repository.ReceivedMessageRepository;
 
+/**
+ * A helper class used for adding sample data and/or create {@code message_db} 
+ * database with its necessary collections with a given {@code JSON} file path.
+ * This class are coupled with the {@code DataLoader} class, which contains 
+ * the example usage.
+ * @see dev.nextchat.server.util.DataLoader.
+ */
 @Service
 public class InitiateMessageDB {
     

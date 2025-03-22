@@ -7,6 +7,10 @@ import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+/**
+ * Interface repository for working with the {@code pending_message}
+ * collection.
+ */
 public interface PendingMessageRepository extends MongoRepository<PendingMessage, UUID> {
 
     // Find messages by receiver

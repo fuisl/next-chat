@@ -15,6 +15,9 @@ import dev.nextchat.server.model.ReceivedMessage;
 import dev.nextchat.server.repository.PendingMessageRepository;
 import dev.nextchat.server.repository.ReceivedMessageRepository;
 
+// This is a useless helper class to test the outputs of created repositories.
+// No doc is provided since this class should be deleted as soon as the message
+// service is deployed.
 @Service
 public class MessageTesting {
     private final ReceivedMessageRepository receivedMessageRepository;
