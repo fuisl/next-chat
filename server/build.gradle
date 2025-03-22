@@ -18,6 +18,17 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Core
+    implementation 'org.springframework.boot:spring-boot-starter'
+    
+    // Spring Boot Web (for REST APIs)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Spring Boot with MongoDB
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
 

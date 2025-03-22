@@ -3,15 +3,19 @@
  */
 package dev.nextchat.server;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+
 @SpringBootApplication
-// @ComponentScan(basePackages = {"com.chatapp.config", "com.chatapp.model", "com.chatapp.repository", "com.chatapp.service", "com.chatapp.controller"})
+// @ComponentScan(basePackages = {"dev.netchat.server.utils"})
 // @EnableMongoRepositories(basePackages = "com.chatapp.repository")
-public class App {
+public class App{
+
     public String getGreeting() {
         return "Hello World!";
     }
