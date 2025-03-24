@@ -17,7 +17,7 @@
          <children>
             <ImageView fitHeight="86.0" fitWidth="68.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../Images/logo-removebg-preview.png" />
+                  <Image url="@../Images/logo.png" />
                </image>
             </ImageView>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Java based Chat system" textAlignment="CENTER" wrappingWidth="158.16015625" />

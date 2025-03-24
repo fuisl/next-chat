@@ -1,5 +1,6 @@
 package dev.nextchat.client.controllers;
 
+import dev.nextchat.client.models.ChatCell;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,8 +14,15 @@ public class ChatCellController implements Initializable {
     public Label txt_msg;
     public Label txt_date;
 
+    private final ChatCell cell;
+
+    public ChatCellController(ChatCell cell) {
+        this.cell = cell;
+    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        fusername.textProperty().bind(cell.senderProperty());
+        txt_msg.textProperty().bind(cell.txtMsgProperty());
+        txt_date.textProperty().bind(cell.dateProperty().asString());
     }
 }

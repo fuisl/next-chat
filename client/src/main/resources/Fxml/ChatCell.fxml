@@ -8,7 +8,7 @@
 <?import javafx.scene.shape.Circle?>
 
 
-<AnchorPane prefHeight="60.0" prefWidth="317.0" styleClass="cell_ctn" stylesheets="@../Styles/ChatCell.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.ChatCellController">
+<AnchorPane prefHeight="60.0" prefWidth="317.0" styleClass="cell_ctn" stylesheets="@../Styles/ChatCell.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Button fx:id="chat_msg_btn" mnemonicParsing="false" prefHeight="60.0" prefWidth="317.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="-1.0">
          <graphic>

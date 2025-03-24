@@ -15,7 +15,7 @@
             </Label>
             <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="202.0" layoutY="166.0" pickOnBounds="true" preserveRatio="true">
                 <image>
-                    <Image url="@../Images/gradient_modified_logo.png" />
+                    <Image url="@../Images/logoButGreen.png" />
                 </image>
             </ImageView>
         </children>

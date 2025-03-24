@@ -1,5 +1,6 @@
 package dev.nextchat.client.controllers;
 
+import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,9 +19,9 @@ public class ChatsController implements Initializable {
 
     public Text user_name;
     public ContextMenu contextMenu;
-    public MenuItem starredMessages;
     public MenuItem newGroup;
     public MenuItem newMess;
+    public ListView<ChatCell> chatCells;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -41,4 +42,9 @@ public class ChatsController implements Initializable {
         Model.getInstance().getViewFactory().getClientSelectedChat().set("Messages");
     }
 
+    private void initChatCells() {
+        if (Model.getInstance().getChatCells().isEmpty()) {
+            Model.getInstance().setAllChatCells();
+        }
+    }
 }

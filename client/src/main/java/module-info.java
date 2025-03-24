@@ -8,6 +8,7 @@ module dev.nextchat.client {
     requires spring.beans;
     requires jakarta.annotation;
     requires spring.core;
+    requires java.sql;
 
 
     opens dev.nextchat.client to javafx.fxml;

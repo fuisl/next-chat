@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ContextMenu?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<AnchorPane prefHeight="750.0" prefWidth="317.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.ChatsController">
+<AnchorPane prefHeight="750.0" prefWidth="317.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.ChatsController">
    <children>
       <VBox prefHeight="162.0" prefWidth="317.0" styleClass="left_ctn" stylesheets="@../Styles/Chats.css" AnchorPane.bottomAnchor="588.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -27,14 +18,14 @@
                      </font>
                   </Text>
                   <Button fx:id="dots_btn" layoutX="278.0" layoutY="16.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="19.0">
-                     <graphic>
+                      <graphic>
                         <FontAwesomeIconView glyphName="ELLIPSIS_V" size="16" />
                      </graphic>
                      <contextMenu>
                         <ContextMenu fx:id="contextMenu">
                           <items>
-                              <MenuItem text="New Group" fx:id="newGroup"/>
-                              <MenuItem text="New Messages" fx:id="newMess"/>
+                              <MenuItem fx:id="newGroup" text="New Group" />
+                              <MenuItem fx:id="newMess" text="New Messages" />
                           </items>
                         </ContextMenu>
                      </contextMenu>
@@ -57,6 +48,6 @@
             </VBox>
          </children>
       </VBox>
-      <ScrollPane layoutX="-3.0" layoutY="152.0" prefHeight="597.0" prefWidth="317.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="162.0" />
+      <ListView fx:id="chatCells" layoutY="162.0" prefHeight="588.0" prefWidth="317.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
    </children>
 </AnchorPane>
