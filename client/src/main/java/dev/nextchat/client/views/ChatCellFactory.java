@@ -17,7 +17,7 @@ public class ChatCellFactory extends ListCell<ChatCell> {
         } else {
             System.out.println("Creating cell for: " + chatCell.senderProperty());
 
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/ChatCell.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/ChatCell.fxml"));
             ChatCellController controller = new ChatCellController(chatCell);
             loader.setController(controller);
             setText(null);

@@ -35,7 +35,7 @@ public class ViewFactory {
     public AnchorPane getChatsView() {
         if (chatsView == null) {
             try {
-                chatsView = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Chats.fxml")).load();
+                chatsView = new FXMLLoader(getClass().getResource("/Fxml/Chats.fxml")).load();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -46,7 +46,7 @@ public class ViewFactory {
     public AnchorPane getMsgView() {
         if (msgView == null) {
             try{
-                msgView = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Messages.fxml")).load();
+                msgView = new FXMLLoader(getClass().getResource("/Fxml/Messages.fxml")).load();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -55,7 +55,7 @@ public class ViewFactory {
 
     }
     public void showSignupWindow(){
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Signup.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Signup.fxml"));
         Scene scene = null;
         try {
             scene = new Scene(loader.load());
@@ -64,14 +64,14 @@ public class ViewFactory {
         }
         Stage stage = new Stage();
         stage.setScene(scene);
-        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("Images/logoButGreen.png")));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
         stage.setTitle("Signup");
         stage.show();
     }
 
 
     public void showLoginWindow() {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Login.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Login.fxml"));
         Scene scene = null;
         try {
             scene = new Scene(loader.load());
@@ -80,13 +80,13 @@ public class ViewFactory {
         }
         Stage stage = new Stage();
         stage.setScene(scene);
-        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("Images/logoButGreen.png")));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
         stage.setTitle("Login");
         stage.show();
     }
 
     public void showClientWindow() {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/Client.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Client.fxml"));
         ClientController clientController = new ClientController();
         loader.setController(clientController);
         Scene scene = null;
@@ -97,7 +97,7 @@ public class ViewFactory {
         }
         Stage stage = new Stage();
         stage.setScene(scene);
-        stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("Images/logoButGreen.png")));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
         stage.setTitle("Chats");
         stage.show();
     }
@@ -105,7 +105,7 @@ public class ViewFactory {
     public AnchorPane getNewMsgWindow() {
         if (newMsgView == null) {
             try{
-                newMsgView = new FXMLLoader(getClass().getClassLoader().getResource("Fxml/NewMsgBox.fxml")).load();
+                newMsgView = new FXMLLoader(getClass().getResource("/Fxml/NewMsgBox.fxml")).load();
             } catch (IOException e) {
                 e.printStackTrace();
             }

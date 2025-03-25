@@ -41,11 +41,14 @@ dependencies {
 }
 
 javafx {
-    version = '17.0.6'
+    version = '23.0.1'
     modules = ['javafx.controls', 'javafx.fxml']
 }
 sourceSets {
     main {
+        java {
+            srcDirs = ['src/main/java']
+        }
         resources {
             srcDirs = ['src/main/resources']
         }
@@ -63,6 +66,8 @@ java {
 application {
     // Define the main class for the application.
     mainClass = 'dev.nextchat.client.Client'
+    mainModule = 'dev.nextchat.client'
+
 }
 
 tasks.named('test') {
