@@ -1,5 +1,6 @@
 package dev.nextchat.client.controllers;
 
+import dev.nextchat.client.models.Model;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -16,29 +17,36 @@ public class MessagesController implements Initializable {
     public TextField msg_inp;
     public Button send_btn;
     public VBox chatContainer;
+    public Label Fid;
+    private String fusername;
 
-    @FXML
-    private void handleSendMessage() {
-        String text = msg_inp.getText().trim();
-        if (!text.isEmpty()) {
-            // Create a new bubble
-            HBox messageBubble = new HBox();
-            Label messageLabel = new Label(text);
-            messageLabel.getStyleClass().add("message-label");
 
-            messageBubble.getChildren().add(messageLabel);
-            messageBubble.getStyleClass().add("message-bubble");
-
-            // Add the bubble to the chat container
-            chatContainer.getChildren().add(messageBubble);
-
-            // Clear the input
-            msg_inp.clear();
-        }
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        send_btn.setOnAction(e -> {
+            String message = msg_inp.getText().trim();
 
+            if (!message.isEmpty()) {
+                Label messageLabel = new Label("Me: " + message);
+                messageLabel.setWrapText(true);
+                messageLabel.setStyle("-fx-background-color: lightblue; -fx-padding: 10; -fx-background-radius: 8;");
+
+                chatContainer.getChildren().add(messageLabel);
+                msg_inp.clear();
+            }
+        });
+
+        Model.getInstance().getViewFactory().getClientSelectedChat().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.isBlank()) {
+                Fid.setText(newVal);
+
+            }
+        });
+
+        String currentUser = Model.getInstance().getViewFactory().getClientSelectedChat().get();
+        if (currentUser != null && !currentUser.isBlank()) {
+            Fid.setText(currentUser);
+        }
     }
 }

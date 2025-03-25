@@ -48,6 +48,6 @@
             </VBox>
          </children>
       </VBox>
-      <ListView fx:id="chatCells" layoutY="162.0" prefHeight="588.0" prefWidth="317.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <ListView fx:id="listChat" layoutY="162.0" prefHeight="588.0" prefWidth="317.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
    </children>
 </AnchorPane>

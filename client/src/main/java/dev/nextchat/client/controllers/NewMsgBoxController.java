@@ -2,6 +2,7 @@ package dev.nextchat.client.controllers;
 
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -15,7 +16,8 @@ public class NewMsgBoxController implements Initializable {
     public TextField fusername;
     public Button new_grp_btn;
     public Button chat_btn;
-    private ObservableList<ChatCell> chatCells;
+    private String username;
+    private ObservableList<ChatCell> chatCells = FXCollections.observableArrayList();;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -28,14 +30,9 @@ public class NewMsgBoxController implements Initializable {
         chat_btn.setOnAction(e -> {
             String enteredUsername = fusername.getText().trim();
             if (!enteredUsername.isEmpty()) {
-                ChatCell newCell = new ChatCell(enteredUsername, "", null); // No message or date yet
-                chatCells.add(newCell); // Add to the observable list
-                System.out.println("New chat created for: " + enteredUsername);
-
-                // Optional: go back to chat view
+                Model.getInstance().newChatCell(enteredUsername);
+                Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
                 Model.getInstance().getViewFactory().getClientSelection().set("Chats");
-            } else {
-                System.out.println("Username field is empty!");
             }
         });
     }

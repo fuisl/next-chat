@@ -1,6 +1,8 @@
 package dev.nextchat.client.controllers;
 
 import dev.nextchat.client.models.ChatCell;
+import dev.nextchat.client.models.Model;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -24,5 +26,11 @@ public class ChatCellController implements Initializable {
         fusername.textProperty().bind(cell.senderProperty());
         txt_msg.textProperty().bind(cell.txtMsgProperty());
         txt_date.textProperty().bind(cell.dateProperty().asString());
+    }
+    @FXML
+    public void onChatButtonClick() {
+        String selectedUser = cell.senderProperty().get();
+        System.out.println("Selected chat with: " + selectedUser);
+        Model.getInstance().getViewFactory().getClientSelectedChat().set(selectedUser);
     }
 }

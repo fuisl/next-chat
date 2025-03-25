@@ -26,4 +26,6 @@ public class ChatCell {
     public ObjectProperty<LocalDate> dateProperty() {
         return this.date;
     }
+
+
 }

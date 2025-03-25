@@ -27,20 +27,17 @@ public class Model {
         return viewFactory;
     }
 
-    private void newChatCell(ObservableList<ChatCell> cells) {
-        ResultSet resultSet = null;
-        try {
-
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void setAllChatCells() {
-        newChatCell(this.chatCells);
-    }
-
     public ObservableList<ChatCell> getChatCells() {
         return chatCells;
     }
+
+    public void newChatCell(String fusername) {
+        if (fusername != null && !fusername.trim().isEmpty()) {
+            ChatCell newCell = new ChatCell(fusername, "", null);
+            chatCells.add(newCell);
+            System.out.println("New ChatCell added for user: " + fusername);
+        }
+    }
+
+
 }

@@ -2,6 +2,7 @@ package dev.nextchat.client.controllers;
 
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
+import dev.nextchat.client.views.ChatCellFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -21,11 +22,12 @@ public class ChatsController implements Initializable {
     public ContextMenu contextMenu;
     public MenuItem newGroup;
     public MenuItem newMess;
-    public ListView<ChatCell> chatCells;
+    public ListView<ChatCell> listChat;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         addListeners();
+        initChatCells();
     }
     private void addListeners() {
         newMess.setOnAction(event -> {
@@ -43,8 +45,9 @@ public class ChatsController implements Initializable {
     }
 
     private void initChatCells() {
-        if (Model.getInstance().getChatCells().isEmpty()) {
-            Model.getInstance().setAllChatCells();
-        }
+        listChat.setItems(Model.getInstance().getChatCells());
+
+        // Set the custom cell factory
+        listChat.setCellFactory(listView -> new ChatCellFactory());
     }
 }
