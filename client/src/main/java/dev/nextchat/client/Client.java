@@ -39,7 +39,13 @@ public class Client {
             // Step 2: Continuous communication
             while (true) {
                 System.out.print("Enter username (or type 'exit' to quit): ");
-                String username = scanner.nextLine();
+                String username = null;
+                if (scanner.hasNextLine()) {
+                    username = scanner.nextLine();
+                } else {
+                    System.out.println("No input detected. Exiting...");
+                    break;
+                }
 
                 if ("exit".equalsIgnoreCase(username)) {
                     outputStream.write("exit".getBytes("UTF-8"));
