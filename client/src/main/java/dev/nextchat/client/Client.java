@@ -21,8 +21,8 @@ public class Client {
         try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
-                Scanner scanner = new Scanner(System.in)) {
-
+                Scanner scanner = new Scanner(System.in);) {
+            
             // Step 1: Perform Handshake
             byte[] buffer = new byte[1024];
             int bytesRead = inputStream.read(buffer);
@@ -39,14 +39,17 @@ public class Client {
             // Step 2: Continuous communication
             while (true) {
                 System.out.print("Enter username (or type 'exit' to quit): ");
-                String username = null;
-                if (scanner.hasNextLine()) {
-                    username = scanner.nextLine();
-                } else {
+
+                if (!scanner.hasNextLine()) {
                     System.out.println("No input detected. Exiting...");
                     break;
                 }
-
+                
+                String username = scanner.nextLine().trim();  // Read username
+                if (username.isEmpty()) {
+                    System.out.println("No username detected. Exiting...");
+                    break;
+                }
                 if ("exit".equalsIgnoreCase(username)) {
                     outputStream.write("exit".getBytes("UTF-8"));
                     outputStream.flush();
@@ -55,6 +58,7 @@ public class Client {
 
                 System.out.print("Enter password: ");
                 String password = scanner.nextLine();
+                
 
                 // Step 3: Send JSON payload
                 JSONObject payload = createJsonPayload(username, password);

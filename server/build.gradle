@@ -55,3 +55,7 @@ tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
+bootRun {
+    systemProperty "server.port", "9090"
+}
