@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="750.0" prefWidth="317.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.ChatsController">
+   <children>
+      <VBox prefHeight="162.0" prefWidth="317.0" styleClass="left_ctn" stylesheets="@../Styles/Chats.css" AnchorPane.bottomAnchor="588.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Pane prefHeight="54.0" prefWidth="289.0" styleClass="header">
+               <children>
+                  <Text fx:id="user_name" layoutX="59.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hi, AndrwPham">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Text>
+                  <Button fx:id="dots_btn" layoutX="278.0" layoutY="16.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="19.0">
+                      <graphic>
+                        <FontAwesomeIconView glyphName="ELLIPSIS_V" size="16" />
+                     </graphic>
+                     <contextMenu>
+                        <ContextMenu fx:id="contextMenu">
+                          <items>
+                              <MenuItem fx:id="newGroup" text="New Group" />
+                              <MenuItem fx:id="newMess" text="New Messages" />
+                          </items>
+                        </ContextMenu>
+                     </contextMenu>
+                  </Button>
+                  <Circle fill="#f2f2f2" layoutX="36.0" layoutY="26.0" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
+               </children>
+            </Pane>
+            <VBox prefHeight="81.0" prefWidth="317.0" styleClass="mid_ctn">
+               <children>
+                  <Label prefHeight="19.0" prefWidth="53.0" text="Chats" />
+                  <TextField prefHeight="26.0" prefWidth="258.0" />
+                  <HBox prefHeight="72.0" prefWidth="317.0" styleClass="mid_ctn">
+                     <children>
+                        <Button fx:id="all_btn" mnemonicParsing="false" text="All" />
+                        <Button fx:id="groups_btn" mnemonicParsing="false" text="Groups" />
+                        <Button fx:id="fav_btn" mnemonicParsing="false" text="Favourite" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+      <ListView fx:id="listChat" layoutY="162.0" prefHeight="588.0" prefWidth="317.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+   </children>
+</AnchorPane>

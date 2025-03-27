@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<AnchorPane prefHeight="750.0" prefWidth="533.0" styleClass="chat_box" stylesheets="@../Styles/Messages.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.MessagesController">
+   <children>
+      <Pane prefHeight="49.0" prefWidth="533.0" styleClass="header_ctn" AnchorPane.bottomAnchor="700.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox prefHeight="50.0" prefWidth="215.0" spacing="15.0">
+               <children>
+                  <Circle fill="#eaecee" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
+                  <Label fx:id="Fid" text="Fuisloy" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="TOP_RIGHT" layoutX="337.0" prefHeight="49.0" prefWidth="196.0" spacing="25.0">
+               <children>
+                  <Button fx:id="search_msg" mnemonicParsing="false">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="SEARCH" size="20" />
+                     </graphic>
+                  </Button>
+                  <Button fx:id="menu" mnemonicParsing="false">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="ELLIPSIS_V" size="20" />
+                     </graphic>
+                  </Button>
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="25.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </Pane>
+      <Pane layoutY="688.0" prefHeight="62.0" prefWidth="533.0" styleClass="header_ctn" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="688.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="50.0" prefWidth="533.0" spacing="10.0">
+               <children>
+                  <Button fx:id="more_btn" mnemonicParsing="false">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="PLUS" size="20" />
+                     </graphic>
+                  </Button>
+                  <TextField fx:id="msg_inp" prefHeight="51.0" prefWidth="420.0" promptText="Type Message" style="-fx-background-color: white;" />
+                  <Button fx:id="send_btn" mnemonicParsing="false">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="SEND" size="20"  />
+                     </graphic>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets left="10.0" right="10.0" top="5.0" />
+               </padding>
+            </HBox>
+         </children>
+      </Pane>
+      <ScrollPane hbarPolicy="NEVER" layoutY="50.0" prefHeight="638.0" prefWidth="533.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
+         <content>
+            <VBox fx:id="chatContainer" prefHeight="637.0" prefWidth="517.0" styleClass="chat_box" />
+         </content></ScrollPane>
+   </children>
+</AnchorPane>
