@@ -61,7 +61,7 @@
                   <HBox prefHeight="46.0" prefWidth="259.0" spacing="10.0">
                      <children>
                         <Circle fill="#dbdddf" radius="17.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Label text="AndrwPham (You)">
+                        <Label fx:id= "Uid" text="AndrwPham (You)">
                            <font>
                               <Font size="14.0" />
                            </font>

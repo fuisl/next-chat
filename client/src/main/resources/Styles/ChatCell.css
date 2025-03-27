@@ -20,3 +20,16 @@
     -fx-font-size: 12px;
     -fx-text-fill: #aaaaaa;
 }
+.my-chat-button {
+    /* Use whatever color or gradient you want here */
+    -fx-background-color: white;
+    -fx-background-radius: 0;     /* Optional: remove rounded corners */
+    -fx-text-fill: #333333;       /* Optional: set text color */
+}
+
+/* Remove focus outlines if you don’t want them */
+.my-chat-button:focused {
+    -fx-background-color: #E6E6E6;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}

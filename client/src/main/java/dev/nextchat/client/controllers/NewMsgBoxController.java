@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
@@ -16,6 +17,7 @@ public class NewMsgBoxController implements Initializable {
     public TextField fusername;
     public Button new_grp_btn;
     public Button chat_btn;
+    public Label Uid;
     private String username;
     private ObservableList<ChatCell> chatCells = FXCollections.observableArrayList();;
 
@@ -28,16 +30,13 @@ public class NewMsgBoxController implements Initializable {
             Model.getInstance().getViewFactory().getClientSelection().set("Chats");
         });
         chat_btn.setOnAction(e -> {
-            String enteredUsername = fusername.getText().trim();
+            String enteredUsername = Uid.getText().trim();
             if (!enteredUsername.isEmpty()) {
                 Model.getInstance().newChatCell(enteredUsername);
                 Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
                 Model.getInstance().getViewFactory().getClientSelection().set("Chats");
             }
         });
-    }
-    public void setChatCells(ObservableList<ChatCell> chatCells) {
-        this.chatCells = chatCells;
     }
 
 }
