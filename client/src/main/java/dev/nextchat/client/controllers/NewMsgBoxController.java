@@ -37,6 +37,9 @@ public class NewMsgBoxController implements Initializable {
                 Model.getInstance().getViewFactory().getClientSelection().set("Chats");
             }
         });
+        new_grp_btn.setOnAction(e -> {
+            Model.getInstance().getViewFactory().getClientSelection().set("Group");
+        });
     }
 
 }

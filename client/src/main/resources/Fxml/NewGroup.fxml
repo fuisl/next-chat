@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="550.0" prefWidth="317.0" stylesheets="@../Styles/NewMsgBox.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.NewGroupController">
+   <children>
+      <VBox prefHeight="100.0" prefWidth="317.0" styleClass="main_ctn" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0" styleClass="additional_HBox">
+               <children>
+                  <Button fx:id="return_btn" mnemonicParsing="false">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="ARROW_LEFT" size="16" />
+                     </graphic>
+                  </Button>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Add Group Members">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+             <HBox prefHeight="42.0" prefWidth="324.0" styleClass="additional_HBox">
+                 <children>
+                     <Button mnemonicParsing="false" prefHeight="24.0" prefWidth="17.0">
+                         <graphic>
+                             <FontAwesomeIconView glyphName="SEARCH" />
+                         </graphic>
+                     </Button>
+                     <TextField fx:id="fusername" prefHeight="29.0" prefWidth="254.0" promptText="Search Username" styleClass="search-bar" />
+                 </children>
+             </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

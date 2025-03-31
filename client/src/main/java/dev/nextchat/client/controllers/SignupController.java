@@ -16,15 +16,22 @@ public class SignupController implements Initializable {
     public TextField passwordConfirm;
     public Button signin_btn;
     public Label error_lbl;
+    public Button login_btn;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         signin_btn.setOnAction(e -> signingin());
+        login_btn.setOnAction(e -> login());
     }
 
     private void signingin() {
         Stage stage = (Stage) signin_btn.getScene().getWindow();
         Model.getInstance().getViewFactory().closeStage(stage);
         Model.getInstance().getViewFactory().showClientWindow();
+    }
+    private void login() {
+        Stage stage = (Stage) signin_btn.getScene().getWindow();
+        Model.getInstance().getViewFactory().closeStage(stage);
+        Model.getInstance().getViewFactory().showLoginWindow();
     }
 }

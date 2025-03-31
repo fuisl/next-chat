@@ -33,11 +33,17 @@ public class ChatsController implements Initializable {
         newMess.setOnAction(event -> {
             createNewMsgBox();
         });
+        newGroup.setOnAction(event -> {
+            createNewGroup();
+        });
 
+    }
+    private void createNewGroup(){
+        Model.getInstance().getViewFactory().getClientSelection().set("Group");
     }
 
     private void createNewMsgBox() {
-        Model.getInstance().getViewFactory().getClientSelection().set("New Message");
+        Model.getInstance().getViewFactory().getClientSelection().set("Message");
     }
 
     private void onChatMess() {

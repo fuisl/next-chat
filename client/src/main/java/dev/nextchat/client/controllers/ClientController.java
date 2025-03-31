@@ -24,14 +24,16 @@ public class ClientController implements Initializable {
         });
 
         Model.getInstance().getViewFactory().getClientSelection().addListener((observable, oldVal, newVal) -> {
-            if (newVal != null) {
-                client_parent.setCenter(Model.getInstance().getViewFactory().getNewMsgWindow());
+            switch (newVal) {
+                case "Message" -> client_parent.setCenter(Model.getInstance().getViewFactory().getNewMsgWindow());
+                case "Group" -> client_parent.setCenter(Model.getInstance().getViewFactory().getNewGroupWindow());
             }
             if ("Chats".equals(newVal)){
                 client_parent.setCenter(originalCenter);
             }
         });
-    }
+
+        }
 
 
 }

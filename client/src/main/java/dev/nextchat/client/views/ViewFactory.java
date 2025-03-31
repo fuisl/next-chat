@@ -17,6 +17,7 @@ public class ViewFactory {
     private AnchorPane chatsView;
     private AnchorPane msgView;
     private AnchorPane newMsgView;
+    private AnchorPane newGroupView;
     private final StringProperty clientSelection;
 
     public ViewFactory() {
@@ -113,6 +114,16 @@ public class ViewFactory {
         return newMsgView;
     }
 
+    public AnchorPane getNewGroupWindow() {
+        if (newGroupView == null) {
+            try{
+                newGroupView = new FXMLLoader(getClass().getResource("/Fxml/NewGroup.fxml")).load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return newGroupView;
+    }
     public void closeStage(Stage stage) {
         stage.close();
     }
