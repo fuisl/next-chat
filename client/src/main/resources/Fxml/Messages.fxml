@@ -53,7 +53,7 @@
                   <TextField fx:id="msg_inp" prefHeight="51.0" prefWidth="420.0" promptText="Type Message" style="-fx-background-color: white;" />
                   <Button fx:id="send_btn" mnemonicParsing="false">
                      <graphic>
-                        <FontAwesomeIconView glyphName="SEND" size="20"  />
+                        <FontAwesomeIconView glyphName="SEND" size="20" />
                      </graphic>
                   </Button>
                </children>
@@ -63,7 +63,7 @@
             </HBox>
          </children>
       </Pane>
-      <ScrollPane hbarPolicy="NEVER" layoutY="50.0" prefHeight="638.0" prefWidth="533.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
+      <ScrollPane fx:id="sp_main" hbarPolicy="NEVER" layoutY="50.0" prefHeight="638.0" prefWidth="533.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
          <content>
             <VBox fx:id="chatContainer" prefHeight="637.0" prefWidth="517.0" styleClass="chat_box" />
          </content></ScrollPane>
