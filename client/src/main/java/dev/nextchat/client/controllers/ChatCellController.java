@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 public class ChatCellController implements Initializable {
@@ -25,7 +26,20 @@ public class ChatCellController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         fusername.textProperty().bind(cell.senderProperty());
         txt_msg.textProperty().bind(cell.txtMsgProperty());
-        txt_date.textProperty().bind(cell.dateProperty().asString());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+
+        if (cell.timestampProperty().get() != null) {
+            txt_date.setText(cell.timestampProperty().get().format(formatter));
+        } else {
+            txt_date.setText(""); // or "—"
+        }
+
+        // Optional: listen for changes and update time dynamically
+        cell.timestampProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                txt_date.setText(newVal.format(formatter));
+            }
+        });
     }
     @FXML
     public void onChatButtonClick() {

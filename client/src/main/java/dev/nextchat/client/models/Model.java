@@ -23,6 +23,20 @@ public class Model {
         }
         return model;
     }
+
+    public ChatCell findOrCreateChatCell(String receiver) {
+        for (ChatCell cell : chatCells) {
+            if (cell.senderProperty().get().equals(receiver)) {
+                return cell;
+            }
+        }
+
+        ChatCell newCell = new ChatCell(receiver, "", null);
+        chatCells.add(newCell);
+        System.out.println("New ChatCell created for: " + receiver);
+        return newCell;
+    }
+
     public ViewFactory getViewFactory() {
         return viewFactory;
     }
@@ -38,6 +52,8 @@ public class Model {
             System.out.println("New ChatCell added for user: " + fusername);
         }
     }
+
+
 
 
 }

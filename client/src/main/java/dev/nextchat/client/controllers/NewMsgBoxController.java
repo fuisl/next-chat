@@ -19,7 +19,6 @@ public class NewMsgBoxController implements Initializable {
     public Button chat_btn;
     public Label Uid;
     private String username;
-    private ObservableList<ChatCell> chatCells = FXCollections.observableArrayList();;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -30,9 +29,9 @@ public class NewMsgBoxController implements Initializable {
             Model.getInstance().getViewFactory().getClientSelection().set("Chats");
         });
         chat_btn.setOnAction(e -> {
-            String enteredUsername = Uid.getText().trim();
+            String enteredUsername = Uid.getText().trim(); // Uid = AndrwPham(demo)
             if (!enteredUsername.isEmpty()) {
-                Model.getInstance().newChatCell(enteredUsername);
+                ChatCell cell = Model.getInstance().findOrCreateChatCell(enteredUsername);
                 Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
                 Model.getInstance().getViewFactory().getClientSelection().set("Chats");
             }
@@ -41,5 +40,7 @@ public class NewMsgBoxController implements Initializable {
             Model.getInstance().getViewFactory().getClientSelection().set("Group");
         });
     }
+
+
 
 }
