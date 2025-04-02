@@ -8,11 +8,18 @@ import java.util.Optional;
 
 @Service
 public class Authenticator {
+    private static Authenticator instance; 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
     private UserRepository userRepository;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    public static Authenticator getInstance() {
+        if (instance == null) {
+            instance = new Authenticator();
+        }
+        return instance;
+    }
 
     public boolean signIn(Credential cred) {
         Optional<User> userOpt = userRepository.findByUsername(cred.getUsername());
@@ -25,7 +32,7 @@ public class Authenticator {
             return false;
         }
 
-        User newUser = new User(cred.getUsername(), passwordEncoder.encode(cred.getHashedPassword()));
+        User newUser = new User(cred.getUsername(), cred.getHashedPassword());
         userRepository.save(newUser);
         return true;
     }
