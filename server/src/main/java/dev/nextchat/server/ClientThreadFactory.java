@@ -1,7 +1,6 @@
 package dev.nextchat.server;
 
 import java.util.concurrent.ThreadFactory;
-
 public class ClientThreadFactory implements ThreadFactory {
     private int counter = 0;
 

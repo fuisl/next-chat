@@ -14,6 +14,11 @@ import org.json.JSONObject;
 public class ClientHandler implements Runnable {
     private final Socket socket;
 
+    // Get Session ID to identify the user
+    // private static final userID getSession (){
+    //     return new userID();
+    // }
+
     public ClientHandler(Socket socket) {
         this.socket = socket;
     }
@@ -81,6 +86,27 @@ public class ClientHandler implements Runnable {
             System.out.printf("Exception occurred for %s: %s%n", socket.getInetAddress(), e.getMessage());
         } finally {
             try {
+                // switch (clientInput) {
+                //     case "authenticate":
+                //         // Simulating user authentication (you should replace this with real authentication logic)
+                //         String userId = chatMessage.getSender();
+                //         userSessions.put(userId, session);
+                //         log.info("User authenticated: {}", userId);
+                //         session.sendMessage(new TextMessage("Authenticated as " + userId));
+                //         break;
+        
+                //     case "getUserID":
+                //         // Simulating user ID retrieval (you should replace this with real logic)
+                //         String userId = getSession();
+                //         out.writeUTF("User ID: " + userId + "\n");
+                //         out.flush();
+                //         break;
+        
+                //     default:
+                //         // Handle other messages (e.g., chat messages)
+                //         session.close();
+                //         break;
+                // }
                 socket.close();
                 System.out.printf("Connection closed for %s%n", socket.getInetAddress());
             } catch (IOException e) {
