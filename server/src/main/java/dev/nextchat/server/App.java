@@ -37,10 +37,8 @@ public class App {
                 auth.signUp(cred);
                 out.println("Account created successfully");
             } 
-            catch (SQLIntegrityConstraintViolationException e) {
-                out.println("Username already exists");
-            } 
-            catch (SQLException e) {
+            catch (Exception e) { // Catching a generic exception if signUp throws any runtime exceptions
+                out.println("An error occurred: " + e.getMessage());
                 e.printStackTrace();
             }
         }
