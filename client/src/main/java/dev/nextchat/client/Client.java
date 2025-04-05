@@ -5,12 +5,30 @@ package dev.nextchat.client;
 
 import javafx.application.Application;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.net.ConnectException;
+
+import dev.nextchat.client.backend.ConnectionManager;
+import dev.nextchat.client.backend.MessageController;
 
 @SpringBootApplication(proxyBeanMethods = false)
 
 public class Client {
     public static void main(String[] args) {
-        Application.launch(App.class, args);
+        try {
+            ConnectionManager connectionManager = new ConnectionManager();
+            String status = connectionManager.init();
+
+            if (status.equals("FAIL")) {
+                throw new ConnectException("Failed connecting to server.");
+            }
+
+            MessageController messageController = new MessageController(connectionManager);
+            messageController.start();
+        } catch (ConnectException e) {
+            e.printStackTrace();
+        }
+        
+        // Application.launch(App.class, args);
     }
 }
 

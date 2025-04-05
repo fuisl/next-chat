@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 public class ConnectionManager {
     private final String SERVER_ADDRESS = "localhost";
-    private final int SERVER_PORT = 5001;
+    private final int SERVER_PORT = 1234;
     private String TOKEN = "some_token";
     private BufferedReader reader;
     private PrintWriter writer;
@@ -21,11 +21,12 @@ public class ConnectionManager {
 
     public String init() {
         try (
+            BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in))
+        ) {
             Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
-            BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in))
-        ) {
+
             System.out.println("Sending handshake response...");
             writer.println("HELLO_SERVER");
 

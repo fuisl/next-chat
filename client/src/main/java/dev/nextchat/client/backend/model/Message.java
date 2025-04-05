@@ -1,4 +1,4 @@
-package dev.nextchat.client.models;
+package dev.nextchat.client.backend.model;
 
 import java.time.Instant;
 import java.util.UUID;
