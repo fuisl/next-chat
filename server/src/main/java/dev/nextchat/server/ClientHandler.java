@@ -11,12 +11,27 @@ import java.net.Socket;
 
 import org.json.JSONObject;
 
+// import dev.nextchat.server.controllers.MessageController;
+
 public class ClientHandler implements Runnable {
     private final Socket socket;
 
     // Get Session ID to identify the user
     // private static final userID getSession (){
     //     return new userID();
+    // }
+
+    //temp data type for sending thread testing
+    // private static class Client {
+    //     public String tempMessage; // Example message to send
+    //     public String tempGroupId; // Example group ID to send the message to
+    //     public String tempSessionCode; // Example session code to send the message to
+
+    //     public Client() {
+    //         this.tempMessage = "Hello from sending thread!";
+    //         this.tempGroupId = "12345";
+    //         this.tempSessionCode = "11111";
+    //     }
     // }
 
     public ClientHandler(Socket socket) {
@@ -40,6 +55,31 @@ public class ClientHandler implements Runnable {
             if (!"HELLO_SERVER".equals(handshakeResponse)) {
                 System.out.println("Handshake failed. Closing connection.");
                 return;
+            // // Send welcome message
+            // output.println("Welcome to the server!");
+
+            // String clientInput;
+            // while ((clientInput = input.readLine()) != null) {
+            //     System.out.printf("Received from %s: %s%n", socket.getInetAddress(), clientInput);
+
+            //     switch (clientInput) {
+            //         // case "authenticate":
+            //         //     // Simulate user authentication
+            //         //     output.println("Please enter your user ID:");
+            //         //     String userId = input.readLine();
+            //         //     // Simulate successful authentication
+            //         //     output.println("Authenticated as " + userId);
+            //         //     break;
+
+            //         case "onMessageSendingRequest":
+            //             // Simulate getting user ID
+            //             // Example client data to send
+            //             new MessageController(socket);
+            //             break;
+
+            //         default:
+            //             output.println("Unknown command: " + clientInput);
+            //     }
             }
             System.out.println("Handshake successful!");
 
@@ -86,27 +126,7 @@ public class ClientHandler implements Runnable {
             System.out.printf("Exception occurred for %s: %s%n", socket.getInetAddress(), e.getMessage());
         } finally {
             try {
-                // switch (clientInput) {
-                //     case "authenticate":
-                //         // Simulating user authentication (you should replace this with real authentication logic)
-                //         String userId = chatMessage.getSender();
-                //         userSessions.put(userId, session);
-                //         log.info("User authenticated: {}", userId);
-                //         session.sendMessage(new TextMessage("Authenticated as " + userId));
-                //         break;
-        
-                //     case "getUserID":
-                //         // Simulating user ID retrieval (you should replace this with real logic)
-                //         String userId = getSession();
-                //         out.writeUTF("User ID: " + userId + "\n");
-                //         out.flush();
-                //         break;
-        
-                //     default:
-                //         // Handle other messages (e.g., chat messages)
-                //         session.close();
-                //         break;
-                // }
+                
                 socket.close();
                 System.out.printf("Connection closed for %s%n", socket.getInetAddress());
             } catch (IOException e) {
