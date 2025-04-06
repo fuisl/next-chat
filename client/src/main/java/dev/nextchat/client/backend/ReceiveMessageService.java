@@ -28,15 +28,21 @@ public class ReceiveMessageService implements Runnable {
         try {
             String jsonMessage;
             
-            while (running && (jsonMessage = this.reader.readLine()) != null) {
-                Message message = this.objectMapper.readValue(jsonMessage, Message.class);
+            while (running) {
+                if (reader.ready()) {
+                    jsonMessage = reader.readLine();
 
-                System.out.println("Received message for groupID: " + message.getGroupId().toString());
+                    Message message = this.objectMapper.readValue(jsonMessage, Message.class);
 
-                this.receivedMessageQueue.put(message);
+                    // System.out.println("Received message for groupID: " + message.getGroupId().toString());
+                    System.out.println(message.getMessage());
+
+                    this.receivedMessageQueue.put(message);
+                }                
             }
         } catch (InterruptedException e){
-            System.out.println("ReceiverService interrupted, shutting down thread...");
+            this.running = false;
+            System.out.println("ReceiveService interrupted, shutting down thread...");
             e.printStackTrace();
             Thread.currentThread().interrupt();
         } catch (IOException e) {

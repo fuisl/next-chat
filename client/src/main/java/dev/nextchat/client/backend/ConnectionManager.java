@@ -20,9 +20,7 @@ public class ConnectionManager {
     public ConnectionManager(){};
 
     public String init() {
-        try (
-            BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in))
-        ) {
+        try {
             Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
