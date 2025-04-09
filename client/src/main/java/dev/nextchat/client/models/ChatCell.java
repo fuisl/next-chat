@@ -4,6 +4,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ public class ChatCell {
     private final StringProperty sender;
     private final StringProperty txt_msg;
     private final ObjectProperty<LocalDateTime> timestamp;
+    private final ObservableList<Message> messages = FXCollections.observableArrayList(); // Store msg
 
     public ChatCell(final String sender, final String txt_msg, final LocalDateTime timestamp) {
         this.sender = new SimpleStringProperty(this,"Sender",sender);
@@ -29,5 +32,14 @@ public class ChatCell {
         return this.timestamp;
     }
 
+    public ObservableList<Message> getMessages() {
+        return messages;
+    }
+
+    public void addMessage(Message message) {
+        messages.add(message);
+        txt_msg.set(message.getMessage());
+        timestamp.set(message.getTimestamp());
+    }
 
 }

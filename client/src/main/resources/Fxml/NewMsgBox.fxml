@@ -26,12 +26,12 @@
             </HBox>
             <HBox prefHeight="42.0" prefWidth="324.0">
                <children>
-                  <Button mnemonicParsing="false" prefHeight="24.0" prefWidth="17.0">
+                  <Button fx:id="chat_btn" mnemonicParsing="false" prefHeight="24.0" prefWidth="17.0">
                      <graphic>
                         <FontAwesomeIconView glyphName="SEARCH" />
                      </graphic>
                   </Button>
-                  <TextField fx:id="fusername" prefHeight="26.0" prefWidth="254.0" promptText="Search Username" styleClass="search-bar" />
+                  <TextField fx:id="fusername" prefHeight="29.0" prefWidth="231.0" promptText="Search Username" styleClass="search-bar" />
                </children>
                <padding>
                   <Insets right="10.0" />
@@ -54,7 +54,7 @@
       </VBox>
       <Pane layoutY="134.0" prefHeight="415.0" prefWidth="317.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="134.6">
          <children>
-            <Button fx:id="chat_btn" mnemonicParsing="false" prefHeight="53.0" prefWidth="317.0">
+            <Button fx:id="self_chat" mnemonicParsing="false" prefHeight="53.0" prefWidth="317.0">
                <graphic>
                   <HBox prefHeight="46.0" prefWidth="259.0" spacing="10.0">
                      <children>

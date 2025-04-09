@@ -63,9 +63,7 @@
             </HBox>
          </children>
       </Pane>
-      <ScrollPane fx:id="sp_main" hbarPolicy="NEVER" layoutY="50.0" prefHeight="638.0" prefWidth="533.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
-         <content>
-            <VBox fx:id="chatContainer" prefHeight="637.0" prefWidth="517.0" styleClass="chat_box" />
-         </content></ScrollPane>
+      <ListView fx:id="msgListView" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                AnchorPane.topAnchor="50.0" AnchorPane.bottomAnchor="62.0"/>
    </children>
 </AnchorPane>

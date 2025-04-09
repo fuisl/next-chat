@@ -10,6 +10,8 @@ import javafx.collections.ObservableList;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.util.Optional;
+import java.util.UUID;
 
 public class Model {
     private  static Model model;
@@ -63,17 +65,22 @@ public class Model {
         return false;
     }
 
-    public ChatCell findOrCreateChatCell(String receiver) {
-        for (ChatCell cell : chatCells) {
-            if (cell.senderProperty().get().equals(receiver)) {
-                return cell;
-            }
-        }
+    public ChatCell findOrCreateChatCell(String fusername) {
+        Optional<ChatCell> existing = chatCells.stream() // Avoid nullPointer for debug
+                .filter(c -> c.senderProperty().get().equals(fusername))
+                .findFirst();
 
-        ChatCell newCell = new ChatCell(receiver, "", null);
-        chatCells.add(newCell);
-        System.out.println("New ChatCell created for: " + receiver);
-        return newCell;
+        if (existing.isPresent()) {
+            // UUID groupId = getGroupId(fusername);
+            //System.out.println("Found existing ChatCell for user '" + fusername + "' with groupId: " + groupId);
+            return existing.get();
+        } else {
+            // UUID groupId = createGroupId(fusername);
+            ChatCell cell = new ChatCell(fusername, "", null);
+            chatCells.add(cell);
+            //System.out.println("Created new ChatCell for user '" + fusername + "' with groupId: " + groupId);
+            return cell;
+        }
     }
 
     public ViewFactory getViewFactory() {
@@ -82,13 +89,5 @@ public class Model {
 
     public ObservableList<ChatCell> getChatCells() {
         return chatCells;
-    }
-
-    public void newChatCell(String fusername) {
-        if (fusername != null && !fusername.trim().isEmpty()) {
-            ChatCell newCell = new ChatCell(fusername, "", null);
-            chatCells.add(newCell);
-            System.out.println("New ChatCell added for user: " + fusername);
-        }
     }
 }

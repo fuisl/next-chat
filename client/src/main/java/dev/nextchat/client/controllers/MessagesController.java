@@ -3,10 +3,13 @@ package dev.nextchat.client.controllers;
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
 import dev.nextchat.client.models.Message;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -23,66 +26,64 @@ public class MessagesController implements Initializable {
     public Button more_btn;
     public TextField msg_inp;
     public Button send_btn;
-    public VBox chatContainer;
     public Label Fid;
-    public ScrollPane sp_main;
-    private String fusername;
+    public ListView<Message> msgListView;
 
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        chatContainer.heightProperty().addListener((observable, oldValue, newValue) -> {
-            sp_main.setVvalue((Double) newValue);
-        });
-
         send_btn.setOnAction(e -> {
-            String sender = "me"; // Replace with: Model.getInstance().getCurrentUser().getUsername()
+            String content = msg_inp.getText().trim();
+            if (content.isEmpty()) return;
+
+            String sender = Model.getInstance().getLoggedInUser(); 
             String receiver = Fid.getText();
-            String msg = msg_inp.getText().trim();
-            Message message = new Message(sender, receiver, msg, LocalDateTime.now()); // receiver == groupID
 
-            ChatCell cell = Model.getInstance().findOrCreateChatCell(receiver);
-            cell.txtMsgProperty().set(msg);
-            cell.timestampProperty().set(message.getTimestamp());
+            Message msg = new Message(sender, receiver, content, LocalDateTime.now());
 
-            if (!msg.isEmpty()){
-                HBox hbox = new HBox();
-                hbox.setAlignment(Pos.CENTER_RIGHT);
-                hbox.setPadding(new Insets(5,5,-3,10));
-                Text text = new Text(msg);
-                TextFlow textFlow = new TextFlow(text);
 
-                textFlow.setStyle("-fx-color: white;" +
-                        " -fx-background-color: #3a54fb;" +
-                        "-fx-background-radius: 15px;" +
-                        "-fx-font-size: 14px;");
-
-                textFlow.setPadding(new Insets(5,10,5,10));
-                text.setFill(Color.color(0.934,0.945,0.996));
-
-                hbox.getChildren().add(textFlow);
-                chatContainer.getChildren().add(hbox);
-
-            }
-
+            // Store locally in chat history
+            ChatCell chat = Model.getInstance().findOrCreateChatCell(receiver);
+            chat.addMessage(msg);
 
             msg_inp.clear();
-            System.out.println("Built message: " + message);
-
         });
 
+        // Loading new chat
         Model.getInstance().getViewFactory().getClientSelectedChat().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.isBlank()) {
-                Fid.setText(newVal);
-
+                loadChat(newVal);
             }
         });
 
+        // Initial load on startup
         String currentUser = Model.getInstance().getViewFactory().getClientSelectedChat().get();
         if (currentUser != null && !currentUser.isBlank()) {
-            Fid.setText(currentUser);
+            loadChat(currentUser);
         }
+
+        // Custom message bubble rendering
+        msgListView.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(Message msg, boolean empty) {
+                super.updateItem(msg, empty);
+
+                if (empty || msg == null) {
+                    setGraphic(null);
+                } else {
+                    boolean isSender =  true;// msg.getSenderId().equals(Model.getInstance().getCurrentUserId());
+                    Node bubble = Model.getInstance().getViewFactory().getMessageBubble(msg, isSender);
+                    setGraphic(bubble);
+                }
+            }
+        });
     }
+    private void loadChat(String username) {
+        Fid.setText(username);
+        ChatCell selectedChat = Model.getInstance().findOrCreateChatCell(username);
+        msgListView.setItems(selectedChat.getMessages());
+    }
+
 
 }
