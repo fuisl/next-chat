@@ -3,52 +3,51 @@
  */
 package dev.nextchat.client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
+import dev.nextchat.client.models.Model;
+import javafx.application.Application;
+import javafx.application.HostServices;
+import javafx.application.Platform;
+import javafx.stage.Stage;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
+public class App extends Application {
+    private ConfigurableApplicationContext applicationContext;
+
+    @Override
+    public void init() {
+        ApplicationContextInitializer<GenericApplicationContext> initializer = ac -> {
+            ac.registerBean(Application.class, () -> App.this);
+            ac.registerBean(Parameters.class, this::getParameters);
+            ac.registerBean(HostServices.class, this::getHostServices);
+        };
+
+        this.applicationContext = new SpringApplicationBuilder(Client.class)
+                .initializers(initializer)  // Add this line
+                .run();
     }
 
-    public static void main(String[] args) throws IOException {
-        try {
-            Socket s = new Socket("localhost", 1234);
-            System.out.println("Connected to server.");
+    @Override
+    public void start(Stage stage) {
+        applicationContext.publishEvent(new StageReadyEvent(stage));
+    }
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())); 
-            PrintWriter out = new PrintWriter(s.getOutputStream(), true); 
-            BufferedReader input = new BufferedReader(new InputStreamReader(System.in)); 
+    @Override
+    public void stop() {
+        this.applicationContext.close();
+        Platform.exit();
+    }
+--
+    static class StageReadyEvent extends ApplicationEvent {
+        public StageReadyEvent(Stage stage) {
+            super(stage);
+        }
 
-            // This is the purpose of test and simulation only 
-            System.out.println("Please type 1 to sign-in or 2 to sign-up: ");
-
-            String choice = input.readLine().trim();
-
-            while ( !(choice.equals("1") || choice.equals("2")) ) {
-                System.out.println("Invalid input. Please type 1 to sign-in or 2 to sign-up: "); 
-                choice = input.readLine().trim();
-            }
-
-            out.println(choice); 
-
-
-            System.out.println("Please type in your username: ");
-            out.println(input.readLine()); 
-
-            System.out.println("Please type in your password: ");
-            out.println(input.readLine());
-
-            String response = in.readLine();
-            System.out.println("Server response: " + response);            
-        } 
-        
-        catch (Exception e) 
-        {
-            e.printStackTrace();
+        public Stage getStage() {
+            return ((Stage) getSource());
         }
     }
 }
