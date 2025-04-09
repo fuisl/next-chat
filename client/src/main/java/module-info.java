@@ -8,14 +8,17 @@ module dev.nextchat.client {
     requires spring.beans;
     requires jakarta.annotation;
     requires spring.core;
-    requires java.sql;
     requires de.jensd.fx.glyphs.fontawesome;
+    requires com.fasterxml.jackson.databind;
+    requires java.sql;
 
 
     opens dev.nextchat.client to javafx.fxml;
     opens dev.nextchat.client.controllers to javafx.fxml;
+    opens dev.nextchat.client.models to com.fasterxml.jackson.databind;
 
     exports dev.nextchat.client;
     exports dev.nextchat.client.controllers to javafx.fxml;
     exports dev.nextchat.client.models to javafx.fxml;
+
 }

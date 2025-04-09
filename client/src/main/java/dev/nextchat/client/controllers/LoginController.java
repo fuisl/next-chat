@@ -4,6 +4,7 @@ import dev.nextchat.client.models.Model;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -12,7 +13,7 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     public TextField username;
-    public TextField password;
+    public PasswordField password;
     public Label error_lbl;
     public Button login_btn;
     public Button SignUp_btn;
@@ -31,8 +32,16 @@ public class LoginController implements Initializable {
 
 
     public void login() {
-        Stage stage = (Stage) login_btn.getScene().getWindow();
-        Model.getInstance().getViewFactory().closeStage(stage);
-        Model.getInstance().getViewFactory().showClientWindow();
+        String user = username.getText().trim();
+        String pass = password.getText().trim();
+
+        boolean success = Model.getInstance().login(user, pass);
+
+        if (success) {
+            Model.getInstance().getViewFactory().closeStage((Stage) login_btn.getScene().getWindow());
+            Model.getInstance().getViewFactory().showClientWindow();
+        } else {
+            error_lbl.setText("Invalid username or password");
+        }
     }
 }
