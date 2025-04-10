@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 public class LoginController implements Initializable {
     public TextField username;
@@ -43,5 +44,15 @@ public class LoginController implements Initializable {
         } else {
             error_lbl.setText("Invalid username or password");
         }
+
+        System.out.println("Login with userid " + Model.getInstance().getLoggedInUserId());
+        UUID userB_ID = UUID.fromString("fb3fd559-9b3b-43f5-8f17-d6beb452ac74");
+
+        MsgReceiver receiver = new MsgReceiver();
+        new Thread(receiver).start();
+
+        receiver.simulateIncomingMessage(userB_ID);
+
+
     }
 }

@@ -11,6 +11,7 @@ module dev.nextchat.client {
     requires de.jensd.fx.glyphs.fontawesome;
     requires com.fasterxml.jackson.databind;
     requires java.sql;
+    requires com.google.common;
 
 
     opens dev.nextchat.client to javafx.fxml;

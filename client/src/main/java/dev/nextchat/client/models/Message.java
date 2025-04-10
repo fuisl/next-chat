@@ -1,42 +1,65 @@
 package dev.nextchat.client.models;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.UUID;
 
-public class Message implements Serializable {
-    private String sender;
-    private String message;
-    private String groupID;
-    private LocalDateTime timestamp;
+public class Message {
 
-    public Message(String sender, String groupID, String message, LocalDateTime timestamp) {
-        this.sender = sender;
-        this.groupID = groupID;
+    protected UUID id;
+    private UUID senderId;
+    protected UUID groupId;
+    protected String message;
+    protected Instant timestamp;
+
+    // Constructors
+    public Message() {}
+
+    public Message(UUID id, UUID senderId, UUID groupId, String message, Instant timestamp) {
+        this.id = UUID.randomUUID();
+        this.senderId = senderId;
+        this.groupId = groupId;
         this.message = message;
         this.timestamp = timestamp;
     }
 
-    public String getSender() {
-        return sender;
+    // Getters and setters
+    public UUID getId() {
+        return id;
     }
 
-    public String getGroupID() {
-        return groupID;
+    public UUID getSenderId() {
+        return senderId;
+    }
+
+    public UUID getGroupId() {
+        return groupId;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public LocalDateTime getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-
-    // debug
-    @Override
-    public String toString() {
-        return "[" + timestamp + "] " + sender + " -> " + groupID + ": " + message;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
+    public void setSenderId(UUID senderId) {
+        this.senderId = senderId;
+    }
+
+    public void setGroupId(UUID groupId) {
+        this.groupId = groupId;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
+    }
 }

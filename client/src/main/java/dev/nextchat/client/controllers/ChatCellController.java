@@ -22,6 +22,11 @@ public class ChatCellController implements Initializable {
     public ChatCellController(ChatCell cell) {
         this.cell = cell;
     }
+
+    private String formatInstant(java.time.Instant instant, DateTimeFormatter formatter) {
+        return java.time.LocalDateTime.ofInstant(instant, java.time.ZoneId.systemDefault()).format(formatter);
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         fusername.textProperty().bind(cell.senderProperty());
@@ -29,7 +34,8 @@ public class ChatCellController implements Initializable {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
 
         if (cell.timestampProperty().get() != null) {
-            txt_date.setText(cell.timestampProperty().get().format(formatter));
+            String formattedTime = formatInstant(cell.timestampProperty().get(), formatter);
+            txt_date.setText(formattedTime);
         } else {
             txt_date.setText(""); // or "—"
         }
@@ -37,7 +43,8 @@ public class ChatCellController implements Initializable {
         // Optional: listen for changes and update time dynamically
         cell.timestampProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                txt_date.setText(newVal.format(formatter));
+                String formattedTime = formatInstant(newVal, formatter);
+                txt_date.setText(formattedTime);
             }
         });
     }

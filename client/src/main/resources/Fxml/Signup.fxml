@@ -47,7 +47,7 @@
                   <Insets />
                </opaqueInsets>
             </HBox>
-            <Label fx:id="error_lbl" prefHeight="21.0" prefWidth="200.0" styleClass="error_lbl">
+            <Label fx:id="error_lbl" prefHeight="21.0" prefWidth="250.0" styleClass="error_lbl">
                <font>
                   <Font size="15.0" />
                </font>

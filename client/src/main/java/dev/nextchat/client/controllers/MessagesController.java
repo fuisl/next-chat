@@ -5,6 +5,7 @@ import dev.nextchat.client.models.Model;
 import dev.nextchat.client.models.Message;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -18,6 +19,7 @@ import javafx.scene.text.TextFlow;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 public class MessagesController implements Initializable {
 
@@ -37,14 +39,14 @@ public class MessagesController implements Initializable {
             String content = msg_inp.getText().trim();
             if (content.isEmpty()) return;
 
-            String sender = Model.getInstance().getLoggedInUser(); 
-            String receiver = Fid.getText();
+            UUID groupId = Model.getInstance().createGroupId(Fid.getText().trim());
+            UUID senderId = Model.getInstance().getLoggedInUserId();
 
-            Message msg = new Message(sender, receiver, content, LocalDateTime.now());
+            Message msg = new Message(UUID.randomUUID(),senderId, groupId, content, Instant.now());
 
 
             // Store locally in chat history
-            ChatCell chat = Model.getInstance().findOrCreateChatCell(receiver);
+            ChatCell chat = Model.getInstance().findOrCreateChatCell(Fid.getText().trim());
             chat.addMessage(msg);
 
             msg_inp.clear();
@@ -72,12 +74,13 @@ public class MessagesController implements Initializable {
                 if (empty || msg == null) {
                     setGraphic(null);
                 } else {
-                    boolean isSender =  true;// msg.getSenderId().equals(Model.getInstance().getCurrentUserId());
+                    boolean isSender = msg.getSenderId().equals(Model.getInstance().getLoggedInUserId());
                     Node bubble = Model.getInstance().getViewFactory().getMessageBubble(msg, isSender);
                     setGraphic(bubble);
                 }
             }
         });
+
     }
     private void loadChat(String username) {
         Fid.setText(username);

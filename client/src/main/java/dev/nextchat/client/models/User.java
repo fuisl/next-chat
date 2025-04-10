@@ -1,20 +1,25 @@
 package dev.nextchat.client.models;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import java.util.UUID;
 
-public class Client {
+public class User {
+    private UUID userId;
     private String username;
     private String password;
 
-    public Client() {}
+    public User() {}
 
-    public Client(String username, String password) {
+    public User(UUID userId, String username, String password) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
     }
 
     // Getters & Setters
+    public UUID getUserId() {
+        return userId;
+    }
+
     public String getUsername() { return username; }
     public String getPassword() { return password; }
 
