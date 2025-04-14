@@ -1,16 +1,9 @@
 [ {
-  "username" : "AndrwPham",
-  "password" : "123456"
-}, {
-  "username" : "alice",
-  "password" : "alicepass"
-}, {
-  "username" : "AnPham",
-  "password" : "123456"
-}, {
-  "username" : "An123",
-  "password" : "123456"
-}, {
+  "userId" : "6d8b1075-7212-4e30-8ef4-351b1cefdcd8",
   "username" : "An",
+  "password" : "123"
+}, {
+  "userId" : "752406cb-e3d5-4ffe-9eb9-f938835b5faa",
+  "username" : "Ngoc",
   "password" : "123"
 } ]

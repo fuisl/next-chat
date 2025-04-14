@@ -1,20 +1,21 @@
 package dev.nextchat.client.models;
 
-import dev.nextchat.client.database.UserDatabase;
-import dev.nextchat.client.views.ViewFactory;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+
+import dev.nextchat.client.database.UserDatabase;
+import dev.nextchat.client.views.ViewFactory;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Model {
     private  static Model model;
@@ -41,12 +42,20 @@ public class Model {
     public void preloadUserIdMapFromJson() {
         try {
             for (User user : UserDatabase.loadUsers()) {
-                userIdMap.put(user.getUsername(), user.getUserId());
+                String username = user.getUsername();
+                UUID userId = user.getUserId();
+    
+                if (username != null && userId != null) {
+                    userIdMap.put(username, userId);
+                } else {
+                    System.err.println("Skipped user due to null: username=" + username + ", userId=" + userId);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    
 
 
     public StringProperty loggedInUserProperty() {

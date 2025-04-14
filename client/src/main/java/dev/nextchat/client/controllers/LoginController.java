@@ -46,7 +46,7 @@ public class LoginController implements Initializable {
         }
 
         System.out.println("Login with userid " + Model.getInstance().getLoggedInUserId());
-        UUID userB_ID = UUID.fromString("fb3fd559-9b3b-43f5-8f17-d6beb452ac74");
+        UUID userB_ID = UUID.fromString("752406cb-e3d5-4ffe-9eb9-f938835b5faa"); //UUID of Ngoc
 
         MsgReceiver receiver = new MsgReceiver();
         new Thread(receiver).start();
