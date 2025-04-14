@@ -9,9 +9,9 @@ module dev.nextchat.client {
     requires jakarta.annotation;
     requires spring.core;
     requires de.jensd.fx.glyphs.fontawesome;
-    requires com.fasterxml.jackson.databind;
-    requires java.sql;
     requires com.google.common;
+    requires com.fasterxml.jackson.datatype.jsr310;
+    requires com.fasterxml.jackson.databind;
 
 
     opens dev.nextchat.client to javafx.fxml;

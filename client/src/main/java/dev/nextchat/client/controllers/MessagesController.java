@@ -1,5 +1,6 @@
 package dev.nextchat.client.controllers;
 
+import dev.nextchat.client.database.MessageQueueManager;
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
 import dev.nextchat.client.models.Message;
@@ -49,6 +50,8 @@ public class MessagesController implements Initializable {
             ChatCell chat = Model.getInstance().findOrCreateChatCell(Fid.getText().trim());
             chat.addMessage(msg);
 
+            MessageQueueManager.enqueueMessage(msg);
+            MessageQueueManager.flushQueueToFile(); //Flush to json
             msg_inp.clear();
         });
 
