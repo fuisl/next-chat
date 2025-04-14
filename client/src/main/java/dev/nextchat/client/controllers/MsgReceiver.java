@@ -42,34 +42,41 @@ public class MsgReceiver implements Runnable {
     public void run() {
         while (true) {
             try {
-                Message msg = receivedQueue.take();  // Wait for message
+                Message msg = receivedQueue.take();
+                UUID incomingGroupId = msg.getGroupId();
+                UUID myUserId = Model.getInstance().getLoggedInUserId();
+                String myUsername = Model.getInstance().getLoggedInUser();
+
+                // Resolve the sender
+                String senderName = Model.getInstance()
+                        .getUserIdToUsernameMap()
+                        .get(msg.getSenderId());
+
+                if (senderName == null || senderName.equals(myUsername)) {
+                    // Don't process messages from myself or unknown
+                    continue;
+                }
+
+                // Check if this groupId is known
+                boolean isKnownGroup = Model.getInstance().getUserToGroupMap().containsValue(incomingGroupId);
+
+                if (!isKnownGroup) {
+                    // First message ever between me and sender
+                    System.out.println("📩 New conversation! Creating groupID for " + senderName);
+
+                    // Store this groupId locally for future match
+                    Model.getInstance().getUserToGroupMap().put(senderName, incomingGroupId);
+                }
+
                 Platform.runLater(() -> {
-                    String senderName = resolveUsernameFromSenderId(msg.getSenderId());
-
-                    if (senderName == null) {
-                        System.out.println("⚠ Could not resolve sender ID to username");
-                        return;
-                    }
-
-                    // Check if there's already a chatCell with senderName, else create one
                     ChatCell cell = Model.getInstance().findOrCreateChatCell(senderName);
-
-                    // Ensure the groupId is mapped (this is important if not already mapped)
-                    Model.getInstance().createGroupId(senderName);
-
-                    // Add message to chat history
                     cell.addMessage(msg);
-
-                    System.out.println("📥 Message from " + senderName + " shown in User A's chat");
                 });
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
             }
         }
-    }
-    private String resolveUsernameFromSenderId(UUID senderId) {
-        Map<UUID, String> map = Model.getInstance().getUserIdToUsernameMap();
-        return map.get(senderId);
     }
 }
