@@ -4,18 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e90c3e5-6b31-457c-85e6-c7bfb5344efd" name="Changes" comment="feat: Messages are now sent to a queue">
+    <list default="true" id="5e90c3e5-6b31-457c-85e6-c7bfb5344efd" name="Changes" comment="feat: Added Messages storing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/controllers/ClientMenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/controllers/ClientMenuController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/controllers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/controllers/LoginController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/controllers/MessagesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/controllers/MessagesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/controllers/MsgReceiver.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/controllers/NewMsgBoxController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/controllers/NewMsgBoxController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/database/MessageQueueManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/database/MessageQueueManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/models/Model.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/dev/nextchat/client/models/Model.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/resources/Db/received_message.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/main/resources/Db/sent_message.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/resources/Db/sent_message.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/main/resources/Db/users.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/resources/Db/users.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/resources/Fxml/NewMsgBox.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/resources/Fxml/NewMsgBox.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -503,7 +500,8 @@
       <workItem from="1744625777072" duration="3373000" />
       <workItem from="1744640178373" duration="5938000" />
       <workItem from="1744685485588" duration="2000" />
-      <workItem from="1744707083711" duration="8498000" />
+      <workItem from="1744707083711" duration="9396000" />
+      <workItem from="1744726007587" duration="10679000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed error when gradle run">
       <option name="closed" value="true" />
@@ -585,7 +583,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744645191775</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="feat: Added Messages storing">
+      <option name="closed" value="true" />
+      <created>1744715721879</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1744715721879</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -651,7 +657,8 @@
     <MESSAGE value="refactor: Change version gradle" />
     <MESSAGE value="refactor: Added example for message simulation" />
     <MESSAGE value="feat: Messages are now sent to a queue" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Messages are now sent to a queue" />
+    <MESSAGE value="feat: Added Messages storing" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Added Messages storing" />
   </component>
   <component name="com.vaadin.designer2.intellij.settings.SizePresetsSettingsComponent">
     <option name="sizePresets">

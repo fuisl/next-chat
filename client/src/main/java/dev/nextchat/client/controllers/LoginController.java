@@ -42,14 +42,15 @@ public class LoginController implements Initializable {
         boolean success = Model.getInstance().login(user, pass);
 
         if (success) {
+            UUID userId = Model.getInstance().getLoggedInUserId();
+            System.out.println("Login with userid " + userId);
+            Model.getInstance().setLoggedInUser(user);
+            Model.getInstance().loadMessagesForUser(userId);
             Model.getInstance().getViewFactory().closeStage((Stage) login_btn.getScene().getWindow());
             Model.getInstance().getViewFactory().showClientWindow();
         } else {
             error_lbl.setText("Invalid username or password");
         }
-        System.out.println("Login with userid " + Model.getInstance().getLoggedInUserId());
-
-        UUID userId = Model.getInstance().getLoggedInUserId();
-        Model.getInstance().loadMessagesForUser(userId);
     }
+
 }

@@ -40,8 +40,10 @@ public class MessagesController implements Initializable {
             String content = msg_inp.getText().trim();
             if (content.isEmpty()) return;
 
-            UUID groupId = Model.getInstance().createGroupId(Fid.getText().trim());
+
             UUID senderId = Model.getInstance().getLoggedInUserId();
+            String senderName = Model.getInstance().getLoggedInUser();
+            UUID groupId = Model.getInstance().getOrCreateGroupId(senderName,Fid.getText().trim());
 
             Message msg = new Message(UUID.randomUUID(),senderId, groupId, content, Instant.now());
 

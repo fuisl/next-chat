@@ -22,8 +22,15 @@ public class NewMsgBoxController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         addListeners();
-        Uid.setText(Model.getInstance().getLoggedInUser() + " (You)");
-
+        String currentUser = Model.getInstance().getLoggedInUser();
+        if (currentUser != null) {
+            Uid.setText(currentUser + " (You)");
+        }
+        Model.getInstance().loggedInUserProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                Uid.setText(newVal + " (You)");
+            }
+        });
     }
     private void addListeners() {
         return_btn.setOnAction(e -> {
@@ -31,7 +38,7 @@ public class NewMsgBoxController implements Initializable {
         });
         self_chat.setOnAction(e -> {
 
-            String enteredUsername = Uid.getText().trim(); // Uid = AndrwPham(demo)
+            String enteredUsername = Model.getInstance().getLoggedInUser();
             if (!enteredUsername.isEmpty()) {
                 Model.getInstance().findOrCreateChatCell(enteredUsername);
                 Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
