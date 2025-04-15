@@ -1,5 +1,7 @@
 package dev.nextchat.client.controllers;
 
+import dev.nextchat.client.models.ChatCell;
+import dev.nextchat.client.models.Message;
 import dev.nextchat.client.models.Model;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -9,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -44,15 +47,9 @@ public class LoginController implements Initializable {
         } else {
             error_lbl.setText("Invalid username or password");
         }
-
         System.out.println("Login with userid " + Model.getInstance().getLoggedInUserId());
-        UUID userB_ID = UUID.fromString("752406cb-e3d5-4ffe-9eb9-f938835b5faa"); //UUID of Ngoc
 
-        MsgReceiver receiver = new MsgReceiver();
-        new Thread(receiver).start();
-
-        receiver.simulateIncomingMessage(userB_ID);
-
-
+        UUID userId = Model.getInstance().getLoggedInUserId();
+        Model.getInstance().loadMessagesForUser(userId);
     }
 }

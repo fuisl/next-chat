@@ -1,0 +1,19 @@
+[ {
+  "id" : "e336d055-e1c8-4cc6-aef0-63e6b04460bf",
+  "senderId" : "6d8b1075-7212-4e30-8ef4-351b1cefdcd8",
+  "groupId" : "db0395c8-4a62-451e-8302-6c1359fd5731",
+  "message" : "123",
+  "timestamp" : "2025-04-15T11:02:25.121839300Z"
+}, {
+  "id" : "fe685ebb-849b-42d6-9491-dd678f9093b8",
+  "senderId" : "6d8b1075-7212-4e30-8ef4-351b1cefdcd8",
+  "groupId" : "d9596f75-1eb6-4e36-b286-81e3aceaa5ae",
+  "message" : "Hi",
+  "timestamp" : "2025-04-15T11:13:54.635118Z"
+}, {
+  "id" : "a5789196-838d-4b01-a6c2-847c71ce4170",
+  "senderId" : "752406cb-e3d5-4ffe-9eb9-f938835b5faa",
+  "groupId" : "4be1e05a-083f-41c1-ab3d-960bfc89e3af",
+  "message" : "Hi",
+  "timestamp" : "2025-04-15T11:14:08.594802300Z"
+} ]

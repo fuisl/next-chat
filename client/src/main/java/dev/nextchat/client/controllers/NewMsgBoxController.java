@@ -17,6 +17,7 @@ public class NewMsgBoxController implements Initializable {
     public Button chat_btn;
     public Label Uid;
     public Button self_chat;
+    public Label error_lbl;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -39,12 +40,21 @@ public class NewMsgBoxController implements Initializable {
         });
 
         chat_btn.setOnAction(e -> {
-            String enteredUsername = fusername.getText().trim();
-            if (!enteredUsername.isEmpty()) {
-                ChatCell cell = Model.getInstance().findOrCreateChatCell(enteredUsername);
-                Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
-                Model.getInstance().getViewFactory().getClientSelection().set("Chats");
+            String enteredUsername = fusername.getText().trim(); // from input field
+
+            if (enteredUsername.isEmpty()) {
+                error_lbl.setText("Please enter a username.");
+                return;
             }
+
+            if (!Model.getInstance().userExists(enteredUsername)) {
+                error_lbl.setText("User does not exist.");
+                return;
+            }
+
+            Model.getInstance().findOrCreateChatCell(enteredUsername);
+            Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
+            Model.getInstance().getViewFactory().getClientSelection().set("Chats");
         });
         new_grp_btn.setOnAction(e -> {
             Model.getInstance().getViewFactory().getClientSelection().set("Group");

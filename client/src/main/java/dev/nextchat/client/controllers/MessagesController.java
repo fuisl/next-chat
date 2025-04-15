@@ -57,16 +57,9 @@ public class MessagesController implements Initializable {
 
         // Loading new chat
         Model.getInstance().getViewFactory().getClientSelectedChat().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && !newVal.isBlank()) {
-                loadChat(newVal);
-            }
+            loadChat(newVal);
         });
-
-        // Initial load on startup
-        String currentUser = Model.getInstance().getViewFactory().getClientSelectedChat().get();
-        if (currentUser != null && !currentUser.isBlank()) {
-            loadChat(currentUser);
-        }
+        loadChat(Model.getInstance().getViewFactory().getClientSelectedChat().get());
 
         // Custom message bubble rendering
         msgListView.setCellFactory(list -> new ListCell<>() {
@@ -86,9 +79,11 @@ public class MessagesController implements Initializable {
 
     }
     private void loadChat(String username) {
-        Fid.setText(username);
-        ChatCell selectedChat = Model.getInstance().findOrCreateChatCell(username);
-        msgListView.setItems(selectedChat.getMessages());
+        if (username != null && !username.isBlank()) {
+            Fid.setText(username);
+            ChatCell selectedChat = Model.getInstance().findOrCreateChatCell(username);
+            msgListView.setItems(selectedChat.getMessages());
+        }
     }
 
 
