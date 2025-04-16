@@ -46,6 +46,9 @@ dependencies {
 
     // This dependency is used by the application.
     implementation libs.guava
+
+    // pseudo database for dev TODO: remove this.
+    implementation 'com.h2database:h2'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
