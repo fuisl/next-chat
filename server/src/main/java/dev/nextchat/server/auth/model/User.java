@@ -1,14 +1,16 @@
 package dev.nextchat.server.auth.model;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user_account")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    @Column(columnDefinition = "BINARY(16)") // Store UUID as binary
+    private UUID id;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -16,15 +18,16 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    // Default constructor required by JPA
-    protected User() {}
+    // Constructors
+    public User() {}  // Required by JPA
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
     }
 
-    public Long getId() {
+    // Getters
+    public UUID getId() {
         return id;
     }
 
@@ -35,4 +38,4 @@ public class User {
     public String getPassword() {
         return password;
     }
-} 
+}

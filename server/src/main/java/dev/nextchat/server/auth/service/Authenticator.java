@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class Authenticator {
@@ -38,5 +39,15 @@ public class Authenticator {
         User user = new User(credential.getUsername(), hashedPassword);
         userRepository.save(user);
         return true;
+    }
+
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public UUID getUserIdByUsername(String username) {
+        return getUserByUsername(username)
+                .map(User::getId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
     }
 }
