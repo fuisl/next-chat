@@ -1,5 +1,3 @@
-// Directory: dev/nextchat/server/auth/service
-
 package dev.nextchat.server.auth.service;
 
 import dev.nextchat.server.auth.model.User;
@@ -17,10 +15,11 @@ import java.util.UUID;
 public class Authenticator {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public Authenticator(UserRepository userRepository) {
+    public Authenticator(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
 
