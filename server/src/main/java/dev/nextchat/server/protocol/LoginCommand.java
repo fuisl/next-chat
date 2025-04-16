@@ -12,6 +12,11 @@ public class LoginCommand implements Command {
 
     private final String username;
     private final String password;
+    private SessionToken sessionToken;
+
+    public SessionToken getSessionToken() {
+        return sessionToken;
+    }
 
     public LoginCommand(String username, String password) {
         this.username = username;
@@ -40,11 +45,11 @@ public class LoginCommand implements Command {
             UUID userId = authenticator.getUserIdByUsername(username);  // Make sure this method exists
             String sessionTokenStr = generateToken();
             sessionService.registerSession(sessionTokenStr, userId);
+            
+            this.sessionToken = new SessionToken(sessionTokenStr, userId);
 
-            SessionToken sessionToken = new SessionToken(sessionTokenStr, userId);
-
-            response.put("token", sessionToken.getToken());
-            response.put("userId", sessionToken.getUserId().toString());
+            response.put("token", this.sessionToken.getToken());
+            response.put("userId", this.sessionToken.getUserId().toString());
             response.put("message", "Login successful");
         } else {
             response.put("message", "Invalid username or password");

@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import dev.nextchat.server.auth.service.Authenticator;
 import dev.nextchat.server.session.service.SessionService;
+import dev.nextchat.server.shared.dto.SessionToken;
 import dev.nextchat.server.context.SpringContext;
 import dev.nextchat.server.protocol.*;
 
@@ -14,6 +15,7 @@ public class ClientHandler implements Runnable {
     private final Authenticator authenticator = SpringContext.getBean(Authenticator.class);
     private final SessionService sessionService = SpringContext.getBean(SessionService.class);
     private final Socket socket;
+    private SessionToken sessionToken;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -66,6 +68,10 @@ public class ClientHandler implements Runnable {
                     JSONObject response = command.execute(context);
                     writer.println(response.toString());
 
+                    if (command instanceof LoginCommand loginCmd) {
+                        this.sessionToken = loginCmd.getSessionToken();
+                    }
+
                 } catch (Exception e) {
                     JSONObject error = new JSONObject();
                     error.put("type", "error");
@@ -78,6 +84,10 @@ public class ClientHandler implements Runnable {
             System.out.printf("I/O error with %s: %s%n", socket.getInetAddress(), e.getMessage());
         } finally {
             try {
+                if (sessionToken != null) {
+                    sessionService.removeSession(sessionToken.getToken());
+                    System.out.printf("Session %s removed for %s%n", sessionToken.getToken(), socket.getInetAddress());
+                }
                 socket.close();
                 System.out.printf("Connection closed for %s%n", socket.getInetAddress());
             } catch (IOException e) {
