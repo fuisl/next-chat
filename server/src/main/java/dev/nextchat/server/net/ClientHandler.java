@@ -2,6 +2,9 @@ package dev.nextchat.server.net;
 
 import org.json.JSONObject;
 
+import dev.nextchat.server.protocol.Command;
+import dev.nextchat.server.protocol.ProtocolDecoder;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -17,11 +20,10 @@ public class ClientHandler implements Runnable {
         System.out.printf("ClientHandler started for %s%n", socket.getInetAddress());
 
         try (
-            InputStream inputStream = socket.getInputStream();
-            OutputStream outputStream = socket.getOutputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true)
-        ) {
+                InputStream inputStream = socket.getInputStream();
+                OutputStream outputStream = socket.getOutputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true)) {
             // Step 1: Handshake
             writer.println("HELLO_CLIENT");
             String handshakeResponse = reader.readLine();
@@ -32,6 +34,7 @@ public class ClientHandler implements Runnable {
             }
 
             System.out.println("Handshake successful.");
+            writer.println("WELCOME");
 
             // Step 2: JSON message loop
             while (true) {
@@ -43,10 +46,8 @@ public class ClientHandler implements Runnable {
                 }
 
                 jsonMessage = jsonMessage.trim();
-                if (jsonMessage.isEmpty()) {
-                    System.out.println("Empty message received. Skipping.");
+                if (jsonMessage.isEmpty())
                     continue;
-                }
 
                 if ("exit".equalsIgnoreCase(jsonMessage)) {
                     System.out.println("Client requested termination.");
@@ -55,23 +56,16 @@ public class ClientHandler implements Runnable {
 
                 System.out.printf("Received JSON from %s: %s%n", socket.getInetAddress(), jsonMessage);
 
-                // Step 3: Parse JSON
                 try {
-                    JSONObject jsonObject = new JSONObject(jsonMessage);
-
-                    String username = jsonObject.getString("username");
-                    String password = jsonObject.getString("passwd");
-
-                    System.out.println("Parsed username: " + username);
-                    System.out.println("Parsed password: " + password);
-
-                    // Step 4: Acknowledge receipt
-                    JSONObject responseJson = new JSONObject();
-                    responseJson.put("message", "Server received credentials successfully");
-                    writer.println(responseJson.toString());
+                    Command command = ProtocolDecoder.parse(jsonMessage);
+                    JSONObject response = command.execute();
+                    writer.println(response.toString());
 
                 } catch (Exception e) {
-                    System.out.println("Invalid JSON format: " + jsonMessage);
+                    JSONObject error = new JSONObject();
+                    error.put("type", "error");
+                    error.put("message", "Failed to parse command: " + e.getMessage());
+                    writer.println(error.toString());
                 }
             }
 
