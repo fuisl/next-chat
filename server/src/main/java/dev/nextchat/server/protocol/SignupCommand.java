@@ -19,7 +19,8 @@ public class SignupCommand implements Command {
     }
 
     @Override
-    public JSONObject execute(Authenticator authenticator) {
+    public JSONObject execute(CommandContext context) {
+        Authenticator authenticator = context.authenticator();
         JSONObject response = new JSONObject();
         Credential credential = new Credential(username, password);
 

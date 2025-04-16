@@ -19,7 +19,10 @@ public class LoginCommand implements Command {
     }
 
     @Override
-    public JSONObject execute(Authenticator authenticator) {
+    public JSONObject execute(CommandContext context) {
+        Authenticator authenticator = context.authenticator();
+        SessionService sessionService = context.sessionService();
+
         JSONObject response = new JSONObject();
         Credential credential = new Credential(username, password);
 
