@@ -1,5 +1,7 @@
 package dev.nextchat.server.protocol;
 
+import dev.nextchat.server.auth.model.Credential;
+import dev.nextchat.server.auth.service.Authenticator;
 import org.json.JSONObject;
 
 public class SignupCommand implements Command {
@@ -17,12 +19,20 @@ public class SignupCommand implements Command {
     }
 
     @Override
-    public JSONObject execute() {
+    public JSONObject execute(Authenticator authenticator) {
         JSONObject response = new JSONObject();
+        Credential credential = new Credential(username, password);
+
+        boolean success = authenticator.signUp(credential);
+
         response.put("type", "signup_response");
-        response.put("status", "ok");
-        response.put("message", "Signup command received");
-        response.put("user", username);
+        response.put("status", success ? "ok" : "fail");
+        response.put("message", success ? "Signup successful" : "Username already exists");
+
+        if (success) {
+            response.put("user", username);
+        }
+
         return response;
     }
 }
