@@ -3,6 +3,7 @@ package dev.nextchat.client.controllers;
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
 import dev.nextchat.client.views.ChatCellFactory;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -28,16 +29,23 @@ public class ChatsController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         addListeners();
         initChatCells();
+        user_name.textProperty().bind(Bindings.concat("Hi, ", Model.getInstance().loggedInUserProperty()));
     }
     private void addListeners() {
         newMess.setOnAction(event -> {
             createNewMsgBox();
         });
+        newGroup.setOnAction(event -> {
+            createNewGroup();
+        });
 
+    }
+    private void createNewGroup(){
+        Model.getInstance().getViewFactory().getClientSelection().set("Group");
     }
 
     private void createNewMsgBox() {
-        Model.getInstance().getViewFactory().getClientSelection().set("New Message");
+        Model.getInstance().getViewFactory().getClientSelection().set("Message");
     }
 
     private void onChatMess() {

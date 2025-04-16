@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<AnchorPane prefHeight="550.0" prefWidth="317.0" styleClass="main_ctn" stylesheets="@../Styles/NewMsgBox.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.NewMsgBoxController">
+<AnchorPane prefHeight="550.0" prefWidth="317.0" styleClass="main_ctn" stylesheets="@../Styles/NewMsgBox.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.NewMsgBoxController">
    <children>
       <VBox layoutX="88.0" layoutY="65.0" prefHeight="133.0" prefWidth="317.0" AnchorPane.bottomAnchor="416.4" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -23,45 +15,55 @@
                <children>
                   <Button fx:id="return_btn" mnemonicParsing="false" prefHeight="26.0" prefWidth="4.0">
                      <graphic>
-                        <FontAwesomeIconView glyphName="ARROW_LEFT" size="1.5em" wrappingWidth="13.028549194335938" />
+                        <FontAwesomeIconView glyphName="ARROW_LEFT" size="16" wrappingWidth="13.028549194335938" />
                      </graphic>
                   </Button>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="New Chats" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="New Chats" wrappingWidth="85.59375">
+                     <font>
+                        <Font size="16.0" />
+                     </font></Text>
                </children>
             </HBox>
             <HBox prefHeight="42.0" prefWidth="324.0">
                <children>
-                  <Button mnemonicParsing="false" prefHeight="24.0" prefWidth="17.0">
+                  <Button fx:id="chat_btn" mnemonicParsing="false" prefHeight="24.0" prefWidth="17.0">
                      <graphic>
                         <FontAwesomeIconView glyphName="SEARCH" />
                      </graphic>
                   </Button>
-                  <TextField fx:id="fusername" prefHeight="26.0" prefWidth="302.0" promptText="Search Username" styleClass="search-bar" />
+                  <TextField fx:id="fusername" prefHeight="29.0" prefWidth="231.0" promptText="Search Username" styleClass="search-bar" />
                </children>
                <padding>
                   <Insets right="10.0" />
                </padding>
             </HBox>
+            <Label fx:id="error_lbl" alignment="TOP_RIGHT" prefHeight="17.0" prefWidth="249.0" styleClass="error_lbl" textAlignment="CENTER" textFill="#ee0000">
+               <padding>
+                  <Insets left="50.0" right="50.0" />
+               </padding></Label>
             <Button fx:id="new_grp_btn" mnemonicParsing="false" prefHeight="43.0" prefWidth="320.0">
                <graphic>
                   <HBox prefHeight="46.0" prefWidth="259.0">
                      <children>
                         <Circle fill="#dbdddf" radius="17.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="New group" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="New group">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Text>
                      </children>
                   </HBox>
                </graphic>
             </Button>
          </children>
       </VBox>
-      <Pane layoutY="134.0" prefHeight="415.0" prefWidth="317.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="134.6">
+      <Pane layoutY="145.0" prefHeight="405.0" prefWidth="317.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="145.0">
          <children>
-            <Button fx:id="chat_btn" mnemonicParsing="false" prefHeight="53.0" prefWidth="317.0">
+            <Button fx:id="self_chat" layoutY="11.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="317.0">
                <graphic>
                   <HBox prefHeight="46.0" prefWidth="259.0" spacing="10.0">
                      <children>
                         <Circle fill="#dbdddf" radius="17.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Label fx:id= "Uid" text="AndrwPham (You)">
+                        <Label fx:id="Uid" text="AndrwPham (You)">
                            <font>
                               <Font size="14.0" />
                            </font>

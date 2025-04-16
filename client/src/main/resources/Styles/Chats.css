@@ -19,7 +19,7 @@
     -fx-background-radius: 10px;
 }
 .header Button:hover {
-    -fx-background-color: gray;
+    -fx-background-color: #f4f4f4;
 }
 .mid_ctn {
     -fx-padding: 5 15 0 15;
@@ -38,8 +38,8 @@
     -fx-font-size: 11px;
     -fx-font-weight: bold;
     -fx-padding: 8px 15px; /* Controls the overall size */
-    -fx-border-radius: 20px; /* Large value makes it oval */
-    -fx-background-radius: 20px;
+    -fx-border-radius: 10px; /* Large value makes it oval */
+    -fx-background-radius: 10px;
 
 }
 .mid_ctn Button:hover{
