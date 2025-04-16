@@ -70,6 +70,10 @@ public class ClientHandler implements Runnable {
 
                     if (command instanceof LoginCommand loginCmd) {
                         this.sessionToken = loginCmd.getSessionToken();
+                        if (sessionToken != null) {
+                            System.out.printf("Session %s registered for user %s%n", sessionToken.getToken(),
+                                    sessionToken.getUserId());
+                        }
                     }
 
                 } catch (Exception e) {
