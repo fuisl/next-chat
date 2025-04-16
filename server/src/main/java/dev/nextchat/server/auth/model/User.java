@@ -1,26 +1,31 @@
-package dev.nextchat.server;
+package dev.nextchat.server.auth.model;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.*;
 
-@Entity 
+@Entity
 @Table(name = "user_account")
 public class User {
-    
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; 
+    private Long id;
 
     @Column(unique = true, nullable = false)
-    private String username; 
+    private String username;
 
     @Column(nullable = false)
-    private String password; 
+    private String password;
 
-    // Getters and Setters 
+    // Default constructor required by JPA
+    protected User() {}
+
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getUsername() {
@@ -30,4 +35,4 @@ public class User {
     public String getPassword() {
         return password;
     }
-}
+} 
