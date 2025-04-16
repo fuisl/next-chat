@@ -2,13 +2,16 @@ package dev.nextchat.server.net;
 
 import org.json.JSONObject;
 
-import dev.nextchat.server.protocol.Command;
-import dev.nextchat.server.protocol.ProtocolDecoder;
+import dev.nextchat.server.auth.service.Authenticator;
+import dev.nextchat.server.context.SpringContext;
+import dev.nextchat.server.protocol.*;
 
 import java.io.*;
 import java.net.Socket;
 
+
 public class ClientHandler implements Runnable {
+    private final Authenticator authenticator=SpringContext.getBean(Authenticator.class);
     private final Socket socket;
 
     public ClientHandler(Socket socket) {
@@ -58,7 +61,7 @@ public class ClientHandler implements Runnable {
 
                 try {
                     Command command = ProtocolDecoder.parse(jsonMessage);
-                    JSONObject response = command.execute();
+                    JSONObject response = command.execute(authenticator);
                     writer.println(response.toString());
 
                 } catch (Exception e) {
