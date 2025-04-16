@@ -50,7 +50,9 @@ dependencies {
     implementation 'org.json:json:20240303'
 
     // pseudo database for dev TODO: remove this.
-    implementation 'com.h2database:h2'
+    // implementation 'com.h2database:h2'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
