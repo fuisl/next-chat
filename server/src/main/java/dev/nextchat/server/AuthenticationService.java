@@ -3,21 +3,6 @@
  */
 package dev.nextchat.server;
 
-<<<<<<< HEAD
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-
-
-@SpringBootApplication
-// @ComponentScan(basePackages = {"dev.netchat.server.utils"})
-// @EnableMongoRepositories(basePackages = "com.chatapp.repository")
-public class App{
-
-=======
 import java.sql.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,26 +12,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.CommandLineRunner;
-// import org.springframework.boot.SpringApplication;
-// import org.springframework.boot.autoconfigure.SpringBootApplication;
-// import org.springframework.context.annotation.ComponentScan;
-// import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-
-// @SpringBootApplication
-// @ComponentScan(basePackages = {"dev.netchat.server.utils"})
-// @EnableMongoRepositories(basePackages = "com.chatapp.repository")
-public class App {
->>>>>>> feature/authentication
+public class AuthenticationService{
     public String getGreeting() {
         return "Hello World!";
     }
 
-<<<<<<< HEAD
-    public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
-=======
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         
         ServerSocket ss = new ServerSocket(1234);
@@ -81,6 +51,5 @@ public class App {
             }
         }
     
->>>>>>> feature/authentication
     }
 }
