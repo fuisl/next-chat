@@ -1,48 +1,52 @@
-// package dev.nextchat.server.protocol.impl;
+package dev.nextchat.server.protocol.impl;
 
-// import dev.nextchat.server.group.service.GroupService;
-// import dev.nextchat.server.messaging.handler.SendMessageHandler;
-// import dev.nextchat.server.messaging.model.Message;
-// import dev.nextchat.server.messaging.service.MessageService;
-// import dev.nextchat.server.protocol.Command;
-// import dev.nextchat.server.protocol.CommandContext;
+import dev.nextchat.server.messaging.handler.SendMessageHandler;
+import dev.nextchat.server.messaging.model.Message;
+import dev.nextchat.server.protocol.Command;
+import dev.nextchat.server.protocol.CommandContext;
+import dev.nextchat.server.protocol.CommandType;
 
-// import java.util.UUID;
+import org.json.JSONObject;
 
-// public class SendMessageCommand implements Command {
+import java.util.UUID;
 
-//     private final MessageService messageService;
-//     private final GroupService groupService;
+public class SendMessageCommand implements Command {
 
-//     public SendMessageCommand(MessageService messageService, GroupService groupService) {
-//         this.messageService = messageService;
-//         this.groupService = groupService;
-//     }
+    private final String content;
+    private final UUID groupId;
+    private final SendMessageHandler handler;
 
-//     @Override
-//     public void execute(String[] args, CommandContext ctx) {
-//         if (!ctx.isAuthenticated()) {
-//             System.out.println("❌ You must be logged in to send a message.");
-//             return;
-//         }
+    public SendMessageCommand(String content, String groupId, SendMessageHandler handler) {
+        this.content = content;
+        this.groupId = UUID.fromString(groupId);
+        this.handler = handler;
+    }
 
-//         if (args.length < 3) {
-//             System.out.println("⚠️ Usage: SEND_MESSAGE <groupId> <content>");
-//             return;
-//         }
+    @Override
+    public CommandType getType() {
+        return CommandType.SEND_MESSAGE;
+    }
 
-//         try {
-//             UUID groupId = UUID.fromString(args[1]);
-//             String content = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length));
+    @Override
+    public JSONObject execute(CommandContext context) {
+        JSONObject response = new JSONObject();
+        response.put("type", "send_message_response");
 
-//             SendMessageHandler handler = new SendMessageHandler(messageService, groupService);
-//             Message message = handler.handle(groupId, content, ctx);
+        try {
+            Message message = handler.handle(groupId, content, context);
 
-//             System.out.println("✅ Message sent: " + message.getContent());
-//         } catch (IllegalArgumentException ex) {
-//             System.out.println("❌ Invalid group ID or format: " + ex.getMessage());
-//         } catch (Exception e) {
-//             System.out.println("❌ Failed to send message: " + e.getMessage());
-//         }
-//     }
-// }
+            response.put("status", "ok");
+            response.put("messageId", message.getId().toString());
+            response.put("groupId", message.getGroupId().toString());
+            response.put("senderId", message.getSenderId().toString());
+            response.put("timestamp", message.getTimestamp().toString());
+            response.put("content", message.getContent());
+
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            response.put("status", "error");
+            response.put("error", e.getMessage());
+        }
+
+        return response;
+    }
+}
