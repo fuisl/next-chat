@@ -3,7 +3,6 @@ package dev.nextchat.server.util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Component;
 
 /**
  * A helper class used for adding sample data and/or create {@code message_db} 
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component;
  * {@code JSON} file path. The data are only added when the collections does
  * not exist.
  */
-@Component
+
 public class DataLoader implements CommandLineRunner {
     private final InitiateMessageDB InitiateMessageDB;
     @Autowired

@@ -10,27 +10,26 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
-import org.springframework.stereotype.Service;
 
 import dev.nextchat.server.model.PendingMessage;
-import dev.nextchat.server.model.ReceivedMessage;
+import dev.nextchat.server.messaging.model.Message;
 import dev.nextchat.server.repository.PendingMessageRepository;
-import dev.nextchat.server.repository.ReceivedMessageRepository;
+import dev.nextchat.server.messaging.repository.MessageRepository;
 
 /**
- * A helper class used for adding sample data and/or create {@code message_db} 
+ * A helper class used for adding sample data and/or create {@code message_db}
  * database with its necessary collections with a given {@code JSON} file path.
- * This class are coupled with the {@code DataLoader} class, which contains 
+ * This class is coupled with the {@code DataLoader} class, which contains
  * the example usage.
+ * 
  * @see dev.nextchat.server.util.DataLoader.
  */
-@Service
 public class InitiateMessageDB {
-    
-    private final ReceivedMessageRepository receivedRepository;
+
+    private final MessageRepository receivedRepository;
     private final PendingMessageRepository pendingRepository;
 
-    public InitiateMessageDB(ReceivedMessageRepository received_repo, PendingMessageRepository pending_repo) {
+    public InitiateMessageDB(MessageRepository received_repo, PendingMessageRepository pending_repo) {
         this.receivedRepository = received_repo;
         this.pendingRepository = pending_repo;
     }
@@ -57,7 +56,9 @@ public class InitiateMessageDB {
 
         Object jsonObj = this.loadJsonFromResources(filePath);
 
-        if (jsonObj instanceof JSONArray) {
+        if (!(jsonObj instanceof JSONArray)) {
+            throw new IllegalArgumentException("Invalid JSON format: Expected an array.");
+        } else {
             JSONArray messagesArray = (JSONArray) jsonObj;
 
             // Iterate through messages
@@ -71,15 +72,16 @@ public class InitiateMessageDB {
                 String timestamp = (String) messageObj.get("timestamp");
 
                 if (filePath.contains("received_message")) {
-                    ReceivedMessage messageDocument = new ReceivedMessage(userId, groupId, message, Instant.parse(timestamp));
+                    Message messageDocument = new Message(userId, groupId, message, Instant.parse(timestamp));
                     receivedRepository.save(messageDocument);
-                } 
-                
+                }
+
                 if (filePath.contains("pending_message")) {
-                    PendingMessage messageDocument = new PendingMessage(userId, groupId, message, Instant.parse(timestamp));
+                    PendingMessage messageDocument = new PendingMessage(userId, groupId, message,
+                            Instant.parse(timestamp));
                     pendingRepository.save(messageDocument);
                 }
-           }
+            }
         }
     }
 }
