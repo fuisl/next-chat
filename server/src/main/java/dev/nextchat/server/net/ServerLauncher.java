@@ -4,6 +4,7 @@ import dev.nextchat.server.auth.service.Authenticator;
 import dev.nextchat.server.group.service.GroupService;
 import dev.nextchat.server.protocol.ProtocolDecoder;
 import dev.nextchat.server.session.service.SessionService;
+import dev.nextchat.server.messaging.service.RelayService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -25,16 +26,19 @@ public class ServerLauncher implements CommandLineRunner {
     private final Authenticator authenticator;
     private final SessionService sessionService;
     private final GroupService groupService;
+    private final RelayService relayService;
 
     public ServerLauncher(
             ProtocolDecoder decoder,
             Authenticator authenticator,
             SessionService sessionService,
-            GroupService groupService) {
+            GroupService groupService,
+            RelayService relayService) {
         this.decoder = decoder;
         this.authenticator = authenticator;
         this.sessionService = sessionService;
         this.groupService = groupService;
+        this.relayService = relayService;
     }
 
     @Override
@@ -52,7 +56,8 @@ public class ServerLauncher implements CommandLineRunner {
                         decoder,
                         authenticator,
                         sessionService,
-                        groupService);
+                        groupService,
+                        relayService);
 
                 threadPool.execute(handler);
             }

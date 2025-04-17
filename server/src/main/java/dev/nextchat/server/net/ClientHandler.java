@@ -3,6 +3,7 @@ package dev.nextchat.server.net;
 import dev.nextchat.server.auth.service.Authenticator;
 import dev.nextchat.server.session.service.SessionService;
 import dev.nextchat.server.group.service.GroupService;
+import dev.nextchat.server.messaging.service.RelayService;
 import dev.nextchat.server.protocol.*;
 import dev.nextchat.server.protocol.impl.LoginCommand;
 import dev.nextchat.server.shared.dto.SessionToken;
@@ -20,18 +21,22 @@ public class ClientHandler implements Runnable {
     private final Authenticator authenticator;
     private final SessionService sessionService;
     private final GroupService groupService;
+    private final RelayService relayService;
     private SessionToken sessionToken;
 
-    public ClientHandler(Socket socket,
+    public ClientHandler(
+            Socket socket,
             ProtocolDecoder decoder,
             Authenticator authenticator,
             SessionService sessionService,
-            GroupService groupService) {
+            GroupService groupService,
+            RelayService relayService) {
         this.socket = socket;
         this.decoder = decoder;
         this.authenticator = authenticator;
         this.sessionService = sessionService;
         this.groupService = groupService;
+        this.relayService = relayService;
     }
 
     @Override
@@ -72,8 +77,12 @@ public class ClientHandler implements Runnable {
 
                     if (command instanceof LoginCommand loginCmd) {
                         this.sessionToken = loginCmd.getSessionToken();
-                        System.out.printf("Session %s registered for user %s%n",
-                                sessionToken.getToken(), sessionToken.getUserId());
+                        if (sessionToken != null) {
+                            System.out.printf("Session %s registered for user %s%n", sessionToken.getToken(),
+                                    sessionToken.getUserId());
+
+                            relayService.register(sessionToken.getUserId(), socket);
+                        }
                     }
 
                 } catch (Exception e) {
@@ -90,6 +99,7 @@ public class ClientHandler implements Runnable {
             try {
                 if (sessionToken != null) {
                     sessionService.removeSession(sessionToken.getToken());
+                    relayService.unregister(sessionToken.getUserId());
                     System.out.printf("Session %s removed for %s%n", sessionToken.getToken(), socket.getInetAddress());
                 }
                 socket.close();
