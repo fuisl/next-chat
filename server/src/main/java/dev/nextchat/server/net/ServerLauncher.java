@@ -59,7 +59,6 @@ public class ServerLauncher implements CommandLineRunner {
 
         } catch (Exception e) {
             System.err.println("🔥 Server failed: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             threadPool.shutdown();
         }
