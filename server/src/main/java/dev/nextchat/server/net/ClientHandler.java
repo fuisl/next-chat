@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import dev.nextchat.server.auth.service.Authenticator;
 import dev.nextchat.server.session.service.SessionService;
+import dev.nextchat.server.group.service.GroupService;
 import dev.nextchat.server.shared.dto.SessionToken;
 import dev.nextchat.server.context.SpringContext;
 import dev.nextchat.server.protocol.*;
@@ -14,6 +15,7 @@ import java.net.Socket;
 public class ClientHandler implements Runnable {
     private final Authenticator authenticator = SpringContext.getBean(Authenticator.class);
     private final SessionService sessionService = SpringContext.getBean(SessionService.class);
+    private final GroupService groupService = SpringContext.getBean(GroupService.class);
     private final Socket socket;
     private SessionToken sessionToken;
 
@@ -64,7 +66,7 @@ public class ClientHandler implements Runnable {
 
                 try {
                     Command command = ProtocolDecoder.parse(jsonMessage);
-                    CommandContext context = new CommandContext(authenticator, sessionService);
+                    CommandContext context = new CommandContext(authenticator, sessionService, groupService, sessionToken != null ? sessionToken.getUserId() : null);
                     JSONObject response = command.execute(context);
                     writer.println(response.toString());
 

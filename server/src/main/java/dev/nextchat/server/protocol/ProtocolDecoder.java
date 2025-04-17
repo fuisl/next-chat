@@ -14,9 +14,18 @@ public class ProtocolDecoder {
             case LOGIN -> new LoginCommand(
                     json.getString("username"),
                     json.getString("passwd"));
+
             case SIGNUP -> new SignupCommand(
                     json.getString("username"),
                     json.getString("passwd"));
+
+            case CREATE_GROUP -> new CreateGroupCommand(
+                    json.getString("name"),
+                    json.optString("description", ""));
+
+            case JOIN_GROUP -> new JoinGroupCommand(
+                    json.getString("groupId"));
+
             default -> throw new IllegalArgumentException("Unknown command type: " + type);
         };
     }
