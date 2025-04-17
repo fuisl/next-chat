@@ -4,7 +4,11 @@ public enum CommandType {
     LOGIN,
     SIGNUP,
     SEND_MESSAGE,
-    UNKNOWN;
+    FETCH_MESSAGE,
+    UNKNOWN,
+    CREATE_GROUP,
+    JOIN_GROUP,
+    LEAVE_GROUP;
 
     public static CommandType fromString(String type) {
         try {
