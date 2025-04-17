@@ -1,26 +1,37 @@
 package dev.nextchat.server.net;
 
-import org.json.JSONObject;
-
 import dev.nextchat.server.auth.service.Authenticator;
 import dev.nextchat.server.session.service.SessionService;
 import dev.nextchat.server.group.service.GroupService;
-import dev.nextchat.server.shared.dto.SessionToken;
-import dev.nextchat.server.context.SpringContext;
 import dev.nextchat.server.protocol.*;
+import dev.nextchat.server.protocol.impl.LoginCommand;
+import dev.nextchat.server.shared.dto.SessionToken;
+
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.UUID;
 
 public class ClientHandler implements Runnable {
-    private final Authenticator authenticator = SpringContext.getBean(Authenticator.class);
-    private final SessionService sessionService = SpringContext.getBean(SessionService.class);
-    private final GroupService groupService = SpringContext.getBean(GroupService.class);
+
     private final Socket socket;
+    private final ProtocolDecoder decoder;
+    private final Authenticator authenticator;
+    private final SessionService sessionService;
+    private final GroupService groupService;
     private SessionToken sessionToken;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket,
+            ProtocolDecoder decoder,
+            Authenticator authenticator,
+            SessionService sessionService,
+            GroupService groupService) {
         this.socket = socket;
+        this.decoder = decoder;
+        this.authenticator = authenticator;
+        this.sessionService = sessionService;
+        this.groupService = groupService;
     }
 
     @Override
@@ -32,7 +43,7 @@ public class ClientHandler implements Runnable {
                 OutputStream outputStream = socket.getOutputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
                 PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true)) {
-            // Step 1: Handshake
+
             writer.println("HELLO_CLIENT");
             String handshakeResponse = reader.readLine();
 
@@ -44,50 +55,37 @@ public class ClientHandler implements Runnable {
             System.out.println("Handshake successful.");
             writer.println("WELCOME");
 
-            // Step 2: JSON message loop
             while (true) {
                 String jsonMessage = reader.readLine();
-
-                if (jsonMessage == null) {
-                    System.out.println("Client disconnected.");
+                if (jsonMessage == null || jsonMessage.isBlank())
                     break;
-                }
-
-                jsonMessage = jsonMessage.trim();
-                if (jsonMessage.isEmpty())
-                    continue;
-
-                if ("exit".equalsIgnoreCase(jsonMessage)) {
-                    System.out.println("Client requested termination.");
+                if ("exit".equalsIgnoreCase(jsonMessage))
                     break;
-                }
-
-                System.out.printf("Received JSON from %s: %s%n", socket.getInetAddress(), jsonMessage);
 
                 try {
-                    Command command = ProtocolDecoder.parse(jsonMessage);
-                    CommandContext context = new CommandContext(authenticator, sessionService, groupService, sessionToken != null ? sessionToken.getUserId() : null);
+                    Command command = decoder.parse(jsonMessage);
+                    UUID userId = sessionToken != null ? sessionToken.getUserId() : null;
+                    CommandContext context = new CommandContext(authenticator, sessionService, groupService, userId);
+
                     JSONObject response = command.execute(context);
                     writer.println(response.toString());
 
                     if (command instanceof LoginCommand loginCmd) {
                         this.sessionToken = loginCmd.getSessionToken();
-                        if (sessionToken != null) {
-                            System.out.printf("Session %s registered for user %s%n", sessionToken.getToken(),
-                                    sessionToken.getUserId());
-                        }
+                        System.out.printf("Session %s registered for user %s%n",
+                                sessionToken.getToken(), sessionToken.getUserId());
                     }
 
                 } catch (Exception e) {
                     JSONObject error = new JSONObject();
                     error.put("type", "error");
-                    error.put("message", "Failed to parse command: " + e.getMessage());
+                    error.put("message", "Failed to parse/execute command: " + e.getMessage());
                     writer.println(error.toString());
                 }
             }
 
         } catch (IOException e) {
-            System.out.printf("I/O error with %s: %s%n", socket.getInetAddress(), e.getMessage());
+            System.err.printf("I/O error with client %s: %s%n", socket.getInetAddress(), e.getMessage());
         } finally {
             try {
                 if (sessionToken != null) {
@@ -97,7 +95,7 @@ public class ClientHandler implements Runnable {
                 socket.close();
                 System.out.printf("Connection closed for %s%n", socket.getInetAddress());
             } catch (IOException e) {
-                System.out.printf("Error closing socket for %s: %s%n", socket.getInetAddress(), e.getMessage());
+                System.err.printf("Error closing socket for %s: %s%n", socket.getInetAddress(), e.getMessage());
             }
         }
     }

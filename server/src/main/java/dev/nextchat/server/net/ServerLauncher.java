@@ -1,5 +1,9 @@
 package dev.nextchat.server.net;
 
+import dev.nextchat.server.auth.service.Authenticator;
+import dev.nextchat.server.group.service.GroupService;
+import dev.nextchat.server.protocol.ProtocolDecoder;
+import dev.nextchat.server.session.service.SessionService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +21,22 @@ public class ServerLauncher implements CommandLineRunner {
         THREAD_POOL_SIZE, new ClientThreadFactory()
     );
 
+    private final ProtocolDecoder decoder;
+    private final Authenticator authenticator;
+    private final SessionService sessionService;
+    private final GroupService groupService;
+
+    public ServerLauncher(
+            ProtocolDecoder decoder,
+            Authenticator authenticator,
+            SessionService sessionService,
+            GroupService groupService) {
+        this.decoder = decoder;
+        this.authenticator = authenticator;
+        this.sessionService = sessionService;
+        this.groupService = groupService;
+    }
+
     @Override
     public void run(String... args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -27,7 +47,14 @@ public class ServerLauncher implements CommandLineRunner {
                 System.out.printf("📥 New connection from %s:%d%n",
                         socket.getInetAddress(), socket.getPort());
 
-                threadPool.execute(new ClientHandler(socket));
+                ClientHandler handler = new ClientHandler(
+                        socket,
+                        decoder,
+                        authenticator,
+                        sessionService,
+                        groupService);
+
+                threadPool.execute(handler);
             }
 
         } catch (Exception e) {
