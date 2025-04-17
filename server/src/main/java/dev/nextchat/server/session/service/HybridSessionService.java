@@ -64,4 +64,16 @@ public class HybridSessionService implements SessionService {
             userToTokenMap.put(entry.getUserId(), entry.getToken());
         }
     }
+
+    @Override
+    public Optional<Session> getSession(String token) {
+        return sessionRepository.findById(token);
+    }
+
+    @Override
+    public Optional<Session> getSession(UUID userId) {
+        return userToTokenMap.containsKey(userId) ? 
+               sessionRepository.findById(userToTokenMap.get(userId)) : 
+               Optional.empty();
+    }
 }
