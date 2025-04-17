@@ -1,7 +1,10 @@
-package dev.nextchat.server.protocol;
+package dev.nextchat.server.protocol.impl;
 
 import dev.nextchat.server.auth.model.Credential;
 import dev.nextchat.server.auth.service.Authenticator;
+import dev.nextchat.server.protocol.Command;
+import dev.nextchat.server.protocol.CommandContext;
+import dev.nextchat.server.protocol.CommandType;
 import dev.nextchat.server.session.service.SessionService;
 import dev.nextchat.server.shared.dto.SessionToken;
 import org.json.JSONObject;

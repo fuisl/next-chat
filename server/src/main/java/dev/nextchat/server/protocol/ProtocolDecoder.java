@@ -1,32 +1,28 @@
 package dev.nextchat.server.protocol;
 
+import dev.nextchat.server.protocol.registry.CommandFactoryRegistry;
+import dev.nextchat.server.protocol.factory.CommandFactory;
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ProtocolDecoder {
 
-    public static Command parse(String rawJson) throws Exception {
+    private final CommandFactoryRegistry registry;
+
+    public ProtocolDecoder(CommandFactoryRegistry registry) {
+        this.registry = registry;
+    }
+
+    public Command parse(String rawJson) throws Exception {
         JSONObject json = new JSONObject(rawJson);
+        CommandType type = CommandType.fromString(json.getString("type"));
 
-        String type = json.optString("type");
-        CommandType commandType = CommandType.fromString(type);
+        if (!registry.supports(type)) {
+            throw new IllegalArgumentException("Unsupported command type: " + type);
+        }
 
-        return switch (commandType) {
-            case LOGIN -> new LoginCommand(
-                    json.getString("username"),
-                    json.getString("passwd"));
-
-            case SIGNUP -> new SignupCommand(
-                    json.getString("username"),
-                    json.getString("passwd"));
-
-            case CREATE_GROUP -> new CreateGroupCommand(
-                    json.getString("name"),
-                    json.optString("description", ""));
-
-            case JOIN_GROUP -> new JoinGroupCommand(
-                    json.getString("groupId"));
-
-            default -> throw new IllegalArgumentException("Unknown command type: " + type);
-        };
+        CommandFactory factory = registry.getFactory(type);
+        return factory.create(json);
     }
 }

@@ -1,6 +1,10 @@
-package dev.nextchat.server.protocol;
+package dev.nextchat.server.protocol.impl;
 
 import dev.nextchat.server.group.service.GroupService;
+import dev.nextchat.server.protocol.Command;
+import dev.nextchat.server.protocol.CommandContext;
+import dev.nextchat.server.protocol.CommandType;
+
 import org.json.JSONObject;
 
 import java.util.UUID;
