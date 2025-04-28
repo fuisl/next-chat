@@ -2,11 +2,10 @@ package dev.nextchat.client.models;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import dev.nextchat.client.database.GroupManager;
 import dev.nextchat.client.database.UserDatabase;
 import dev.nextchat.client.views.ViewFactory;
 import javafx.beans.property.SimpleStringProperty;
@@ -14,24 +13,24 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import dev.nextchat.client.database.MessageQueueManager;
+import java.util.stream.Collectors;
 
 public class Model {
     private  static Model model;
     private final ViewFactory viewFactory;
     private final ObservableList<ChatCell> chatCells;
     private final StringProperty loggedInUser = new SimpleStringProperty();
-    private final LinkedBlockingQueue<Message> sendMessageQueue = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<Message> receivedMessageQueue = new LinkedBlockingQueue<>();
-    private final Map<UUID, Set<UUID>> groupIdToUsers = new HashMap<>();
-    private final Map<String, UUID> userPairToGroupMap = new HashMap<>();
-
+    private final ObservableList<Message> messages = FXCollections.observableArrayList();
     BiMap<String, UUID> userIdMap = HashBiMap.create();
     private final MessageQueueManager messageQueueManager = new MessageQueueManager();
+    private final GroupManager groupManager = new GroupManager();
+
 
 
     private Model() {
         this.viewFactory = new ViewFactory();
         this.chatCells = FXCollections.observableArrayList();
+        groupManager.getAllGroups();
     }
 
     public static synchronized Model getInstance() {
@@ -46,7 +45,7 @@ public class Model {
             for (User user : UserDatabase.loadUsers()) {
                 String username = user.getUsername();
                 UUID userId = user.getUserId();
-    
+
                 if (username != null && userId != null) {
                     userIdMap.put(username, userId);
                 } else {
@@ -74,19 +73,6 @@ public class Model {
         this.loggedInUser.set(username);
     }
 
-
-
-    public boolean isUserInGroup(UUID userId, UUID groupId) {
-        Set<UUID> members = groupIdToUsers.get(groupId);
-        if (members == null) return false;
-
-        for (UUID member : members) {
-            if (member.equals(userId)) {
-                return true;
-            }
-        }
-        return false;
-    }
     public Map<UUID, String> getUserIdToUsernameMap() {
         return userIdMap.inverse();
     }
@@ -120,11 +106,19 @@ public class Model {
         return false;
     }
 
+    public String resolveRecipientFromGroup(UUID groupId, UUID selfId) {
+        UUID otherId = groupManager.getOtherMember(groupId, selfId);
+        return otherId == null ? null : userIdMap.inverse().get(otherId);
+    }
+
     public void loadMessagesForUser(UUID loggedInUserId) {
         List<Message> allMessages = messageQueueManager.loadMessages();
         System.out.println("🔍 Loading messages for: " + userIdMap.inverse().get(loggedInUserId));
 
-
+        Set<UUID> groupIds = allMessages.stream()
+                .map(Message::getGroupId)
+                .collect(Collectors.toSet());
+        System.out.println("GroupIds: " + groupIds);
         for (Message msg : allMessages) {
             UUID groupId = msg.getGroupId();
             UUID senderId = msg.getSenderId();
@@ -132,9 +126,9 @@ public class Model {
             System.out.println("Checking message:");
             System.out.println("  - groupId: " + msg.getGroupId());
             System.out.println("  - senderId: " + msg.getSenderId());
-            System.out.println("  - userInGroup? " + isUserInGroup(loggedInUserId, msg.getGroupId()));
+            System.out.println("  - userInGroup? " + groupManager.isUserInGroup(loggedInUserId, groupId));
 
-            if (!isUserInGroup(loggedInUserId, groupId)) continue;
+            if (!groupManager.isUserInGroup(loggedInUserId, groupId)) continue;
 
             // Case: RECEIVED message (sender ≠ me)
             if (!senderId.equals(loggedInUserId)) {
@@ -155,68 +149,45 @@ public class Model {
                     System.out.println("⚠️ Could not resolve recipient for groupId: " + groupId);
                 }
             }
-
-
         }
-
     }
 
+    public UUID createGroupId(String userAName, String userBName) {
+        UUID userAId = userIdMap.get(userAName);
+        UUID userBId = userIdMap.get(userBName);
 
-    public String resolveRecipientFromGroup(UUID groupId, UUID selfId) {
-        Set<UUID> members = groupIdToUsers.get(groupId);
-        if (members == null) return null;
-
-        for (UUID uid : members) {
-            if (!uid.equals(selfId)) {
-                return userIdMap.inverse().get(uid);
-            }
+        if (userAId == null) {
+            throw new IllegalArgumentException("Unknown user: " + userAName);
+        }
+        if (userBId == null) {
+            throw new IllegalArgumentException("Unknown user: " + userBName);
         }
 
-        System.out.println("⚠️ Failed to resolve recipient for groupId: " + groupId + " and selfId: " + selfId);
-        return null;
+        // Delegate to GroupManager’s UUID-based method
+        return groupManager.getOrCreateGroupId(userAId, userBId);
     }
 
-
-    public UUID getOrCreateGroupId(String userA, String userB) {
-        List<String> sorted = new ArrayList<>(List.of(userA, userB));
-        Collections.sort(sorted);
-        String pairKey = sorted.get(0) + "-" + sorted.get(1);
-
-        if (userPairToGroupMap.containsKey(pairKey)) {
-            return userPairToGroupMap.get(pairKey);
+    public ChatCell findOrCreateChatCell(String otherUsername) {
+        // 1) Resolve UUIDs
+        UUID me      = getLoggedInUserId();
+        UUID otherId = userIdMap.get(otherUsername);
+        if (otherId == null) {
+            throw new IllegalArgumentException("Unknown user: " + otherUsername);
         }
 
-        UUID groupId = UUID.randomUUID();
-        userPairToGroupMap.put(pairKey, groupId);
+        // 2) Ask GroupManager for a groupId for this pair (creates if missing)
+        UUID groupId = groupManager.getOrCreateGroupId(me, otherId);
 
-        UUID idA = userIdMap.get(userA);
-        UUID idB = userIdMap.get(userB);
-        Set<UUID> members = new HashSet<>();
-        members.add(idA);
-        members.add(idB); // duplicate won't throw here
-
-        groupIdToUsers.put(groupId, members);
-
-        System.out.println("🔗 Created groupId: " + groupId + " for pair: " + pairKey);
-        return groupId;
-    }
-
-
-    public ChatCell findOrCreateChatCell(String fusername) {
-        Optional<ChatCell> existing = chatCells.stream() // Avoid nullPointer for debug
-                .filter(c -> c.senderProperty().get().equals(fusername))
-                .findFirst();
-        UUID groupId = getOrCreateGroupId(fusername, getLoggedInUser());
-        if (existing.isPresent()) {
-            System.out.println("Found existing ChatCell for user " + fusername + "and " + getLoggedInUser() +" with groupId: " + groupId);
-            return existing.get();
-        } else {
-            System.out.println("Created new ChatCell for user " + fusername + "and " + getLoggedInUser() + " with groupId: " + groupId);
-            ChatCell cell = new ChatCell(fusername, "", null);
-            chatCells.add(cell);
-            logUsersInGroup(groupId);
-            return cell;
-        }
+        // 3) Try to find an existing ChatCell for that conversation
+        return chatCells.stream()
+                .filter(c -> c.getGroupId().equals(groupId))
+                .findFirst()
+                // 4) Or create one if none exists
+                .orElseGet(() -> {
+                    ChatCell cell = new ChatCell(otherUsername, groupId);
+                    chatCells.add(cell);
+                    return cell;
+                });
     }
 
     public ViewFactory getViewFactory() {
@@ -229,18 +200,6 @@ public class Model {
 
     public MessageQueueManager getMessageQueueManager() {
         return messageQueueManager;
-    }
-
-    public void logUsersInGroup(UUID groupId) {
-        System.out.println("Users in groupId: " + groupId);
-        Set<UUID> users = groupIdToUsers.get(groupId);
-
-        if (users != null) {
-            for (UUID userId : users) {
-                String username = userIdMap.inverse().get(userId);
-                System.out.println(" - " + username + ": " + userId);
-            }
-        }
     }
 
     public void resetSessionState() {

@@ -35,6 +35,7 @@ public class NewMsgBoxController implements Initializable {
     private void addListeners() {
         return_btn.setOnAction(e -> {
             Model.getInstance().getViewFactory().getClientSelection().set("Chats");
+            fusername.clear();
         });
         self_chat.setOnAction(e -> {
 
@@ -44,6 +45,7 @@ public class NewMsgBoxController implements Initializable {
                 Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
                 Model.getInstance().getViewFactory().getClientSelection().set("Chats");
             }
+            fusername.clear();
         });
 
         chat_btn.setOnAction(e -> {
@@ -62,6 +64,7 @@ public class NewMsgBoxController implements Initializable {
             Model.getInstance().findOrCreateChatCell(enteredUsername);
             Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
             Model.getInstance().getViewFactory().getClientSelection().set("Chats");
+            fusername.clear();
         });
         new_grp_btn.setOnAction(e -> {
             Model.getInstance().getViewFactory().getClientSelection().set("Group");

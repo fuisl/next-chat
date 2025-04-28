@@ -21,5 +21,6 @@ module dev.nextchat.client {
     exports dev.nextchat.client;
     exports dev.nextchat.client.controllers to javafx.fxml;
     exports dev.nextchat.client.models to javafx.fxml;
+    exports dev.nextchat.client.database;
 
 }

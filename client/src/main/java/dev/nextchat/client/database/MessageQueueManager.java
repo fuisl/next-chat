@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageQueueManager {
-    private static final File messageFile = new File("src/main/resources/Db/sent_message.json");
+    private static final File messageFile = new File("src/main/resources/Db/messages.json");
     private static final ObjectMapper mapper;
     private static final LinkedBlockingQueue<Message> sendQueue = new LinkedBlockingQueue<>();
 

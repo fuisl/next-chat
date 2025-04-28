@@ -12,7 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Client {
     public static void main(String[] args) {
         Model.getInstance().preloadUserIdMapFromJson();
-
         Application.launch(App.class, args);
     }
 }

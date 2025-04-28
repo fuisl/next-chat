@@ -24,6 +24,7 @@ public class ClientMenuController implements Initializable {
         Stage currentStage = (Stage) logout_btn.getScene().getWindow();
         Model.getInstance().getViewFactory().closeStage(currentStage);
         Model.getInstance().getViewFactory().showLoginWindow();
+        Model.getInstance().getViewFactory().getClientSelectedChat().set(null);
         Model.getInstance().resetSessionState();
     }
 
