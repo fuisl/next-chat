@@ -27,7 +27,20 @@ public class FetchBeforeMessageCommandFactory implements CommandFactory {
     @Override
     public Command create(JSONObject json) throws Exception {
         UUID groupId = UUID.fromString(json.getString("groupId"));
-        Instant timestamp = Instant.parse(json.getString("timestamp"));
+
+        String timestampStr = json.getString("timestamp");
+        
+        // Validate and parse the timestamp
+        Instant timestamp;
+        try {
+            if (!timestampStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$")) {
+                throw new IllegalArgumentException("Invalid timestamp format. Expected ISO-8601 format.");
+            }
+            timestamp = Instant.parse(timestampStr);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to parse timestamp: " + e.getMessage(), e);
+        }
+
         return new FetchBeforeMessageCommand(groupId, messageService, groupService, timestamp);
     }
 
