@@ -44,4 +44,11 @@ public interface MessageService {
      * @return list of matched messages
      */
     List<Message> searchMessages(UUID groupId, String keyword);
+
+    /**
+     * Deletes a message by its ID.
+     *
+     * @param messageId the ID of the message to delete
+     */
+    Message deleteMessage(UUID messageId);
 }

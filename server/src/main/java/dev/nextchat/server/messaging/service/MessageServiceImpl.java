@@ -43,4 +43,9 @@ public class MessageServiceImpl implements MessageService {
     public List<Message> searchMessages(UUID groupId, String keyword) {
         return messageRepository.findByGroupIdAndContentRegex(groupId, keyword);
     }
+
+    @Override
+    public Message deleteMessage(UUID messageId) {
+        messageRepository.deleteById(messageId);
+    }
 }
