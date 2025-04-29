@@ -16,4 +16,8 @@ public interface MessageRepository extends MongoRepository<Message, UUID> {
     List<Message> findTop20ByGroupIdAndTimestampBeforeOrderByTimestampDesc(UUID groupId, Instant timestamp);
 
     List<Message> findByGroupIdAndContentRegex(UUID groupId, String searchText);
+
+    Message findById(UUID messageId);
+
+    Message save(Message message);
 }

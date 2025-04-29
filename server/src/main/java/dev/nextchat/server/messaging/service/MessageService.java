@@ -44,4 +44,13 @@ public interface MessageService {
      * @return list of matched messages
      */
     List<Message> searchMessages(UUID groupId, String keyword);
+
+    /**
+     * Edits the content of an existing message.
+     *
+     * @param messageId the ID of the message to edit
+     * @param newContent the new content for the message
+     * @return the updated message
+     */
+    Message editMessage(UUID messageId, String newContent);
 }

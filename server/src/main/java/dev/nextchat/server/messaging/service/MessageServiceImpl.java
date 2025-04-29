@@ -43,4 +43,14 @@ public class MessageServiceImpl implements MessageService {
     public List<Message> searchMessages(UUID groupId, String keyword) {
         return messageRepository.findByGroupIdAndContentRegex(groupId, keyword);
     }
+
+    @Override
+    public Message editMessage(UUID messageId, String newContent) {
+        Message message = messageRepository.findById(messageId);
+        if (message != null) {
+            message.setContent(newContent);
+            return messageRepository.save(message);
+        }       
+        return null;
+    }
 }
