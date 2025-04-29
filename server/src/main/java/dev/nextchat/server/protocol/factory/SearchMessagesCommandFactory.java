@@ -5,15 +5,11 @@ import dev.nextchat.server.group.service.GroupService;
 import dev.nextchat.server.protocol.Command;
 import dev.nextchat.server.protocol.CommandType;
 import dev.nextchat.server.protocol.impl.SearchMessagesCommand;
-
 import org.json.JSONObject;
-import org.springframework.stereotype.Component;
 
-import java.util.UUID;
 
 @Component
 public class SearchMessagesCommandFactory implements CommandFactory {
-
     private final MessageService messageService;
     private final GroupService groupService;
 
@@ -26,7 +22,6 @@ public class SearchMessagesCommandFactory implements CommandFactory {
     public Command create(JSONObject json) throws Exception {
         UUID groupId = UUID.fromString(json.getString("groupId"));
         String keyword = json.getString("keyword");
-
         return new SearchMessagesCommand(groupId, keyword, messageService, groupService);
     }
 
@@ -34,4 +29,5 @@ public class SearchMessagesCommandFactory implements CommandFactory {
     public CommandType getType() {
         return CommandType.SEARCH_MESSAGES;
     }
+    
 }
