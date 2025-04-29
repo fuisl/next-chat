@@ -4,6 +4,7 @@ public enum CommandType {
     LOGIN,
     SIGNUP,
     SEND_MESSAGE,
+    TYPING_INDICATOR,
     FETCH_RECENT,
     FETCH_BEFORE,
     SEARCH_MESSAGES,
