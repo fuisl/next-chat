@@ -13,16 +13,15 @@ module dev.nextchat.client {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.databind;
 
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.datatype.jsr310;
-
     opens dev.nextchat.client to javafx.fxml;
     opens dev.nextchat.client.controllers to javafx.fxml;
     opens dev.nextchat.client.models to com.fasterxml.jackson.databind;
 
     exports dev.nextchat.client;
     exports dev.nextchat.client.backend.model;
+
     opens dev.nextchat.client.backend.model to com.fasterxml.jackson.databind;
+
     exports dev.nextchat.client.controllers to javafx.fxml;
     exports dev.nextchat.client.models to javafx.fxml;
 
