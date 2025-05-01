@@ -2,10 +2,14 @@ package dev.nextchat.client.views;
 
 import dev.nextchat.client.controllers.ClientController;
 
+import dev.nextchat.client.controllers.MsgBBController;
+import dev.nextchat.client.models.Message;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -124,6 +128,22 @@ public class ViewFactory {
         }
         return newGroupView;
     }
+
+    public Node getMessageBubble(Message message, boolean isSender) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/MsgBB.fxml"));
+            Node bubble = loader.load();
+
+            MsgBBController controller = loader.getController();
+            controller.setMessage(message, isSender);
+
+            return bubble;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Label("Failed to load message");
+        }
+    }
+
     public void closeStage(Stage stage) {
         stage.close();
     }

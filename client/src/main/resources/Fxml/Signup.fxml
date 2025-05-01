@@ -12,6 +12,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.control.PasswordField?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../Styles/login.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.SignupController">
    <children>
       <VBox layoutX="6.0" prefHeight="400.0" prefWidth="205.0" styleClass="logo_ctn" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -29,9 +30,9 @@
             <Label text="Username:" />
             <TextField fx:id="username" prefHeight="19.0" prefWidth="243.0" styleClass="input_field" />
             <Label text="Password:" />
-            <TextField fx:id="password" styleClass="input_field" />
+            <PasswordField fx:id="password" styleClass="input_field" />
             <Label text="Confirm Password" />
-            <TextField fx:id="passwordConfirm" styleClass="input_field" />
+            <PasswordField fx:id="passwordConfirm" styleClass="input_field" />
             <Button fx:id="signin_btn" mnemonicParsing="false" styleClass="login_button" text="Sign up" textAlignment="CENTER" />
             <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="350.0">
                <children>
@@ -46,7 +47,7 @@
                   <Insets />
                </opaqueInsets>
             </HBox>
-            <Label fx:id="error_lbl" prefHeight="21.0" prefWidth="58.0" styleClass="error_lbl">
+            <Label fx:id="error_lbl" prefHeight="21.0" prefWidth="250.0" styleClass="error_lbl">
                <font>
                   <Font size="15.0" />
                </font>

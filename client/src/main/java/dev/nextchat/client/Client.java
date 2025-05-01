@@ -3,6 +3,7 @@
  */
 package dev.nextchat.client;
 
+import dev.nextchat.client.models.Model;
 import javafx.application.Application;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.net.ConnectException;
@@ -14,21 +15,8 @@ import dev.nextchat.client.backend.MessageController;
 
 public class Client {
     public static void main(String[] args) {
-        ConnectionManager connectionManager = new ConnectionManager();
+        Model.getInstance().preloadUserIdMapFromJson();
 
-        try {
-            String status = connectionManager.init();
-
-            if (status.equals("FAIL")) {
-                throw new ConnectException("Failed connecting to server.");
-            }
-        } catch (ConnectException e) {
-            e.printStackTrace();
-        }
-
-        MessageController messageController = new MessageController(connectionManager);
-        messageController.start();
-        
         Application.launch(App.class, args);
 
         messageController.stop();

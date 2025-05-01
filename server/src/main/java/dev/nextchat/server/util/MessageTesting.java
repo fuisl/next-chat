@@ -47,4 +47,24 @@ public class MessageTesting {
             }
         }
     }
+
+    public void printReceivedMessages(String groupId) {
+        List<ReceivedMessage> messages = receivedMessageRepository.findByGroupId(UUID.fromString(groupId));
+        System.out.printf("Found %d\n", messages.size());
+        
+        if (messages.isEmpty()) {
+            System.out.println("No messages found.");
+        } else {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    
+            try {
+                objectMapper.writeValue(new File("result_messages.json"), messages);
+                System.out.println("Messages saved to messages.json");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

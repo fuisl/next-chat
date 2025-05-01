@@ -1,13 +1,26 @@
 package dev.nextchat.client.controllers;
 
+import dev.nextchat.client.database.MessageQueueManager;
+import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
-import javafx.fxml.FXML;
+import dev.nextchat.client.models.Message;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 public class MessagesController implements Initializable {
 
@@ -16,37 +29,64 @@ public class MessagesController implements Initializable {
     public Button more_btn;
     public TextField msg_inp;
     public Button send_btn;
-    public VBox chatContainer;
     public Label Fid;
-    private String fusername;
+    public ListView<Message> msgListView;
 
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         send_btn.setOnAction(e -> {
-            String message = msg_inp.getText().trim();
+            String content = msg_inp.getText().trim();
+            if (content.isEmpty()) return;
 
-            if (!message.isEmpty()) {
-                Label messageLabel = new Label("Me: " + message);
-                messageLabel.setWrapText(true);
-                messageLabel.setStyle("-fx-background-color: lightblue; -fx-padding: 10; -fx-background-radius: 8;");
 
-                chatContainer.getChildren().add(messageLabel);
-                msg_inp.clear();
-            }
+            UUID senderId = Model.getInstance().getLoggedInUserId();
+            String senderName = Model.getInstance().getLoggedInUser();
+            UUID groupId = Model.getInstance().getOrCreateGroupId(senderName,Fid.getText().trim());
+
+            Message msg = new Message(UUID.randomUUID(),senderId, groupId, content, Instant.now());
+
+
+            // Store locally in chat history
+            ChatCell chat = Model.getInstance().findOrCreateChatCell(Fid.getText().trim());
+            chat.addMessage(msg);
+
+            MessageQueueManager.enqueueMessage(msg);
+            MessageQueueManager.flushQueueToFile(); //Flush to json
+            msg_inp.clear();
         });
 
+        // Loading new chat
         Model.getInstance().getViewFactory().getClientSelectedChat().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && !newVal.isBlank()) {
-                Fid.setText(newVal);
+            loadChat(newVal);
+        });
+        loadChat(Model.getInstance().getViewFactory().getClientSelectedChat().get());
 
+        // Custom message bubble rendering
+        msgListView.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(Message msg, boolean empty) {
+                super.updateItem(msg, empty);
+
+                if (empty || msg == null) {
+                    setGraphic(null);
+                } else {
+                    boolean isSender = msg.getSenderId().equals(Model.getInstance().getLoggedInUserId());
+                    Node bubble = Model.getInstance().getViewFactory().getMessageBubble(msg, isSender);
+                    setGraphic(bubble);
+                }
             }
         });
 
-        String currentUser = Model.getInstance().getViewFactory().getClientSelectedChat().get();
-        if (currentUser != null && !currentUser.isBlank()) {
-            Fid.setText(currentUser);
+    }
+    private void loadChat(String username) {
+        if (username != null && !username.isBlank()) {
+            Fid.setText(username);
+            ChatCell selectedChat = Model.getInstance().findOrCreateChatCell(username);
+            msgListView.setItems(selectedChat.getMessages());
         }
     }
+
+
 }
