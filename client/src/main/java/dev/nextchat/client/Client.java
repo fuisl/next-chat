@@ -18,8 +18,5 @@ public class Client {
         Model.getInstance().preloadUserIdMapFromJson();
 
         Application.launch(App.class, args);
-
-        messageController.stop();
     }
 }
-
