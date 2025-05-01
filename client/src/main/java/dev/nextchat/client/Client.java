@@ -6,6 +6,10 @@ package dev.nextchat.client;
 import dev.nextchat.client.models.Model;
 import javafx.application.Application;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.net.ConnectException;
+
+import dev.nextchat.client.backend.ConnectionManager;
+import dev.nextchat.client.backend.MessageController;
 
 @SpringBootApplication(proxyBeanMethods = false)
 
@@ -16,4 +20,3 @@ public class Client {
         Application.launch(App.class, args);
     }
 }
-

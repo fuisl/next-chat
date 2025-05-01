@@ -38,9 +38,9 @@ dependencies {
     implementation 'org.openjfx:javafx-controls:17' // Adjust JavaFX version as needed
     implementation 'org.openjfx:javafx-fxml:17'
     implementation 'org.openjfx:javafx-graphics:13'
+
     implementation 'org.json:json:20240303'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
-
 }
 
 javafx {
