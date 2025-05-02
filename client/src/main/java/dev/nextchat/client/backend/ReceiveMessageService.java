@@ -5,42 +5,35 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONObject;
 
 import dev.nextchat.client.backend.model.Message;
 
 public class ReceiveMessageService implements Runnable {
     private BufferedReader reader;
-    private LinkedBlockingQueue<Message> receivedMessageQueue;
-    private ObjectMapper objectMapper;
+    private LinkedBlockingQueue<JSONObject> receivedMessageQueue;
     private boolean running;
 
-    public ReceiveMessageService(BufferedReader reader, LinkedBlockingQueue<Message> receivedMessageQueue) {
+    public ReceiveMessageService(BufferedReader reader, LinkedBlockingQueue<JSONObject> receivedMessageQueue) {
         this.reader = reader;
         this.receivedMessageQueue = receivedMessageQueue;
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
         this.running = true;
     }
 
     public void run() {
         try {
-            String jsonMessage;
-            
+            String rawMessage;
+            JSONObject json;
+
             while (running) {
                 if (reader.ready()) {
-                    jsonMessage = reader.readLine();
+                    rawMessage = reader.readLine();
+                    json = new JSONObject(rawMessage);
 
-                    Message message = this.objectMapper.readValue(jsonMessage, Message.class);
-
-                    // System.out.println("Received message for groupID: " + message.getGroupId().toString());
-                    System.out.println(message.getMessage());
-
-                    this.receivedMessageQueue.put(message);
-                }                
+                    this.receivedMessageQueue.put(json);
+                }
             }
-        } catch (InterruptedException e){
+        } catch (InterruptedException e) {
             this.running = false;
             System.out.println("ReceiveService interrupted, shutting down thread...");
             e.printStackTrace();

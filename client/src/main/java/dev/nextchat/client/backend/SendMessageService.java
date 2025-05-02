@@ -6,44 +6,32 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONObject;
 
 import dev.nextchat.client.backend.model.Message;
 
 public class SendMessageService implements Runnable {
     private PrintWriter writer;
-    private LinkedBlockingQueue<Message> sendMessageQueue;
-    private ObjectMapper objectMapper;
+    private LinkedBlockingQueue<JSONObject> sendMessageQueue;
     private boolean running;
 
-    public SendMessageService(PrintWriter writer, LinkedBlockingQueue<Message> sendMessageQueue) {
+    public SendMessageService(PrintWriter writer, LinkedBlockingQueue<JSONObject> sendMessageQueue) {
         this.writer = writer;
         this.sendMessageQueue = sendMessageQueue;
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
         this.running = true;
     }
 
     public void run() {
         try {
-            String jsonMessage;
-            
+            String rawMessage;
+
             while (!Thread.currentThread().isInterrupted()) {
-                Message message = sendMessageQueue.take();
+                JSONObject jsonMessage = sendMessageQueue.take();
 
-                // System.out.println("Send message for groupID: " + message.getGroupId().toString() + "with payload: " + message.getMessage());
-
-                jsonMessage = objectMapper.writeValueAsString(message);
-
-                writer.println(jsonMessage);
+                writer.println(jsonMessage.toString());
             }
-        } catch (InterruptedException e){
+        } catch (InterruptedException e) {
             System.out.println("SendService interrupted, shutting down thread...");
-            e.printStackTrace();
-            Thread.currentThread().interrupt();
-        } catch (IOException e) {
-            System.out.println("IO Error in ReceiverService...");
             e.printStackTrace();
             Thread.currentThread().interrupt();
         }
