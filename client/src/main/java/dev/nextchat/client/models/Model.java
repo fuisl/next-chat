@@ -152,7 +152,7 @@ public class Model {
         }
     }
 
-    public UUID createGroupId(String userAName, String userBName) {
+    public UUID getOrCreateGroupId(String userAName, String userBName) {
         UUID userAId = userIdMap.get(userAName);
         UUID userBId = userIdMap.get(userBName);
 

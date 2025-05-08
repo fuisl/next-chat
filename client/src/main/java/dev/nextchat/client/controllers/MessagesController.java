@@ -5,18 +5,11 @@ import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
 import dev.nextchat.client.models.Message;
 
-import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalDateTime;
+
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -43,10 +36,9 @@ public class MessagesController implements Initializable {
 
             UUID senderId = Model.getInstance().getLoggedInUserId();
             String senderName = Model.getInstance().getLoggedInUser();
-            UUID groupId = Model.getInstance().createGroupId(senderName,Fid.getText().trim());
+            UUID groupId = Model.getInstance().getOrCreateGroupId(senderName,Fid.getText().trim());
 
             Message msg = new Message(UUID.randomUUID(),senderId, groupId, content, Instant.now());
-
 
             // Store locally in chat history
             ChatCell chat = Model.getInstance().findOrCreateChatCell(Fid.getText().trim());
