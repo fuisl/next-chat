@@ -5,6 +5,16 @@ import java.util.UUID;
 
 import org.json.JSONObject;
 
+/*
+ * This is a helper class for creating valid json messages based on the 
+ * predefined protocol for communication between client and server. The
+ * commands available here are based on the commit 70e14f91030... of pull request 18.
+ * These methods should be the only way the client UI uses to send messages to the server,
+ * which can be done by using the desired method to generate the JSONObject
+ * and push to the SendingMessageQueue.
+ * @see <a href="https://github.com/fuisl/next-chat/pull/18">Pull request 18</a>
+*/
+
 public class RequestFactory {
     public static JSONObject createMessageRequest(UUID userId, UUID groupId, String content) {
         JSONObject json = new JSONObject();
