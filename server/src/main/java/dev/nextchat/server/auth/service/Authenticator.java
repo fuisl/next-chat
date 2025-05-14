@@ -50,6 +50,10 @@ public class Authenticator {
         return userRepository.findByUsername(username);
     }
 
+    public Optional<User> getUserByUserId(UUID id) {
+        return userRepository.findById(id);
+    }
+
     public UUID getUserIdByUsername(String username) {
         return getUserByUsername(username)
                 .map(User::getId)
