@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,6 +28,11 @@ public class Authenticator {
         Optional<User> userOpt = userRepository.findByUsername(credential.getUsername());
         return userOpt.isPresent() &&
                 passwordEncoder.matches(credential.getRawPassword(), userOpt.get().getPassword());
+    }
+
+    @Transactional
+    public int updateLastOnlineTimeStamp(Instant time, UUID userId) {
+        return userRepository.setLastOnlineTimeStamp(time, userId);
     }
 
     @Transactional

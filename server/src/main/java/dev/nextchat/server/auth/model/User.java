@@ -1,6 +1,8 @@
 package dev.nextchat.server.auth.model;
 
 import jakarta.persistence.*;
+
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -18,8 +20,12 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = true, updatable = true)
+    private Instant last_online;
+
     // Constructors
-    public User() {}  // Required by JPA
+    public User() {
+    } // Required by JPA
 
     public User(String username, String password) {
         this.username = username;
@@ -37,5 +43,9 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public Instant getLastOnlineTimeStamp() {
+        return last_online;
     }
 }

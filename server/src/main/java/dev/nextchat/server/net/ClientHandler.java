@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.time.Instant;
 import java.util.UUID;
 
 public class ClientHandler implements Runnable {
@@ -100,6 +101,7 @@ public class ClientHandler implements Runnable {
                 if (sessionToken != null) {
                     sessionService.removeSession(sessionToken.getToken());
                     relayService.unregister(sessionToken.getUserId());
+                    authenticator.updateLastOnlineTimeStamp(Instant.now(), sessionToken.getUserId());
                     System.out.printf("Session %s removed for %s%n", sessionToken.getToken(), socket.getInetAddress());
                 }
                 socket.close();
