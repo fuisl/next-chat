@@ -66,7 +66,8 @@ public class FetchNewMessageCommand implements Command {
 
         // TODO: handle null timestamp
         if (opt.isPresent()) {
-            lastOnlineTimeStamp = opt.get().getLastOnlineTimeStamp();
+            lastOnlineTimeStamp = opt.get().getLastOnlineTimeStamp() != null ? opt.get().getLastOnlineTimeStamp()
+                    : opt.get().getCreateTimeStamp();
         } else {
             response.put("status", "error");
             response.put("message", "User does not exist!");

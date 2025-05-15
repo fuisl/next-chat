@@ -23,6 +23,9 @@ public class User {
     @Column(nullable = true, updatable = true)
     private Instant last_online;
 
+    @Column(nullable = false, updatable = false)
+    private Instant created_at;
+
     // Constructors
     public User() {
     } // Required by JPA
@@ -47,5 +50,14 @@ public class User {
 
     public Instant getLastOnlineTimeStamp() {
         return last_online;
+    }
+
+    public Instant getCreateTimeStamp() {
+        return created_at;
+    }
+
+    // Setters
+    public void setCreateTimeStamp(Instant time) {
+        this.created_at = time;
     }
 }

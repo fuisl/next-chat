@@ -42,6 +42,7 @@ public class Authenticator {
         }
         String hashedPassword = passwordEncoder.encode(credential.getRawPassword());
         User user = new User(credential.getUsername(), hashedPassword);
+        user.setCreateTimeStamp(Instant.now());
         userRepository.save(user);
         return true;
     }
