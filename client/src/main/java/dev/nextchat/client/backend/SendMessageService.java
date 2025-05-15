@@ -21,6 +21,7 @@ public class SendMessageService implements Runnable {
         this.running = true;
     }
 
+
     public void run() {
         try {
             String rawMessage;
@@ -29,7 +30,10 @@ public class SendMessageService implements Runnable {
                 JSONObject jsonMessage = sendMessageQueue.take();
 
                 writer.println(jsonMessage.toString());
+                writer.flush();
+                System.out.println("[SendMessageService] Sending message to server: " + jsonMessage.toString());
             }
+
         } catch (InterruptedException e) {
             System.out.println("SendService interrupted, shutting down thread...");
             e.printStackTrace();

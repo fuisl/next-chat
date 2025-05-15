@@ -1,13 +1,4 @@
 [ {
-  "groupId" : "28d2c2d5-f00d-4916-a486-b1b681c4ad31",
+  "groupId" : "c123783a-0ab7-4f40-a995-4148bbf62939",
   "members" : [ "6d8b1075-7212-4e30-8ef4-351b1cefdcd8", "752406cb-e3d5-4ffe-9eb9-f938835b5faa" ]
-}, {
-  "groupId" : "6da5dd96-87fe-4e77-88ae-db3c1efc4c2c",
-  "members" : [ "4975e2c0-e7e4-4e88-b185-7d210d63344e", "6d8b1075-7212-4e30-8ef4-351b1cefdcd8" ]
-}, {
-  "groupId" : "00a31180-c87b-408a-810d-3771acf23e77",
-  "members" : [ "4975e2c0-e7e4-4e88-b185-7d210d63344e", "752406cb-e3d5-4ffe-9eb9-f938835b5faa" ]
-}, {
-  "groupId" : "43c63ccf-f733-4df9-9a68-1d0b827436b4",
-  "members" : [ "6d8b1075-7212-4e30-8ef4-351b1cefdcd8" ]
 } ]

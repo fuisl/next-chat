@@ -1,12 +1,6 @@
 package dev.nextchat.client.backend;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.Buffer;
 import java.time.Instant;
 import java.util.Scanner;
@@ -37,6 +31,7 @@ public class MessageController {
         this.sendMessageThread = new Thread(
                 new SendMessageService(this.connectionManager.getWriter(), this.sendMessageQueue));
         this.sendMessageThread.start();
+        System.out.println("[MessageController] Send thread started");
     }
 
     // private void getInputTest() {

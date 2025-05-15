@@ -1,7 +1,5 @@
 package dev.nextchat.client.controllers;
 
-import dev.nextchat.client.models.ChatCell;
-import dev.nextchat.client.models.Message;
 import dev.nextchat.client.models.Model;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -11,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 

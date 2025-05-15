@@ -5,6 +5,8 @@ import java.util.*;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import dev.nextchat.client.backend.ConnectionManager;
+import dev.nextchat.client.backend.MessageController;
 import dev.nextchat.client.database.GroupManager;
 import dev.nextchat.client.database.UserDatabase;
 import dev.nextchat.client.views.ViewFactory;
@@ -24,12 +26,14 @@ public class Model {
     BiMap<String, UUID> userIdMap = HashBiMap.create();
     private final MessageQueueManager messageQueueManager = new MessageQueueManager();
     private final GroupManager groupManager = new GroupManager();
-
-
+    private ConnectionManager connectionManager;
+    private MessageController messageController;
 
     private Model() {
         this.viewFactory = new ViewFactory();
         this.chatCells = FXCollections.observableArrayList();
+        this.connectionManager = new ConnectionManager();
+        this.messageController = new MessageController(connectionManager);
         groupManager.getAllGroups();
     }
 
@@ -38,6 +42,22 @@ public class Model {
             model = new Model();
         }
         return model;
+    }
+
+    public void setConnectionManager(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
+
+    public ConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
+
+    public void setMessageController(MessageController messageController) {
+        this.messageController = messageController;
+    }
+
+    public MessageController getMessageController() {
+        return messageController;
     }
 
     public void preloadUserIdMapFromJson() {
@@ -207,6 +227,5 @@ public class Model {
         loggedInUser.set(null);
         System.out.println("[Model] Session state reset.");
     }
-
 
 }

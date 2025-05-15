@@ -3,6 +3,7 @@ package dev.nextchat.client.backend.utils;
 import java.time.Instant;
 import java.util.UUID;
 
+import dev.nextchat.client.models.Message;
 import org.json.JSONObject;
 
 /*
@@ -16,16 +17,17 @@ import org.json.JSONObject;
 */
 
 public class RequestFactory {
-    public static JSONObject createMessageRequest(UUID userId, UUID groupId, String content) {
+    public static JSONObject createMessageRequest(Message msg) {
         JSONObject json = new JSONObject();
         json.put("type", "message");
-        json.put("groupId", groupId.toString());
-        json.put("senderId", userId.toString());
-        json.put("content", content);
-        json.put("timestamp", Instant.now());
-
+        json.put("id", msg.getId().toString());
+        json.put("senderId", msg.getSenderId().toString());
+        json.put("groupId", msg.getGroupId().toString());
+        json.put("content", msg.getMessage());
+        json.put("timestamp", msg.getTimestamp());
         return json;
     }
+
 
     public static JSONObject createLoginRequest(String userName, String raw_password) {
         JSONObject json = new JSONObject();

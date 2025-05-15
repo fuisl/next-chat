@@ -1,5 +1,7 @@
 package dev.nextchat.client.models;
 
+import org.json.JSONObject;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -61,5 +63,15 @@ public class Message {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public static Message fromJson(JSONObject json) {
+        return new Message(
+                UUID.fromString(json.getString("id")),
+                UUID.fromString(json.getString("senderId")),
+                UUID.fromString(json.getString("groupId")),
+                json.getString("content"),
+                Instant.parse(json.getString("timestamp"))
+        );
     }
 }

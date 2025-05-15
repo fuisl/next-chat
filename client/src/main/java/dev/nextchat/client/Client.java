@@ -29,6 +29,7 @@ public class Client {
 
         MessageController messageController = new MessageController(connectionManager);
         messageController.start();
+        Model.getInstance().setMessageController(messageController);
 
         Application.launch(App.class, args);
     }

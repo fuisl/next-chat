@@ -1,5 +1,7 @@
 package dev.nextchat.client.controllers;
 
+import dev.nextchat.client.backend.MessageController;
+import dev.nextchat.client.backend.utils.RequestFactory;
 import dev.nextchat.client.database.MessageQueueManager;
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
@@ -10,6 +12,7 @@ import java.time.Instant;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -33,19 +36,20 @@ public class MessagesController implements Initializable {
             String content = msg_inp.getText().trim();
             if (content.isEmpty()) return;
 
-
             UUID senderId = Model.getInstance().getLoggedInUserId();
             String senderName = Model.getInstance().getLoggedInUser();
             UUID groupId = Model.getInstance().getOrCreateGroupId(senderName,Fid.getText().trim());
+            Message msg = new Message(UUID.randomUUID(),senderId,groupId,content,Instant.now());
 
-            Message msg = new Message(UUID.randomUUID(),senderId, groupId, content, Instant.now());
+            JSONObject message = RequestFactory.createMessageRequest(msg);
+            MessageController msgCtrl = Model.getInstance().getMessageController();
+            msgCtrl.getSendMessageQueue().offer(message);
+            System.out.println("[MessagesController] Queued message: " + message.toString());
 
             // Store locally in chat history
             ChatCell chat = Model.getInstance().findOrCreateChatCell(Fid.getText().trim());
             chat.addMessage(msg);
 
-            MessageQueueManager.enqueueMessage(msg);
-            MessageQueueManager.flushQueueToFile(); //Flush to json
             msg_inp.clear();
         });
 
