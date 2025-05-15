@@ -30,11 +30,12 @@ public interface MessageService {
     /**
      * Retrieves up to 20 older messages for a group sent before the given timestamp.
      *
-     * @param groupId  the group ID
      * @param before   timestamp cutoff (exclusive)
      * @return list of messages older than the given timestamp
      */
     List<Message> findMessagesBefore(UUID groupId, Instant before);
+
+    List<Message> findAllNewMessagesByGroups(List<UUID> groupIds, Instant timestamp);
 
     /**
      * Searches messages in a group using a case-insensitive regex keyword.

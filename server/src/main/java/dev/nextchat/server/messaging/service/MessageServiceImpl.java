@@ -43,4 +43,9 @@ public class MessageServiceImpl implements MessageService {
     public List<Message> searchMessages(UUID groupId, String keyword) {
         return messageRepository.findByGroupIdAndContentRegex(groupId, keyword);
     }
+
+    @Override
+    public List<Message> findAllNewMessagesByGroups(List<UUID> groupIds, Instant after) {
+        return messageRepository.findAllNewMessagesByGroups(groupIds, after);
+    }
 }
