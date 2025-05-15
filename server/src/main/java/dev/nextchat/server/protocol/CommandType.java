@@ -6,6 +6,7 @@ public enum CommandType {
     SEND_MESSAGE,
     FETCH_RECENT,
     FETCH_BEFORE,
+    FETCH_NEW,
     SEARCH_MESSAGES,
     UNKNOWN,
     CREATE_GROUP,
