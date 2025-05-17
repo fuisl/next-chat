@@ -26,37 +26,7 @@ public class MessageQueueManager {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    // Called from UI when user sends a message
-    public static void enqueueMessage(Message message) {
-        sendQueue.offer(message); // non-blocking add
-        System.out.println("Enqueued message: " + message.getMessage());
-    }
-
-    // Writes all queued messages into the JSON file
-    public static void flushQueueToFile() {
-        try {
-            // Ensure file exists
-            if (!messageFile.exists() || messageFile.length() == 0) {
-                Files.writeString(messageFile.toPath(), "[]");
-            }
-            // Load existing messages
-            List<Message> existing = mapper.readValue(messageFile, new TypeReference<>() {});
-
-            List<Message> toAdd = new ArrayList<>();
-            sendQueue.drainTo(toAdd);
-
-            // Append them
-            existing.addAll(toAdd);
-
-            mapper.writeValue(messageFile, existing);
-            System.out.println("Flushed " + toAdd.size() + " message(s) to sendQueue.json");
-
-        } catch (IOException e) {
-            System.err.println("Failed to flush messages to file.");
-            e.printStackTrace();
-        }
-    }
-    public List<Message> loadMessages() {
+    public static List<Message> loadMessages() {
         try {
             if (messageFile.exists()) {
                 return Arrays.asList(mapper.readValue(messageFile, Message[].class));
@@ -67,7 +37,7 @@ public class MessageQueueManager {
         return new ArrayList<>();
     }
 
-    public void saveMessage(Message message) {
+    public static void saveMessage(Message message) {
         List<Message> messages = loadMessages();
         messages.add(message);
         try {

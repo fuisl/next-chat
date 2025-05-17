@@ -27,8 +27,7 @@ public class MessagesController implements Initializable {
     public Button send_btn;
     public Label Fid;
     public ListView<Message> msgListView;
-
-
+    private MessageQueueManager messageQueueManager;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -47,6 +46,7 @@ public class MessagesController implements Initializable {
             System.out.println("[MessagesController] Queued message: " + message.toString());
 
             // Store locally in chat history
+            MessageQueueManager.saveMessage(msg);
             ChatCell chat = Model.getInstance().findOrCreateChatCell(Fid.getText().trim());
             chat.addMessage(msg);
 
