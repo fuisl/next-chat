@@ -65,13 +65,4 @@ public class Message {
         this.timestamp = timestamp;
     }
 
-    public static Message fromJson(JSONObject json) {
-        return new Message(
-                UUID.fromString(json.getString("id")),
-                UUID.fromString(json.getString("senderId")),
-                UUID.fromString(json.getString("groupId")),
-                json.getString("content"),
-                Instant.parse(json.getString("timestamp"))
-        );
-    }
 }

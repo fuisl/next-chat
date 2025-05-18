@@ -7,6 +7,7 @@ import com.google.common.collect.HashBiMap;
 
 import dev.nextchat.client.backend.ConnectionManager;
 import dev.nextchat.client.backend.MessageController;
+import dev.nextchat.client.controllers.auth.ResponseRouter;
 import dev.nextchat.client.database.GroupManager;
 import dev.nextchat.client.database.UserDatabase;
 import dev.nextchat.client.views.ViewFactory;
@@ -28,12 +29,14 @@ public class Model {
     private final GroupManager groupManager = new GroupManager();
     private ConnectionManager connectionManager;
     private MessageController messageController;
+    private ResponseRouter responseRouter;
 
     private Model() {
         this.viewFactory = new ViewFactory();
         this.chatCells = FXCollections.observableArrayList();
         this.connectionManager = new ConnectionManager();
         this.messageController = new MessageController(connectionManager);
+        this.responseRouter = new ResponseRouter();
         groupManager.getAllGroups();
     }
 
@@ -42,6 +45,10 @@ public class Model {
             model = new Model();
         }
         return model;
+    }
+
+    public ResponseRouter getResponseRouter() {
+        return responseRouter;
     }
 
     public void setConnectionManager(ConnectionManager connectionManager) {
@@ -172,6 +179,26 @@ public class Model {
         }
     }
 
+    public void renderMessage(Message msg, UUID loggedInUserId) {
+        UUID groupId = msg.getGroupId();
+        UUID senderId = msg.getSenderId();
+
+        if (!groupManager.isUserInGroup(loggedInUserId, groupId)) return;
+
+        if (!senderId.equals(loggedInUserId)) {
+            String senderUsername = userIdMap.inverse().get(senderId);
+            ChatCell cell = findOrCreateChatCell(senderUsername);
+            if (cell != null) cell.addMessage(msg);
+        } else {
+            String recipientUsername = resolveRecipientFromGroup(groupId, loggedInUserId);
+            if (recipientUsername != null) {
+                ChatCell cell = findOrCreateChatCell(recipientUsername);
+                if (cell != null) cell.addMessage(msg);
+            }
+        }
+    }
+
+
     public UUID getOrCreateGroupId(String userAName, String userBName) {
         UUID userAId = userIdMap.get(userAName);
         UUID userBId = userIdMap.get(userBName);
@@ -227,5 +254,4 @@ public class Model {
         loggedInUser.set(null);
         System.out.println("[Model] Session state reset.");
     }
-
 }
