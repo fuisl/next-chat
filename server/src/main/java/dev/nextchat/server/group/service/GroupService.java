@@ -21,6 +21,8 @@ public interface GroupService {
 
     List<UUID> getUserIdsInGroup(UUID groupId);
 
+    Optional<Group> getGroupInfo(UUID groupId);
+
     void updateLastRead(UUID groupId, UUID userId, Instant timestamp);
 
     Optional<Instant> getLastRead(UUID groupId, UUID userId);
