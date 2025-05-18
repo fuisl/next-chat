@@ -15,6 +15,7 @@ public class MessageParser {
                 UUID.fromString(json.getString("groupId")),
                 json.getString("content"),
                 Instant.parse(json.getString("timestamp"))
+
         );
     }
 
