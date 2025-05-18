@@ -3,6 +3,8 @@ package dev.nextchat.client.views;
 import dev.nextchat.client.controllers.ClientController;
 
 import dev.nextchat.client.controllers.MsgBBController;
+import dev.nextchat.client.controllers.auth.LoginController;
+import dev.nextchat.client.controllers.auth.SignupController;
 import dev.nextchat.client.models.Message;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -23,6 +25,8 @@ public class ViewFactory {
     private AnchorPane newMsgView;
     private AnchorPane newGroupView;
     private final StringProperty clientSelection;
+    private LoginController loginController;
+    private SignupController signUpController;
 
     public ViewFactory() {
         this.clientSelectedChat = new SimpleStringProperty(" ");
@@ -67,6 +71,7 @@ public class ViewFactory {
         } catch (IOException e){
             e.printStackTrace();
         }
+        signUpController = loader.getController();
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
@@ -74,6 +79,9 @@ public class ViewFactory {
         stage.show();
     }
 
+    public SignupController getSignUpController() {
+        return signUpController;
+    }
 
     public void showLoginWindow() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Login.fxml"));
@@ -83,11 +91,16 @@ public class ViewFactory {
         } catch (IOException e){
             e.printStackTrace();
         }
+        loginController = loader.getController();
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
         stage.setTitle("Login");
         stage.show();
+    }
+
+    public LoginController getLoginController() {
+        return loginController;
     }
 
     public void showClientWindow() {

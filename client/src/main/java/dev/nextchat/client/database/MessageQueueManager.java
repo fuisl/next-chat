@@ -38,7 +38,7 @@ public class MessageQueueManager {
     }
 
     public static void saveMessage(Message message) {
-        List<Message> messages = loadMessages();
+        List<Message> messages = new ArrayList<>(loadMessages());
         messages.add(message);
         try {
             mapper.writeValue(messageFile, messages);
