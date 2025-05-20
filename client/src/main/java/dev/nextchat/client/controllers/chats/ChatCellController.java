@@ -1,4 +1,4 @@
-package dev.nextchat.client.controllers;
+package dev.nextchat.client.controllers.chats;
 
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;

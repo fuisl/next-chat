@@ -1,6 +1,5 @@
-package dev.nextchat.client.controllers;
+package dev.nextchat.client.controllers.chats;
 
-import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -50,16 +49,6 @@ public class NewMsgBoxController implements Initializable {
 
         chat_btn.setOnAction(e -> {
             String enteredUsername = fusername.getText().trim(); // from input field
-
-            if (enteredUsername.isEmpty()) {
-                error_lbl.setText("Please enter a username.");
-                return;
-            }
-
-            if (!Model.getInstance().userExists(enteredUsername)) {
-                error_lbl.setText("User does not exist.");
-                return;
-            }
 
             Model.getInstance().findOrCreateChatCell(enteredUsername);
             Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);

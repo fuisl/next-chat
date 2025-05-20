@@ -1,15 +1,13 @@
 package dev.nextchat.client.models;
 
-import java.io.IOException;
 import java.util.*;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 import dev.nextchat.client.backend.ConnectionManager;
 import dev.nextchat.client.backend.MessageController;
-import dev.nextchat.client.controllers.auth.ResponseRouter;
+import dev.nextchat.client.controllers.ResponseRouter;
 import dev.nextchat.client.database.GroupManager;
-import dev.nextchat.client.database.UserDatabase;
 import dev.nextchat.client.views.ViewFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -23,6 +21,7 @@ public class Model {
     private final ViewFactory viewFactory;
     private final ObservableList<ChatCell> chatCells;
     private final StringProperty loggedInUser = new SimpleStringProperty();
+    private UUID loggedInUserId;
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
     BiMap<String, UUID> userIdMap = HashBiMap.create();
     private final MessageQueueManager messageQueueManager = new MessageQueueManager();
@@ -67,23 +66,6 @@ public class Model {
         return messageController;
     }
 
-    public void preloadUserIdMapFromJson() {
-        try {
-            for (User user : UserDatabase.loadUsers()) {
-                String username = user.getUsername();
-                UUID userId = user.getUserId();
-
-                if (username != null && userId != null) {
-                    userIdMap.put(username, userId);
-                } else {
-                    System.err.println("Skipped user due to null: username=" + username + ", userId=" + userId);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public StringProperty loggedInUserProperty() {
         return loggedInUser;
     }
@@ -100,6 +82,10 @@ public class Model {
         this.loggedInUser.set(username);
     }
 
+    public void setLoggedInUserId(UUID id) {
+        this.loggedInUserId = id;
+    }
+
     public Map<UUID, String> getUserIdToUsernameMap() {
         return userIdMap.inverse();
     }
@@ -108,75 +94,9 @@ public class Model {
         return userIdMap.containsKey(username);
     }
 
-    public boolean login(String username, String password) {
-        boolean valid = UserDatabase.authenticate(username, password);
-        if (valid) setLoggedInUser(username);
-        return valid;
-    }
-
-    public boolean registerUser(String username, String password) {
-        try {
-            if (UserDatabase.userExists(username)) {
-                return false; // User already exists
-            }
-
-            UUID uuid = UUID.randomUUID();
-            User newUser = new User(uuid, username, password);
-            UserDatabase.registerUser(newUser);
-            setLoggedInUser(username);
-            userIdMap.put(username, uuid);
-            return true;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public String resolveRecipientFromGroup(UUID groupId, UUID selfId) {
         UUID otherId = groupManager.getOtherMember(groupId, selfId);
         return otherId == null ? null : userIdMap.inverse().get(otherId);
-    }
-
-    public void loadMessagesForUser(UUID loggedInUserId) {
-        List<Message> allMessages = messageQueueManager.loadMessages();
-        System.out.println("🔍 Loading messages for: " + userIdMap.inverse().get(loggedInUserId));
-
-        Set<UUID> groupIds = allMessages.stream()
-                .map(Message::getGroupId)
-                .collect(Collectors.toSet());
-        System.out.println("GroupIds: " + groupIds);
-        for (Message msg : allMessages) {
-            UUID groupId = msg.getGroupId();
-            UUID senderId = msg.getSenderId();
-
-            System.out.println("Checking message:");
-            System.out.println("  - groupId: " + msg.getGroupId());
-            System.out.println("  - senderId: " + msg.getSenderId());
-            System.out.println("  - userInGroup? " + groupManager.isUserInGroup(loggedInUserId, groupId));
-
-            if (!groupManager.isUserInGroup(loggedInUserId, groupId)) continue;
-
-            // Case: RECEIVED message (sender ≠ me)
-            if (!senderId.equals(loggedInUserId)) {
-                String senderUsername = userIdMap.inverse().get(senderId);
-                ChatCell cell = findOrCreateChatCell(senderUsername);
-                if (cell != null) {
-                    cell.addMessage(msg);
-                }
-                // Case: SENT message → figure out recipient
-            } else {
-                String recipientUsername = resolveRecipientFromGroup(groupId, loggedInUserId);
-                if (recipientUsername != null && !recipientUsername.equals(userIdMap.inverse().get(loggedInUserId))) {
-                    ChatCell cell = findOrCreateChatCell(recipientUsername);
-                    if (cell != null) {
-                        cell.addMessage(msg);
-                    }
-                } else {
-                    System.out.println("⚠️ Could not resolve recipient for groupId: " + groupId);
-                }
-            }
-        }
     }
 
     public void renderMessage(Message msg, UUID loggedInUserId) {

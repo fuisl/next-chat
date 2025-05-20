@@ -2,8 +2,8 @@ package dev.nextchat.client.controllers.auth;
 
 import dev.nextchat.client.backend.MessageController;
 import dev.nextchat.client.backend.ServerResponseHandler;
-import dev.nextchat.client.backend.ServerResponseListener;
 import dev.nextchat.client.backend.utils.RequestFactory;
+import dev.nextchat.client.controllers.ResponseRouter;
 import dev.nextchat.client.models.Model;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 public class LoginController implements Initializable, ServerResponseHandler {
     public TextField username;
@@ -23,6 +24,7 @@ public class LoginController implements Initializable, ServerResponseHandler {
     public Label error_lbl;
     public Button login_btn;
     public Button SignUp_btn;
+    private String pendingUsername;
 
     private final MessageController msgCtrl = Model.getInstance().getMessageController();
     private ResponseRouter router = Model.getInstance().getResponseRouter();
@@ -40,6 +42,15 @@ public class LoginController implements Initializable, ServerResponseHandler {
                 Stage stage = (Stage) login_btn.getScene().getWindow();
                 Model.getInstance().getViewFactory().closeStage(stage);
                 Model.getInstance().getViewFactory().showClientWindow();
+                String user = pendingUsername;
+                UUID id   = UUID.fromString(resp.getString("userId"));
+
+                // 2) store it in the Model
+                Model.getInstance().setLoggedInUser(user);
+                Model.getInstance().setLoggedInUserId(id);
+
+                // 3) now you can safely call getLoggedInUser() elsewhere
+                System.out.println(">>> Logged in as: " + Model.getInstance().getLoggedInUser());
             });
             case "fail" -> Platform.runLater(() ->{
                error_lbl.setText(resp.getString("message"));
@@ -60,6 +71,7 @@ public class LoginController implements Initializable, ServerResponseHandler {
         String pass = password.getText();
         // build a JSON login request, e.g.:
         // { "type":"login", "username":"…", "password":"…" }
+        pendingUsername = user;
         JSONObject req = RequestFactory.createLoginRequest(user, pass);
         msgCtrl.getSendMessageQueue().offer(req);
     }

@@ -5,7 +5,7 @@ import dev.nextchat.client.App.StageReadyEvent;
 import dev.nextchat.client.backend.MessageController;
 import dev.nextchat.client.backend.ServerResponseListener;
 import dev.nextchat.client.controllers.auth.LoginController;
-import dev.nextchat.client.controllers.auth.ResponseRouter;
+import dev.nextchat.client.controllers.ResponseRouter;
 import dev.nextchat.client.models.Model;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;

@@ -1,10 +1,9 @@
-package dev.nextchat.client.controllers;
+package dev.nextchat.client.controllers.chats;
 
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
 import dev.nextchat.client.views.ChatCellFactory;
 import javafx.beans.binding.Bindings;
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;

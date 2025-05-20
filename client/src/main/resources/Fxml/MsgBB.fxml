@@ -5,7 +5,7 @@
 
 <HBox xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="dev.nextchat.client.controllers.MsgBBController"
+            fx:controller="dev.nextchat.client.controllers.messages.MsgBBController"
             fx:id="bubbleBox">
 
     <Label fx:id="msgLabel" />

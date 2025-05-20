@@ -1,6 +1,6 @@
 package dev.nextchat.client.views;
 
-import dev.nextchat.client.controllers.ChatCellController;
+import dev.nextchat.client.controllers.chats.ChatCellController;
 import dev.nextchat.client.models.ChatCell;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListCell;

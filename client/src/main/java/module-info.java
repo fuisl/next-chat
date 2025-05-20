@@ -30,5 +30,9 @@ module dev.nextchat.client {
     exports dev.nextchat.client.database;
     exports dev.nextchat.client.controllers.auth to javafx.fxml;
     opens dev.nextchat.client.controllers.auth to javafx.fxml;
+    exports dev.nextchat.client.controllers.messages to javafx.fxml;
+    opens dev.nextchat.client.controllers.messages to javafx.fxml;
+    exports dev.nextchat.client.controllers.chats to javafx.fxml;
+    opens dev.nextchat.client.controllers.chats to javafx.fxml;
 
 }

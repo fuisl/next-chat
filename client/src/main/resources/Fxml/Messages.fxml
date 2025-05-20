@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<AnchorPane prefHeight="750.0" prefWidth="533.0" styleClass="chat_box" stylesheets="@../Styles/Messages.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.MessagesController">
+<AnchorPane prefHeight="750.0" prefWidth="533.0" styleClass="chat_box" stylesheets="@../Styles/Messages.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.messages.MessagesController">
    <children>
       <Pane prefHeight="49.0" prefWidth="533.0" styleClass="header_ctn" AnchorPane.bottomAnchor="700.0" AnchorPane.topAnchor="0.0">
          <children>

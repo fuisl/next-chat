@@ -2,7 +2,7 @@ package dev.nextchat.client.views;
 
 import dev.nextchat.client.controllers.ClientController;
 
-import dev.nextchat.client.controllers.MsgBBController;
+import dev.nextchat.client.controllers.messages.MsgBBController;
 import dev.nextchat.client.controllers.auth.LoginController;
 import dev.nextchat.client.controllers.auth.SignupController;
 import dev.nextchat.client.models.Message;

@@ -17,7 +17,7 @@ import dev.nextchat.client.backend.MessageController;
 public class Client {
     public static void main(String[] args) {
         ConnectionManager connectionManager = new ConnectionManager();
-        Model.getInstance().preloadUserIdMapFromJson();
+        //Model.getInstance().preloadUserIdMapFromJson();
         try {
             String status = connectionManager.init();
 

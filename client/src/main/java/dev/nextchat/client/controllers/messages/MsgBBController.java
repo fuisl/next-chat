@@ -1,4 +1,4 @@
-package dev.nextchat.client.controllers;
+package dev.nextchat.client.controllers.messages;
 
 import dev.nextchat.client.models.Message;
 import javafx.geometry.Pos;

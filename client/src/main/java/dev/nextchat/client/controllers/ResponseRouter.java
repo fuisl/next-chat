@@ -1,11 +1,15 @@
-package dev.nextchat.client.controllers.auth;
+package dev.nextchat.client.controllers;
 
 import dev.nextchat.client.backend.ServerResponseHandler;
+import dev.nextchat.client.controllers.auth.LoginController;
+import dev.nextchat.client.controllers.auth.SignupController;
+import dev.nextchat.client.controllers.messages.MessagesController;
 import org.json.JSONObject;
 
 public class ResponseRouter implements ServerResponseHandler {
-    private LoginController  loginCtrl;
+    private LoginController loginCtrl;
     private SignupController signupCtrl;
+    private MessagesController messagesCtrl;
 
     public void setLoginController(LoginController c)   { this.loginCtrl = c; }
     public void setSignupController(SignupController c) { this.signupCtrl = c; }
@@ -29,4 +33,7 @@ public class ResponseRouter implements ServerResponseHandler {
         }
     }
 
+    public void setMessageController(MessagesController messagesController) {
+        this.messagesCtrl = messagesController;
+    }
 }
