@@ -5,6 +5,7 @@ public enum CommandType {
     FETCH_BEFORE,
     FETCH_GROUP_INFO,
     FETCH_NEW,
+    FETCH_PER_GROUP,
     FETCH_RECENT,
     JOIN_GROUP,
     LEAVE_GROUP,

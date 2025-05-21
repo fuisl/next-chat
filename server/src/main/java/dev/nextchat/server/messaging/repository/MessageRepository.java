@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import dev.nextchat.server.messaging.model.Message;
 
-public interface MessageRepository extends MongoRepository<Message, UUID> {
+public interface MessageRepository extends MongoRepository<Message, UUID>, CustomMessageRepository {
 
     List<Message> findByGroupId(UUID groupId);
 

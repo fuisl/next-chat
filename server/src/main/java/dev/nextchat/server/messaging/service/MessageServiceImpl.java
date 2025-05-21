@@ -48,4 +48,9 @@ public class MessageServiceImpl implements MessageService {
     public List<Message> findAllNewMessagesByGroups(List<UUID> groupIds, Instant after) {
         return messageRepository.findAllNewMessagesByGroups(groupIds, after);
     }
+
+    @Override
+    public List<Message> findLatestMessagePerGroup(List<UUID> groupIds, Instant timestamp) {
+        return messageRepository.findLatestMessagesPerGroupBeforeTimestamp(groupIds, timestamp);
+    }
 }
