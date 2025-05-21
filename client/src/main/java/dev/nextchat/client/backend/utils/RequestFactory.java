@@ -76,4 +76,11 @@ public class RequestFactory {
         json.put("timestamp", timestamp);
         return json;
     }
+    public static JSONObject checkIfUserExist(String username) {
+        JSONObject json = new JSONObject();
+        json.put("type", "checkUserExistence");
+        json.put("username", username);
+        return json;
+    }
+
 }
