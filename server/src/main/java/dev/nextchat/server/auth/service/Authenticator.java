@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -59,5 +60,9 @@ public class Authenticator {
         return getUserByUsername(username)
                 .map(User::getId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+    }
+
+    public List<String> getUsernameByUserIds(List<UUID> ids) {
+        return userRepository.findUserNamesByUserIds(ids);
     }
 }

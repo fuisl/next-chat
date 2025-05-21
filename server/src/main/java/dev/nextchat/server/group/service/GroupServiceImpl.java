@@ -84,4 +84,9 @@ public class GroupServiceImpl implements GroupService {
         return groupMemberRepository.findById(new GroupMemberId(userId, groupId))
                 .map(GroupMember::getLastRead);
     }
+
+    @Override
+    public Optional<Group> getGroupInfo(UUID groupId) {
+        return groupRepository.findById(groupId);
+    }
 }

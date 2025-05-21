@@ -5,42 +5,40 @@ import dev.nextchat.server.messaging.service.MessageService;
 import dev.nextchat.server.protocol.Command;
 import dev.nextchat.server.protocol.CommandContext;
 import dev.nextchat.server.protocol.CommandType;
-import dev.nextchat.server.auth.model.User;
 import dev.nextchat.server.group.model.Group;
 import dev.nextchat.server.group.service.GroupService;
-import dev.nextchat.server.auth.service.Authenticator;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.Optional;
-
-import java.time.Instant;
 import java.util.stream.Collectors;
+import java.time.Instant;
 
-public class FetchNewMessageCommand implements Command {
+public class FetchPerGroupCommand implements Command {
+    private final Instant timestamp;
+    private final String requestId;
     private final MessageService messageService;
-    private final GroupService groupService;
-    private final Authenticator authenticator;
 
-    public FetchNewMessageCommand(MessageService messageService, GroupService groupService,
-            Authenticator authenticator) {
+    public FetchPerGroupCommand(String requestId, Instant timestamp, MessageService messageService) {
+        this.timestamp = timestamp;
+        this.requestId = requestId;
         this.messageService = messageService;
-        this.groupService = groupService;
-        this.authenticator = authenticator;
     }
 
     @Override
     public CommandType getType() {
-        return CommandType.FETCH_NEW;
+        return CommandType.FETCH_PER_GROUP;
     }
 
     @Override
     public JSONObject execute(CommandContext context) {
+        GroupService groupService = context.groupService();
+
         JSONObject response = new JSONObject();
-        response.put("type", "fetch_new_message_response");
+        response.put("requestId", requestId);
 
         if (!context.isAuthenticated()) {
             response.put("status", "error");
@@ -49,10 +47,8 @@ public class FetchNewMessageCommand implements Command {
         }
 
         UUID userId = context.sessionUserId();
-        Optional<User> opt = authenticator.getUserByUserId(userId);
         List<Group> groups = groupService.getGroupsForUser(userId);
-        Instant lastOnlineTimeStamp;
-        List<UUID> groupIds;
+        List<UUID> groupIds = new ArrayList<>();
 
         if (groups.size() != 0) {
             groupIds = groups.stream()
@@ -64,23 +60,14 @@ public class FetchNewMessageCommand implements Command {
             return response;
         }
 
-        if (opt.isPresent()) {
-            lastOnlineTimeStamp = opt.get().getLastOnlineTimeStamp() != null ? opt.get().getLastOnlineTimeStamp()
-                    : opt.get().getCreateTimeStamp();
-        } else {
-            response.put("status", "error");
-            response.put("message", "User does not exist!");
-            return response;
-        }
-
-        List<Message> messages = messageService.findAllNewMessagesByGroups(groupIds,
-                lastOnlineTimeStamp);
+        List<Message> messages = messageService.findLatestMessagePerGroup(groupIds, timestamp);
 
         JSONArray jsonMessages = new JSONArray();
         for (Message m : messages) {
             JSONObject msg = new JSONObject();
             msg.put("id", m.getId().toString());
             msg.put("senderId", m.getSenderId().toString());
+            msg.put("groupId", m.getGroupId().toString());
             msg.put("content", m.getContent());
             msg.put("timestamp", m.getTimestamp().toString());
             jsonMessages.put(msg);
