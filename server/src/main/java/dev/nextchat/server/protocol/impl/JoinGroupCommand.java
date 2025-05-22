@@ -1,19 +1,21 @@
 package dev.nextchat.server.protocol.impl;
 
+import java.util.UUID;
+
+import org.json.JSONObject;
+
 import dev.nextchat.server.group.service.GroupService;
 import dev.nextchat.server.protocol.Command;
 import dev.nextchat.server.protocol.CommandContext;
 import dev.nextchat.server.protocol.CommandType;
 
-import org.json.JSONObject;
-
-import java.util.UUID;
-
 public class JoinGroupCommand implements Command {
     private final String groupId;
+    private UUID userId;
 
-    public JoinGroupCommand(String groupId) {
+    public JoinGroupCommand(String groupId, String userId) {
         this.groupId = groupId;
+        this.userId = userId != null ? UUID.fromString(userId) : null;
     }
 
     @Override
@@ -32,7 +34,10 @@ public class JoinGroupCommand implements Command {
             return response;
         }
 
-        UUID userId = context.sessionUserId();
+        if (userId == null) {
+            userId = context.sessionUserId();
+        }
+
         GroupService groupService = context.groupService();
 
         try {
