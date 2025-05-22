@@ -3,6 +3,7 @@ package dev.nextchat.client.controllers.auth;
 import dev.nextchat.client.backend.MessageController;
 import dev.nextchat.client.backend.ServerResponseHandler;
 import dev.nextchat.client.backend.utils.RequestFactory;
+import dev.nextchat.client.controllers.ResponseRouter;
 import dev.nextchat.client.models.Model;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
@@ -24,7 +25,8 @@ public class SignupController implements Initializable, ServerResponseHandler {
     public Label error_lbl;
     public Button login_btn;
     
-    private final MessageController msgCtrl = Model.getInstance().getMessageController();
+    private final MessageController msgCtrl = Model.getInstance().getMsgCtrl();
+    private ResponseRouter router = Model.getInstance().getResponseRouter();
      
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

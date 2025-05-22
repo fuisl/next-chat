@@ -34,39 +34,6 @@ public class MessageController {
         System.out.println("[MessageController] Send thread started");
     }
 
-    // private void getInputTest() {
-    // UUID senderID = UUID.randomUUID();
-    // UUID groupID = UUID.randomUUID();
-    //
-    // String input;
-    //
-    // try {
-    // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-    //
-    // while (true) {
-    // if (reader.ready()) {
-    // input = reader.readLine();
-    // if (input.equals("bye")) {
-    // break;
-    // }
-    //
-    // Message message = new Message(senderID, groupID, input, Instant.now());
-    //
-    // try {
-    // System.out.println("Add message to send queue");
-    // sendMessageQueue.put(message);
-    // } catch (InterruptedException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // }
-    //
-    // reader.close();
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
-    // }
-
     public void stop() {
         System.out.println("Shutting down services");
 

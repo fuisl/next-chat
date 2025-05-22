@@ -1,15 +1,20 @@
 package dev.nextchat.client.controllers.chats;
 
+import dev.nextchat.client.backend.MessageController;
+import dev.nextchat.client.backend.ServerResponseHandler;
 import dev.nextchat.client.models.Model;
+import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
-public class NewMsgBoxController implements Initializable {
+public class NewMsgBoxController implements Initializable, ServerResponseHandler {
     public Button return_btn;
     public TextField fusername;
     public Button new_grp_btn;
@@ -17,6 +22,8 @@ public class NewMsgBoxController implements Initializable {
     public Label Uid;
     public Button self_chat;
     public Label error_lbl;
+    private String pendingUsername;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -49,10 +56,14 @@ public class NewMsgBoxController implements Initializable {
 
         chat_btn.setOnAction(e -> {
             String enteredUsername = fusername.getText().trim(); // from input field
+            pendingUsername = enteredUsername;
+            JSONObject request = new JSONObject();
+            request.put("type", "check_user_existence");
+            request.put("username", enteredUsername);
 
-            Model.getInstance().findOrCreateChatCell(enteredUsername);
-            Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
-            Model.getInstance().getViewFactory().getClientSelection().set("Chats");
+            MessageController msgCtrl = Model.getInstance().getMsgCtrl();
+            msgCtrl.getSendMessageQueue().offer(request);
+
             fusername.clear();
         });
         new_grp_btn.setOnAction(e -> {
@@ -61,5 +72,32 @@ public class NewMsgBoxController implements Initializable {
     }
 
 
+    @Override
+    public void onServerResponse(JSONObject response) {
+        String type = response.optString("type");
+        if (!"checkUserExistenceResponse".equals(type)) return;
+
+        boolean exists = response.optBoolean("exists", false);
+
+        Platform.runLater(() -> {
+            if (exists) {
+                // 1) Extract and store the other user's UUID
+                String userIdStr = response.getString("userId");
+                UUID otherId = UUID.fromString(userIdStr);
+                Model.getInstance().addKnownUser(pendingUsername, otherId);
+
+                // 3) Switch UI to the new chat
+                Model.getInstance().getViewFactory()
+                        .getClientSelectedChat()
+                        .set(pendingUsername);
+                Model.getInstance().getViewFactory()
+                        .getClientSelection()
+                        .set("Chats");
+            } else {
+                error_lbl.setText("Username not found");
+            }
+            fusername.clear();
+        });
+    }
 
 }

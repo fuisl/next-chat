@@ -3,7 +3,6 @@
  */
 package dev.nextchat.client;
 
-import dev.nextchat.client.backend.ServerResponseListener;
 import dev.nextchat.client.models.Model;
 import javafx.application.Application;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,7 +29,7 @@ public class Client {
 
         MessageController messageController = new MessageController(connectionManager);
         messageController.start();
-        Model.getInstance().setMessageController(messageController);
+        Model.getInstance().setMsgCtrl(messageController);
 
 
         Application.launch(App.class, args);

@@ -1,5 +1,6 @@
 package dev.nextchat.client.controllers.chats;
 
+import dev.nextchat.client.controllers.ResponseRouter;
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
 import dev.nextchat.client.views.ChatCellFactory;
@@ -23,6 +24,8 @@ public class ChatsController implements Initializable {
     public MenuItem newGroup;
     public MenuItem newMess;
     public ListView<ChatCell> listChat;
+    private ResponseRouter router = Model.getInstance().getResponseRouter();
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -45,6 +48,7 @@ public class ChatsController implements Initializable {
 
     private void createNewMsgBox() {
         Model.getInstance().getViewFactory().getClientSelection().set("Message");
+        router.setNewMessagesController(Model.getInstance().getViewFactory().getNewMsgController());
     }
 
     private void onChatMess() {

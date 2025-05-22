@@ -2,6 +2,8 @@ package dev.nextchat.client.views;
 
 import dev.nextchat.client.controllers.ClientController;
 
+import dev.nextchat.client.controllers.chats.NewMsgBoxController;
+import dev.nextchat.client.controllers.messages.MessagesController;
 import dev.nextchat.client.controllers.messages.MsgBBController;
 import dev.nextchat.client.controllers.auth.LoginController;
 import dev.nextchat.client.controllers.auth.SignupController;
@@ -27,6 +29,8 @@ public class ViewFactory {
     private final StringProperty clientSelection;
     private LoginController loginController;
     private SignupController signUpController;
+    private NewMsgBoxController newMsgController;
+    private MessagesController messageController;
 
     public ViewFactory() {
         this.clientSelectedChat = new SimpleStringProperty(" ");
@@ -61,8 +65,9 @@ public class ViewFactory {
             }
         }
         return msgView;
-
     }
+
+
     public void showSignupWindow(){
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Signup.fxml"));
         Scene scene = null;
@@ -122,13 +127,20 @@ public class ViewFactory {
 
     public AnchorPane getNewMsgWindow() {
         if (newMsgView == null) {
-            try{
-                newMsgView = new FXMLLoader(getClass().getResource("/Fxml/NewMsgBox.fxml")).load();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/NewMsgBox.fxml"));
+                newMsgView = loader.load();
+                newMsgController = loader.getController();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         return newMsgView;
+    }
+
+    public NewMsgBoxController getNewMsgController() {
+        return newMsgController;
     }
 
     public AnchorPane getNewGroupWindow() {

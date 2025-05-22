@@ -29,8 +29,8 @@ public class ChatCellController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        fusername.textProperty().bind(cell.senderProperty());
-        txt_msg.textProperty().bind(cell.txtMsgProperty());
+        fusername.textProperty().bind(cell.otherUsernameProperty());
+        txt_msg.textProperty().bind(cell.lastMessageProperty());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
 
         if (cell.timestampProperty().get() != null) {
@@ -50,7 +50,7 @@ public class ChatCellController implements Initializable {
     }
     @FXML
     public void onChatButtonClick() {
-        String selectedUser = cell.senderProperty().get();
+        String selectedUser = cell.getOtherUsername();
         System.out.println("Selected chat with: " + selectedUser);
         Model.getInstance().getViewFactory().getClientSelectedChat().set(selectedUser);
     }

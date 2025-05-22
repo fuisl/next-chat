@@ -3,6 +3,7 @@ package dev.nextchat.client.database;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import dev.nextchat.client.database.GroupInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,51 +51,37 @@ public class GroupManager {
         }
     }
 
+    public List<GroupInfo> getAllGroups() {
+        return List.copyOf(groups);
+    }
+
     public UUID getOtherMember(UUID groupId, UUID selfId) {
         return groups.stream()
                 .filter(g -> g.getGroupId().equals(groupId))
-                .findFirst()
-                .map(g -> g.getMembers().stream()
-                        .filter(id -> !id.equals(selfId))
-                        .findFirst()
-                        .orElse(null)
-                )
-                .orElse(null);
+                .flatMap(g -> g.getMembers().stream())
+                .filter(id -> !id.equals(selfId))
+                .findFirst().orElse(null);
     }
-
 
     public boolean isUserInGroup(UUID userId, UUID groupId) {
         return groups.stream()
                 .filter(g -> g.getGroupId().equals(groupId))
-                .findFirst()
-                .map(g -> g.getMembers().contains(userId))
-                .orElse(false);
+                .anyMatch(g -> g.getMembers().contains(userId));
     }
 
-    public UUID getOrCreateGroupId(UUID userA, UUID userB) {
-        // 1) Build a set for easy comparison (order doesn't matter)
+    public synchronized UUID getExistingGroupId(UUID userA, UUID userB) {
         Set<UUID> pair = new HashSet<>(Arrays.asList(userA, userB));
-
-        // 2) Search existing groups for exactly those two members
         for (GroupInfo info : groups) {
-            Set<UUID> members = new HashSet<>(info.getMembers());
-            if (members.equals(pair)) {
+            if (new HashSet<>(info.getMembers()).equals(pair)) {
                 return info.getGroupId();
             }
         }
+        return null;
+    }
 
-        // 3) Not found → create a new group
-        UUID newGroupId = UUID.randomUUID();
-        GroupInfo newGroup = new GroupInfo(newGroupId, new ArrayList<>(pair));
-        groups.add(newGroup);
-
-        // 4) Persist back to disk
+    public synchronized void addGroupMapping(UUID groupId, UUID userA, UUID userB) {
+        groups.add(new GroupInfo(groupId, Arrays.asList(userA, userB)));
         saveGroups();
-
-        return newGroupId;
     }
 
-    public List<GroupInfo> getAllGroups() {
-        return List.copyOf(groups);
-    }
 }

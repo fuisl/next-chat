@@ -11,42 +11,49 @@ import java.time.Instant;
 import java.util.UUID;
 
 public class ChatCell {
-    private final StringProperty sender;
-    private final UUID groupId;
-    private final StringProperty txt_msg;
+    private final StringProperty otherUsername;
+    private UUID groupId;
+    private final StringProperty lastMessage;
     private final ObjectProperty<Instant> timestamp;
-    private final ObservableList<Message> messages = FXCollections.observableArrayList(); // Store msgs
+    private final ObservableList<Message> messages = FXCollections.observableArrayList();
 
-    public ChatCell(String sender, UUID groupId) {
-        this(sender, groupId, "", null);
+    public ChatCell(String otherUsername, UUID groupId) {
+        this.otherUsername = new SimpleStringProperty(this, "otherUsername", otherUsername);
+        this.lastMessage = new SimpleStringProperty(this, "lastMessage", "");
+        this.timestamp = new SimpleObjectProperty<>(this, "timestamp", null);
+        this.groupId = groupId;
     }
 
-    public ChatCell(final String sender, final UUID groupId, final String txt_msg, final Instant timestamp) {
-        this.sender = new SimpleStringProperty(this,"Sender",sender);
-        this.txt_msg = new SimpleStringProperty(this,"Msg",txt_msg);
-        this.timestamp = new SimpleObjectProperty<>(this, "Timestamp", timestamp);
-        this.groupId   = groupId;
+    public String getOtherUsername() {
+        return otherUsername.get();
     }
+    public StringProperty otherUsernameProperty() {
+        return otherUsername;
+    }
+
     public UUID getGroupId() {
         return groupId;
     }
-    public StringProperty senderProperty() {
-        return this.sender;
-    }
-    public StringProperty txtMsgProperty() {
-        return this.txt_msg;
-    }
-    public ObjectProperty<Instant> timestampProperty() {
-        return this.timestamp;
+
+    public void setGroupId(UUID groupId) {
+        this.groupId = groupId;
     }
 
     public ObservableList<Message> getMessages() {
         return messages;
     }
-    public void addMessage(Message message) {
-        messages.add(message);
-        txt_msg.set(message.getMessage());
-        timestamp.set(message.getTimestamp());
+
+    public StringProperty lastMessageProperty() {
+        return lastMessage;
     }
 
+    public ObjectProperty<Instant> timestampProperty() {
+        return timestamp;
+    }
+
+    public void addMessage(Message msg) {
+        messages.add(msg);
+        lastMessage.set(msg.getMessage());
+        timestamp.set(msg.getTimestamp());
+    }
 }

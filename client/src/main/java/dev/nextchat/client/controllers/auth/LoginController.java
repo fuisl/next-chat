@@ -26,7 +26,7 @@ public class LoginController implements Initializable, ServerResponseHandler {
     public Button SignUp_btn;
     private String pendingUsername;
 
-    private final MessageController msgCtrl = Model.getInstance().getMessageController();
+    private final MessageController msgCtrl = Model.getInstance().getMsgCtrl();
     private ResponseRouter router = Model.getInstance().getResponseRouter();
 
     @Override
@@ -50,7 +50,7 @@ public class LoginController implements Initializable, ServerResponseHandler {
                 Model.getInstance().setLoggedInUserId(id);
 
                 // 3) now you can safely call getLoggedInUser() elsewhere
-                System.out.println(">>> Logged in as: " + Model.getInstance().getLoggedInUser());
+                System.out.println(">>> Logged in as: " + Model.getInstance().getLoggedInUserId());
             });
             case "fail" -> Platform.runLater(() ->{
                error_lbl.setText(resp.getString("message"));

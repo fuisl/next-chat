@@ -6,6 +6,7 @@ import com.google.common.collect.HashBiMap;
 
 import dev.nextchat.client.backend.ConnectionManager;
 import dev.nextchat.client.backend.MessageController;
+import dev.nextchat.client.backend.utils.RequestFactory;
 import dev.nextchat.client.controllers.ResponseRouter;
 import dev.nextchat.client.database.GroupManager;
 import dev.nextchat.client.views.ViewFactory;
@@ -14,7 +15,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import dev.nextchat.client.database.MessageQueueManager;
-import java.util.stream.Collectors;
+import org.json.JSONObject;
 
 public class Model {
     private  static Model model;
@@ -24,17 +25,16 @@ public class Model {
     private UUID loggedInUserId;
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
     BiMap<String, UUID> userIdMap = HashBiMap.create();
-    private final MessageQueueManager messageQueueManager = new MessageQueueManager();
     private final GroupManager groupManager = new GroupManager();
     private ConnectionManager connectionManager;
-    private MessageController messageController;
+    private MessageController msgCtrl;
     private ResponseRouter responseRouter;
 
     private Model() {
         this.viewFactory = new ViewFactory();
         this.chatCells = FXCollections.observableArrayList();
         this.connectionManager = new ConnectionManager();
-        this.messageController = new MessageController(connectionManager);
+        this.msgCtrl = new MessageController(connectionManager);
         this.responseRouter = new ResponseRouter();
         groupManager.getAllGroups();
     }
@@ -58,12 +58,12 @@ public class Model {
         return connectionManager;
     }
 
-    public void setMessageController(MessageController messageController) {
-        this.messageController = messageController;
+    public void setMsgCtrl(MessageController msgCtrl) {
+        this.msgCtrl = msgCtrl;
     }
 
-    public MessageController getMessageController() {
-        return messageController;
+    public MessageController getMsgCtrl() {
+        return msgCtrl;
     }
 
     public StringProperty loggedInUserProperty() {
@@ -75,7 +75,7 @@ public class Model {
     }
 
     public UUID getLoggedInUserId() {
-        return userIdMap.get(getLoggedInUser());
+        return loggedInUserId;
     }
 
     public void setLoggedInUser(String username) {
@@ -84,14 +84,6 @@ public class Model {
 
     public void setLoggedInUserId(UUID id) {
         this.loggedInUserId = id;
-    }
-
-    public Map<UUID, String> getUserIdToUsernameMap() {
-        return userIdMap.inverse();
-    }
-
-    public boolean userExists(String username) {
-        return userIdMap.containsKey(username);
     }
 
     public String resolveRecipientFromGroup(UUID groupId, UUID selfId) {
@@ -118,43 +110,88 @@ public class Model {
         }
     }
 
-
-    public UUID getOrCreateGroupId(String userAName, String userBName) {
-        UUID userAId = userIdMap.get(userAName);
-        UUID userBId = userIdMap.get(userBName);
-
-        if (userAId == null) {
-            throw new IllegalArgumentException("Unknown user: " + userAName);
-        }
-        if (userBId == null) {
-            throw new IllegalArgumentException("Unknown user: " + userBName);
-        }
-
-        // Delegate to GroupManager’s UUID-based method
-        return groupManager.getOrCreateGroupId(userAId, userBId);
+    public void addKnownUser(String username, UUID id) {
+        userIdMap.put(username, id);
     }
 
     public ChatCell findOrCreateChatCell(String otherUsername) {
-        // 1) Resolve UUIDs
         UUID me      = getLoggedInUserId();
-        UUID otherId = userIdMap.get(otherUsername);
+        UUID otherId = getUserId(otherUsername);
         if (otherId == null) {
-            throw new IllegalArgumentException("Unknown user: " + otherUsername);
+            throw new IllegalStateException(
+                    "User ID for '" + otherUsername + "' unknown; validate existence first.");
         }
 
-        // 2) Ask GroupManager for a groupId for this pair (creates if missing)
-        UUID groupId = groupManager.getOrCreateGroupId(me, otherId);
+        // 0) Reuse fully-established chats
+        for (ChatCell cell : chatCells) {
+            if (otherUsername.equals(cell.getOtherUsername())
+                    && cell.getGroupId() != null) {
+                return cell;
+            }
+        }
 
-        // 3) Try to find an existing ChatCell for that conversation
+        // 1) Check persisted group mapping
+        UUID storedGroupId = groupManager.getExistingGroupId(me, otherId);
+        if (storedGroupId != null) {
+            ChatCell cell = new ChatCell(otherUsername, storedGroupId);
+            chatCells.add(cell);
+            return cell;
+        }
+
+        // 2) Reuse pending creation (no groupId yet)
+        for (ChatCell cell : chatCells) {
+            if (otherUsername.equals(cell.getOtherUsername())
+                    && cell.getGroupId() == null) {
+                return cell;
+            }
+        }
+
+        // 3) No existing or pending chat: create and ask server
+        ChatCell cell = new ChatCell(otherUsername, null);
+        chatCells.add(cell);
+
+        JSONObject createReq = RequestFactory.createNewGroupRequest(me, otherUsername, "");
+        msgCtrl.getSendMessageQueue().offer(createReq);
+
+        return cell;
+    }
+
+    public void handleCreateGroupResponse(JSONObject response) {
+        UUID   groupId       = UUID.fromString(response.getString("groupId"));
+        String otherUsername = response.getString("username");  // make sure your server is returning this!
+        UUID   me            = getLoggedInUserId();
+        UUID   otherId       = getUserId(otherUsername);
+
+        // 1) Persist server‐returned groupId
+        groupManager.addGroupMapping(groupId, me, otherId);
+        System.out.println("[Model] Persisted groupId " + groupId + " for users " + me + " & " + otherId);
+
+        // 2) Update the ChatCell
+        ChatCell cell = findChatCellByUsername(otherUsername);
+        cell.setGroupId(groupId);
+        System.out.println("[Model] Attached groupId to ChatCell for " + otherUsername);
+
+        // 3) Build and send the join‐group request
+        JSONObject joinReq = RequestFactory.createJoinGroupRequest(otherId, groupId);
+        System.out.println("[Model] Sending joinGroupRequest: " + joinReq);
+        msgCtrl.getSendMessageQueue().offer(joinReq);
+    }
+
+
+    public UUID getUserId(String username) {
+        return userIdMap.get(username);
+    }
+
+    private ChatCell findChatCellByUsername(String username) {
         return chatCells.stream()
-                .filter(c -> c.getGroupId().equals(groupId))
+                .filter(c -> username.equals(c.getOtherUsername()))
                 .findFirst()
-                // 4) Or create one if none exists
-                .orElseGet(() -> {
-                    ChatCell cell = new ChatCell(otherUsername, groupId);
-                    chatCells.add(cell);
-                    return cell;
-                });
+                .orElseThrow(() -> new IllegalStateException("ChatCell not found for " + username));
+    }
+
+    public void persistGroupMapping(UUID userA, UUID userB, UUID groupId) {
+        // delegate to the GroupManager’s JSON store
+        groupManager.addGroupMapping(groupId, userA, userB);
     }
 
     public ViewFactory getViewFactory() {
@@ -165,9 +202,6 @@ public class Model {
         return chatCells;
     }
 
-    public MessageQueueManager getMessageQueueManager() {
-        return messageQueueManager;
-    }
 
     public void resetSessionState() {
         chatCells.clear();
