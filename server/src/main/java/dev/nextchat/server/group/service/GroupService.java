@@ -28,4 +28,7 @@ public interface GroupService {
     Optional<Instant> getLastRead(UUID groupId, UUID userId);
 
     List<Group> getGroupsByPattern(String search);
+
+    // debt: not handle 2 groups
+    Optional<UUID> getGroupWithTwoUsers(UUID userA, UUID userB);
 }
