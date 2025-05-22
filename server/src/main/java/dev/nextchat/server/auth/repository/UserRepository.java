@@ -24,4 +24,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query(value = "SELECT username FROM user_account WHERE user_account.id IN ?1", nativeQuery = true)
     List<String> findUserNamesByUserIds(List<UUID> user_ids);
+
+    @Query(value = "SELECT * FROM user_account WHERE LOWER(username) LIKE LOWER(CONCAT('%', ?1, '%')) LIMIT 30", nativeQuery = true)
+    List<User> findUserByPattern(String search);
 }

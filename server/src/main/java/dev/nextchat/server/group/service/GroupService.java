@@ -26,4 +26,6 @@ public interface GroupService {
     void updateLastRead(UUID groupId, UUID userId, Instant timestamp);
 
     Optional<Instant> getLastRead(UUID groupId, UUID userId);
+
+    List<Group> getGroupsByPattern(String search);
 }

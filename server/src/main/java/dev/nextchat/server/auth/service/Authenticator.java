@@ -65,4 +65,8 @@ public class Authenticator {
     public List<String> getUsernameByUserIds(List<UUID> ids) {
         return userRepository.findUserNamesByUserIds(ids);
     }
+
+    public List<User> getUserByPattern(String search) {
+        return userRepository.findUserByPattern(search);
+    }
 }

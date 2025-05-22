@@ -89,4 +89,9 @@ public class GroupServiceImpl implements GroupService {
     public Optional<Group> getGroupInfo(UUID groupId) {
         return groupRepository.findById(groupId);
     }
+
+    @Override
+    public List<Group> getGroupsByPattern(String search) {
+        return groupRepository.findGroupByPattern(search);
+    }
 }

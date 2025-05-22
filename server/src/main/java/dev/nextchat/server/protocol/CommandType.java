@@ -10,6 +10,7 @@ public enum CommandType {
     JOIN_GROUP,
     LEAVE_GROUP,
     LOGIN,
+    SEARCH_CONVERSATION,
     SEARCH_MESSAGES,
     SEND_MESSAGE,
     SIGNUP,
