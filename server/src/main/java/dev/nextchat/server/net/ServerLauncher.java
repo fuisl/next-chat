@@ -1,5 +1,6 @@
 package dev.nextchat.server.net;
 
+import dev.nextchat.server.auth.repository.UserRepository;
 import dev.nextchat.server.auth.service.Authenticator;
 import dev.nextchat.server.group.service.GroupService;
 import dev.nextchat.server.protocol.ProtocolDecoder;
@@ -27,18 +28,21 @@ public class ServerLauncher implements CommandLineRunner {
     private final SessionService sessionService;
     private final GroupService groupService;
     private final RelayService relayService;
+    private final UserRepository userRepository;
 
     public ServerLauncher(
             ProtocolDecoder decoder,
             Authenticator authenticator,
             SessionService sessionService,
             GroupService groupService,
-            RelayService relayService) {
+            RelayService relayService,
+            UserRepository userRepository) {
         this.decoder = decoder;
         this.authenticator = authenticator;
         this.sessionService = sessionService;
         this.groupService = groupService;
         this.relayService = relayService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -57,7 +61,8 @@ public class ServerLauncher implements CommandLineRunner {
                         authenticator,
                         sessionService,
                         groupService,
-                        relayService);
+                        relayService,
+                        userRepository);
 
                 threadPool.execute(handler);
             }

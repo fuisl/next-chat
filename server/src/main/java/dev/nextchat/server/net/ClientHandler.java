@@ -1,5 +1,6 @@
 package dev.nextchat.server.net;
 
+import dev.nextchat.server.auth.repository.UserRepository;
 import dev.nextchat.server.auth.service.Authenticator;
 import dev.nextchat.server.session.service.SessionService;
 import dev.nextchat.server.group.service.GroupService;
@@ -23,6 +24,7 @@ public class ClientHandler implements Runnable {
     private final SessionService sessionService;
     private final GroupService groupService;
     private final RelayService relayService;
+    private final UserRepository userRepository;
     private SessionToken sessionToken;
 
     public ClientHandler(
@@ -31,13 +33,15 @@ public class ClientHandler implements Runnable {
             Authenticator authenticator,
             SessionService sessionService,
             GroupService groupService,
-            RelayService relayService) {
+            RelayService relayService,
+            UserRepository userRepository) {
         this.socket = socket;
         this.decoder = decoder;
         this.authenticator = authenticator;
         this.sessionService = sessionService;
         this.groupService = groupService;
         this.relayService = relayService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -71,7 +75,7 @@ public class ClientHandler implements Runnable {
                 try {
                     Command command = decoder.parse(jsonMessage);
                     UUID userId = sessionToken != null ? sessionToken.getUserId() : null;
-                    CommandContext context = new CommandContext(authenticator, sessionService, groupService, userId);
+                    CommandContext context = new CommandContext(authenticator, sessionService, groupService, userId, userRepository);
 
                     JSONObject response = command.execute(context);
                     writer.println(response.toString());

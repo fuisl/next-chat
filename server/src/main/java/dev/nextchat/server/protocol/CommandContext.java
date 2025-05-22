@@ -1,5 +1,6 @@
 package dev.nextchat.server.protocol;
 
+import dev.nextchat.server.auth.repository.UserRepository;
 import dev.nextchat.server.auth.service.Authenticator;
 import dev.nextchat.server.session.service.SessionService;
 import dev.nextchat.server.group.service.GroupService;
@@ -10,7 +11,8 @@ public record CommandContext(
         Authenticator authenticator,
         SessionService sessionService,
         GroupService groupService,
-        UUID sessionUserId) {
+        UUID sessionUserId,
+        UserRepository userRepository) {
 
     public boolean isAuthenticated() {
         return sessionUserId != null;
@@ -19,5 +21,8 @@ public record CommandContext(
     public Session getSession() {
         return sessionService.getSession(sessionUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+    }
+    public UserRepository getUserRepository() {
+        return userRepository;
     }
 }
