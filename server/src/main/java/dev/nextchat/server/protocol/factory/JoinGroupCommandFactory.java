@@ -1,10 +1,11 @@
 package dev.nextchat.server.protocol.factory;
 
+import org.json.JSONObject;
+import org.springframework.stereotype.Component;
+
 import dev.nextchat.server.protocol.Command;
 import dev.nextchat.server.protocol.CommandType;
 import dev.nextchat.server.protocol.impl.JoinGroupCommand;
-import org.json.JSONObject;
-import org.springframework.stereotype.Component;
 
 @Component
 public class JoinGroupCommandFactory implements CommandFactory {
@@ -17,6 +18,7 @@ public class JoinGroupCommandFactory implements CommandFactory {
     @Override
     public Command create(JSONObject json) {
         String groupId = json.getString("groupId");
-        return new JoinGroupCommand(groupId);
+        String userId = json.optString("userId", null);
+        return new JoinGroupCommand(groupId, userId);
     }
 }
