@@ -19,7 +19,7 @@ import org.json.JSONObject;
 public class RequestFactory {
     public static JSONObject createMessageRequest(Message msg) {
         JSONObject json = new JSONObject();
-        json.put("type", "message");
+        json.put("type", "send_message");
         json.put("id", msg.getId().toString());
         json.put("senderId", msg.getSenderId().toString());
         json.put("groupId", msg.getGroupId().toString());
@@ -83,4 +83,10 @@ public class RequestFactory {
         return json;
     }
 
+    public static JSONObject requestUsername(UUID userId){
+        JSONObject json = new JSONObject();
+        json.put("type","get_username");
+        json.put("userId", userId);
+        return json;
+    }
 }

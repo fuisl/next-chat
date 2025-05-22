@@ -5,6 +5,7 @@ import dev.nextchat.client.controllers.auth.LoginController;
 import dev.nextchat.client.controllers.auth.SignupController;
 import dev.nextchat.client.controllers.chats.NewMsgBoxController;
 import dev.nextchat.client.controllers.messages.MessagesController;
+import dev.nextchat.client.models.Model;
 import org.json.JSONObject;
 
 public class ResponseRouter implements ServerResponseHandler {
@@ -25,6 +26,9 @@ public class ResponseRouter implements ServerResponseHandler {
 
     @Override
     public void onServerResponse(JSONObject resp) {
+        System.out.println("<<< [ResponseRouter instance hash: " + System.identityHashCode(this) +
+                " User: " + (Model.getInstance() != null ? Model.getInstance().getLoggedInUser() : "UNKNOWN_MODEL_USER") +
+                "] ENTRY: onServerResponse. Raw Resp: " + resp.toString());
         String type = resp.getString("type");
 
         if (type.startsWith("login")) {
@@ -46,13 +50,10 @@ public class ResponseRouter implements ServerResponseHandler {
                 System.out.println("!!! [ResponseRouter] CHECK_USER response but newMessagesBoxCtrl is null");
             }
         } else if (type.equals("create_group_response") || type.equals("createGroupResponse")) {
-            if (messagesController != null) {
-                messagesController.handleCreateGroupResponse(resp);
-            } else {
-                System.out.println("!!! [ResponseRouter] CREATE_GROUP response but MessagesController is null");
-            }
+            Model.getInstance().handleCreateGroupResponse(resp);
+        } else if (type.equals("message")) {
+            Model.getInstance().handleIncomingChatMessage(resp); // Sender also uses this
+            System.out.println("[ResponseRouter] Routed " + type + " (sender ACK) to Model.handleIncomingChatMessage");
         }
     }
-
-
 }

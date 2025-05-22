@@ -2,6 +2,7 @@ package dev.nextchat.client.controllers.chats;
 
 import dev.nextchat.client.backend.MessageController;
 import dev.nextchat.client.backend.ServerResponseHandler;
+import dev.nextchat.client.backend.utils.RequestFactory;
 import dev.nextchat.client.models.Model;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
@@ -47,7 +48,7 @@ public class NewMsgBoxController implements Initializable, ServerResponseHandler
 
             String enteredUsername = Model.getInstance().getLoggedInUser();
             if (!enteredUsername.isEmpty()) {
-                Model.getInstance().findOrCreateChatCell(enteredUsername);
+               // Model.getInstance().findOrCreateChatCell(enteredUsername);
                 Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
                 Model.getInstance().getViewFactory().getClientSelection().set("Chats");
             }
@@ -81,20 +82,33 @@ public class NewMsgBoxController implements Initializable, ServerResponseHandler
 
         Platform.runLater(() -> {
             if (exists) {
-                // 1) Extract and store the other user's UUID
-                String userIdStr = response.getString("userId");
-                UUID otherId = UUID.fromString(userIdStr);
-                Model.getInstance().addKnownUser(pendingUsername, otherId);
+                String userIdStr = response.getString("userId"); // This is User B's ID
+                UUID otherUserId = UUID.fromString(userIdStr);
 
-                // 3) Switch UI to the new chat
-                Model.getInstance().getViewFactory()
-                        .getClientSelectedChat()
-                        .set(pendingUsername);
-                Model.getInstance().getViewFactory()
-                        .getClientSelection()
-                        .set("Chats");
+                error_lbl.setText("User '" + pendingUsername + "' found. Creating chat session...");
+
+                UUID loggedInUserId = Model.getInstance().getLoggedInUserId(); // This is User A's ID
+
+                if (loggedInUserId != null) {
+                    Model.getInstance().setPendingInviteForNextGroup(otherUserId);
+
+                    // Create a generic group name for 1-on-1. Server might override or manage this.
+                    String groupNameFor1on1 = "Chat: " + Model.getInstance().getLoggedInUser() + " & " + pendingUsername;
+                    String groupDescription = "Direct chat";
+
+                    JSONObject createGroupReq = RequestFactory.createNewGroupRequest(
+                            loggedInUserId, // The user creating the group
+                            groupNameFor1on1,
+                            groupDescription
+                    );
+                    Model.getInstance().getMsgCtrl().getSendMessageQueue().offer(createGroupReq);
+                    // Flow continues in Model.handleCreateGroupResponse once server replies
+                } else {
+                    error_lbl.setText("Error: Could not initiate chat. Session issue.");
+                    Model.getInstance().setPendingInviteForNextGroup(null); // Ensure state is cleared if pre-check fails
+                }
             } else {
-                error_lbl.setText("Username not found");
+                error_lbl.setText("Username '" + pendingUsername + "' not found.");
             }
             fusername.clear();
         });
