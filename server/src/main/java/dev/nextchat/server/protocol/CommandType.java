@@ -11,6 +11,9 @@ public enum CommandType {
     CREATE_GROUP,
     JOIN_GROUP,
     CHECK_USER_EXISTENCE,
+    FETCH_GROUP_INFO,
+    FETCH_NEW,
+    FETCH_PER_GROUP,
     LEAVE_GROUP;
 
     public static CommandType fromString(String type) {
