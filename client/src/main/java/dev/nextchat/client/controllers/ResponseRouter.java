@@ -26,9 +26,6 @@ public class ResponseRouter implements ServerResponseHandler {
 
     @Override
     public void onServerResponse(JSONObject resp) {
-        System.out.println("<<< [ResponseRouter instance hash: " + System.identityHashCode(this) +
-                " User: " + (Model.getInstance() != null ? Model.getInstance().getLoggedInUser() : "UNKNOWN_MODEL_USER") +
-                "] ENTRY: onServerResponse. Raw Resp: " + resp.toString());
         String type = resp.getString("type");
 
         if (type.startsWith("login")) {
@@ -53,7 +50,6 @@ public class ResponseRouter implements ServerResponseHandler {
             Model.getInstance().handleCreateGroupResponse(resp);
         } else if (type.equals("message")) {
             Model.getInstance().handleIncomingChatMessage(resp); // Sender also uses this
-            System.out.println("[ResponseRouter] Routed " + type + " (sender ACK) to Model.handleIncomingChatMessage");
         }
     }
 }

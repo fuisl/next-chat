@@ -1,8 +1,7 @@
 package dev.nextchat.client.models;
 
-// Removed: com.google.common.collect.BiMap and com.google.common.collect.HashBiMap
 import dev.nextchat.client.backend.ConnectionManager;
-import dev.nextchat.client.backend.MessageController; // Backend MessageController
+import dev.nextchat.client.backend.MessageController;
 import dev.nextchat.client.backend.utils.RequestFactory;
 import dev.nextchat.client.controllers.ResponseRouter;
 import dev.nextchat.client.database.GroupInfo;
@@ -10,12 +9,14 @@ import dev.nextchat.client.database.GroupManager;
 import dev.nextchat.client.database.MessageQueueManager;
 import dev.nextchat.client.views.ViewFactory;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.json.JSONObject;
 
+import javafx.util.Callback;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +27,12 @@ import java.util.stream.Collectors;
 public class Model {
     private static Model model;
     private final ViewFactory viewFactory;
-    private final ObservableList<ChatCell> chatCells; // For the main chat list UI
-    private final StringProperty loggedInUser = new SimpleStringProperty(); // This is the username of the logged-in user
+    private final ObservableList<ChatCell> chatCells;
+    private final StringProperty loggedInUser = new SimpleStringProperty();
     private UUID loggedInUserId;
 
-    // Group and Chat Management
     private final GroupManager groupManager;
-    private final Map<UUID, ChatCell> chatCellsByGroup = new HashMap<>(); // groupId -> ChatCell
+    private final Map<UUID, ChatCell> chatCellsByGroup = new HashMap<>();
     private UUID otherUserId = null;
     private ConnectionManager connectionManager;
     private MessageController msgCtrl;
@@ -40,11 +40,14 @@ public class Model {
 
     private Model() {
         this.viewFactory = new ViewFactory();
-        this.chatCells = FXCollections.observableArrayList();
         this.groupManager = new GroupManager();
         this.responseRouter = new ResponseRouter();
         this.connectionManager = new ConnectionManager();
-        // msgCtrl and responseRouter are typically set after Model instance creation.
+        Callback<ChatCell, Observable[]> extractor = cell -> new Observable[]{
+                cell.timestampProperty(),
+                cell.otherUsernameProperty()
+        };
+        this.chatCells = FXCollections.observableArrayList(extractor);
     }
 
     public static synchronized Model getInstance() {

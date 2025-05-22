@@ -88,7 +88,6 @@ public class MessagesController implements Initializable {
             fid.setText("No Chat Selected");
         }
 
-
         // Send button action
         send_btn.setOnAction(e -> {
             String content = msg_inp.getText().trim();
@@ -113,7 +112,7 @@ public class MessagesController implements Initializable {
             }
 
             // 3. Persist locally (Optimistic Update)
-            //MessageQueueManager.saveMessage(newMessage);
+            MessageQueueManager.saveMessage(newMessage);
             System.out.println("[MessagesController] Saved message locally: " + newMessage.getId());
 
             // 4. Update UI (Optimistic Update)

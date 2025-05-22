@@ -13,10 +13,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class ChatCell {
-    // Made otherUsername modifiable by removing final from declaration
-    // and providing a setter.
+
     private final StringProperty otherUsername;
-    private UUID groupId; // Should also be final if not changed after construction
+    private UUID groupId;
     private final StringProperty lastMessage;
     private final ObjectProperty<Instant> timestamp;
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
@@ -25,7 +24,7 @@ public class ChatCell {
         this.otherUsername = new SimpleStringProperty(this, "otherUsername", initialOtherUsername);
         this.lastMessage = new SimpleStringProperty(this, "lastMessage", "");
         this.timestamp = new SimpleObjectProperty<>(this, "timestamp", null);
-        this.groupId = groupId; // Consider making this final if it's set only once
+        this.groupId = groupId;
     }
 
     public String getOtherUsername() {
