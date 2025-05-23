@@ -15,6 +15,7 @@ public enum CommandType {
     FETCH_GROUP_WITH_USER,
     FETCH_NEW,
     FETCH_PER_GROUP,
+    SEARCH_CONVERSATION,
     LEAVE_GROUP;
 
     public static CommandType fromString(String type) {
