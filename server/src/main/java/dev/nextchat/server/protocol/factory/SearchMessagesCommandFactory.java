@@ -5,7 +5,11 @@ import dev.nextchat.server.group.service.GroupService;
 import dev.nextchat.server.protocol.Command;
 import dev.nextchat.server.protocol.CommandType;
 import dev.nextchat.server.protocol.impl.SearchMessagesCommand;
+
+import java.util.UUID;
+
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
 
 @Component
