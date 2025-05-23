@@ -30,5 +30,8 @@ replay_pid*
 build
 
 .vscode
+
 server/bin
 client/bin
+=======
+
