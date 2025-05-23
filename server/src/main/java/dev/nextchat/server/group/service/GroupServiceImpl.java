@@ -8,6 +8,7 @@ import dev.nextchat.server.group.repository.GroupMemberRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -88,5 +89,25 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Optional<Group> getGroupInfo(UUID groupId) {
         return groupRepository.findById(groupId);
+    }
+
+    @Override
+    public List<Group> getGroupsByPattern(String search) {
+        return groupRepository.findGroupByPattern(search);
+    }
+
+    @Override
+    public Optional<UUID> getGroupWithTwoUsers(UUID userA, UUID userB) {
+        Optional<byte[]> groupIdInBytes = groupMemberRepository.findGroupsWithExactlyTwoUsers(userA, userB);
+
+        if (!groupIdInBytes.isPresent()) {
+            return Optional.empty();
+        }
+
+        ByteBuffer bb = ByteBuffer.wrap(groupIdInBytes.get());
+        long high = bb.getLong();
+        long low = bb.getLong();
+
+        return Optional.of(new UUID(high, low));
     }
 }
