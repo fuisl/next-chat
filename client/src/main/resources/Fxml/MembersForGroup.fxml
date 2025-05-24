@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="50.0" prefWidth="300.0" stylesheets="@../Styles/MembersForGroup.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.chats.MembersGroupController">
+   <children>
+      <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="115.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Circle fill="WHITE" radius="18.0" stroke="BLACK" strokeType="INSIDE" />
+            <Label fx:id="username" alignment="TOP_LEFT" text="Username">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
+         </children>
+         <padding>
+            <Insets left="15.0" right="10.0" />
+         </padding>
+      </HBox>
+      <Button fx:id="remove_btn" layoutX="279.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleRemoveMember" AnchorPane.bottomAnchor="13.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="13.0">
+         <graphic>
+            <FontAwesomeIconView glyphName="REMOVE" selectionStart="0" size="15" />
+         </graphic></Button>
+   </children>
+</AnchorPane>

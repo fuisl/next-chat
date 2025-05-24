@@ -2,12 +2,14 @@ package dev.nextchat.client.views;
 
 import dev.nextchat.client.controllers.ClientController;
 
+import dev.nextchat.client.controllers.chats.NewGroupController;
 import dev.nextchat.client.controllers.chats.NewMsgBoxController;
 import dev.nextchat.client.controllers.messages.MessagesController;
 import dev.nextchat.client.controllers.messages.MsgBBController;
 import dev.nextchat.client.controllers.auth.LoginController;
 import dev.nextchat.client.controllers.auth.SignupController;
 import dev.nextchat.client.models.Message;
+import dev.nextchat.client.models.Model;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
@@ -31,6 +33,7 @@ public class ViewFactory {
     private SignupController signUpController;
     private NewMsgBoxController newMsgController;
     private MessagesController messageController;
+    private NewGroupController newGroupViewController;
 
     public ViewFactory() {
         this.clientSelectedChat = new SimpleStringProperty(" ");
@@ -77,6 +80,7 @@ public class ViewFactory {
             e.printStackTrace();
         }
         signUpController = loader.getController();
+        Model.getInstance().getResponseRouter().setSignupController(signUpController);
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
@@ -97,6 +101,7 @@ public class ViewFactory {
             e.printStackTrace();
         }
         loginController = loader.getController();
+        Model.getInstance().getResponseRouter().setLoginController(loginController); // Set it
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
@@ -109,6 +114,8 @@ public class ViewFactory {
     }
 
     public void showClientWindow() {
+        //Model.getInstance().getResponseRouter().setNewMessagesController(null);
+        //Model.getInstance().getResponseRouter().setNewGroupController(null);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Client.fxml"));
         ClientController clientController = new ClientController();
         loader.setController(clientController);
@@ -131,7 +138,8 @@ public class ViewFactory {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/NewMsgBox.fxml"));
                 newMsgView = loader.load();
                 newMsgController = loader.getController();
-
+                Model.getInstance().getResponseRouter().setNewMessagesController(newMsgController); // Set it
+                Model.getInstance().getResponseRouter().setNewGroupController(null); // Clear the other
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -146,7 +154,11 @@ public class ViewFactory {
     public AnchorPane getNewGroupWindow() {
         if (newGroupView == null) {
             try{
-                newGroupView = new FXMLLoader(getClass().getResource("/Fxml/NewGroup.fxml")).load();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/NewGroup.fxml"));
+                newGroupView = loader.load();
+                newGroupViewController = loader.getController();
+                Model.getInstance().getResponseRouter().setNewGroupController(newGroupViewController); // Set it
+                Model.getInstance().getResponseRouter().setNewMessagesController(null); // Clear the other
             } catch (IOException e) {
                 e.printStackTrace();
             }

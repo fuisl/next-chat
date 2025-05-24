@@ -3,6 +3,7 @@ package dev.nextchat.client.controllers;
 import dev.nextchat.client.backend.ServerResponseHandler;
 import dev.nextchat.client.controllers.auth.LoginController;
 import dev.nextchat.client.controllers.auth.SignupController;
+import dev.nextchat.client.controllers.chats.NewGroupController;
 import dev.nextchat.client.controllers.chats.NewMsgBoxController;
 import dev.nextchat.client.controllers.messages.MessagesController;
 import dev.nextchat.client.models.Model;
@@ -13,6 +14,7 @@ public class ResponseRouter implements ServerResponseHandler {
     private SignupController signupCtrl;
     private NewMsgBoxController newMessagesBoxController;
     private MessagesController messagesController;
+    private NewGroupController newGroupController;
 
     public void setLoginController(LoginController c)   { this.loginCtrl = c; }
     public void setSignupController(SignupController c) { this.signupCtrl = c; }
@@ -21,6 +23,9 @@ public class ResponseRouter implements ServerResponseHandler {
     }
     public void setMessagesController(MessagesController c) {
         this.messagesController = c;
+    }
+    public void setNewGroupController(NewGroupController newGroupController) {
+        this.newGroupController = newGroupController;
     }
 
 
@@ -43,8 +48,11 @@ public class ResponseRouter implements ServerResponseHandler {
         } else if (type.equals("checkUserExistenceResponse")) {
             if (newMessagesBoxController != null) {
                 newMessagesBoxController.onServerResponse(resp);
-            } else {
-                System.out.println("!!! [ResponseRouter] CHECK_USER response but newMessagesBoxCtrl is null");
+            }
+            if (newGroupController != null) {
+                newGroupController.onServerResponse(resp);
+            }else{
+                System.out.println("!!! [ResponseRouter] NEW GROUP response but newGroup is null");
             }
         } else if (type.equals("create_group_response") || type.equals("createGroupResponse")) {
             Model.getInstance().handleCreateGroupResponse(resp);

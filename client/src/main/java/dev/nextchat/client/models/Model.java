@@ -36,6 +36,8 @@ public class Model {
     private ResponseRouter responseRouter;
     private UUID newChat_pendingOtherUserId = null;
     private String newChat_pendingOtherUsername = null;
+    private String pendingGroupNameForNewGroup = null;
+    private List<UserDisplay> pendingMembersForNewGroup = new ArrayList<>();
 
     private Model() {
         this.viewFactory = new ViewFactory();
@@ -132,6 +134,26 @@ public class Model {
         }
     }
 
+    private void clearSinglePendingChatContext() {
+        this.newChat_pendingOtherUserId = null;
+        this.newChat_pendingOtherUsername = null;
+    }
+    private void clearPendingMultiMemberGroupContext() {
+        this.pendingGroupNameForNewGroup = null;
+        if (this.pendingMembersForNewGroup != null) {
+            this.pendingMembersForNewGroup.clear();
+        }
+    }
+
+    public void prepareGroupCreationWithMembers(String groupNameIgnored, List<UserDisplay> membersToInvite) {
+        clearSinglePendingChatContext();
+        // We don't store the groupName here anymore, as it will be derived from groupId.
+        this.pendingGroupNameForNewGroup = null; // Explicitly null
+        this.pendingMembersForNewGroup = new ArrayList<>(membersToInvite);
+        // System.out.println("[Model.prepareGroupCreation] Prepared with " + membersToInvite.size() + " members to invite. Name will be ID-based.");
+    }
+
+
     public ChatCell findOrCreateChatCell(UUID groupId) {
         return chatCellsByGroup.computeIfAbsent(groupId, gid -> {
             String initialDisplayName = "Loading..."; // Default placeholder
@@ -164,46 +186,62 @@ public class Model {
         try {
             UUID groupId = UUID.fromString(response.getString("groupId"));
             UUID currentUser = getLoggedInUserId();
-            UUID otherUserIdFromPending = this.newChat_pendingOtherUserId;
-            String otherUsernameFromPending = this.newChat_pendingOtherUsername;
-            this.newChat_pendingOtherUserId = null;
-            this.newChat_pendingOtherUsername = null;
 
-            if (currentUser == null || otherUserIdFromPending == null || otherUsernameFromPending == null) {
-                System.err.println("[Model.handleCreateGroupResponse] Missing context for 1-on-1 chat with group " + groupId);
+            // Determine if this group creation was for a 1-on-1 chat or a multi-member group
+            boolean isFromMultiMemberSetupViaPendingList = (this.pendingMembersForNewGroup != null && !this.pendingMembersForNewGroup.isEmpty());
+            boolean isFromSingleChatSetupViaOldPendingFields = (this.newChat_pendingOtherUserId != null && this.newChat_pendingOtherUsername != null);
+
+            String finalCellDisplayName;
+            List<UUID> membersToActuallyInviteAndRecord = new ArrayList<>();
+
+            if (isFromMultiMemberSetupViaPendingList) {
+                // Name will be derived from groupId for multi-member groups created this way
+                finalCellDisplayName = "Group " + groupId.toString().substring(0, Math.min(groupId.toString().length(), 4));
+                this.pendingMembersForNewGroup.forEach(ud -> membersToActuallyInviteAndRecord.add(ud.userId()));
+                groupManager.addGroupMapping(groupId, currentUser, finalCellDisplayName); // Use the ID-based name
+            } else if (isFromSingleChatSetupViaOldPendingFields) {
+                finalCellDisplayName = this.newChat_pendingOtherUsername;
+                membersToActuallyInviteAndRecord.add(this.newChat_pendingOtherUserId);
+                String internalGroupName = "DM_" + currentUser.toString().substring(0,Math.min(4,currentUser.toString().length())) + "_" + this.newChat_pendingOtherUserId.toString().substring(0,Math.min(4,this.newChat_pendingOtherUserId.toString().length()));
+                groupManager.addGroupMapping(groupId, currentUser, internalGroupName);
+            } else {
+                finalCellDisplayName = response.optString("groupName", "Chat " + groupId.toString().substring(0,Math.min(4,groupId.toString().length())));
+                groupManager.addGroupMapping(groupId, currentUser, finalCellDisplayName);
             }
 
-            String internalGroupName = response.optString("groupName", "DM_" + (currentUser != null ? currentUser.toString().substring(0,4) : "X") + "_" + (otherUserIdFromPending != null ? otherUserIdFromPending.toString().substring(0,4) : "Y"));
-            groupManager.addGroupMapping(groupId, currentUser, internalGroupName);
-            if (otherUserIdFromPending != null) {
-                groupManager.addMemberToGroup(groupId, otherUserIdFromPending);
+            groupManager.addMemberToGroup(groupId, currentUser); // Ensure creator is a member
+            for (UUID memberIdToInvite : membersToActuallyInviteAndRecord) {
+                groupManager.addMemberToGroup(groupId, memberIdToInvite); // Optimistic local add
             }
-
-            final String nameForCell = (otherUsernameFromPending != null) ? otherUsernameFromPending : "Loading...";
 
             ChatCell cell = chatCellsByGroup.computeIfAbsent(groupId, gid -> {
-                ChatCell newCell = new ChatCell(nameForCell, gid);
+                ChatCell newCell = new ChatCell(finalCellDisplayName, gid);
                 Platform.runLater(() -> { if (!chatCells.contains(newCell)) chatCells.add(newCell); });
                 return newCell;
             });
-            if (!nameForCell.equals("Loading...") && !cell.getOtherUsername().equals(nameForCell)) {
-                final String finalDisplayName = nameForCell;
-                Platform.runLater(() -> cell.setOtherUsername(finalDisplayName));
+            if (!cell.getOtherUsername().equals(finalCellDisplayName)) {
+                Platform.runLater(() -> cell.setOtherUsername(finalCellDisplayName));
             }
 
-            if (otherUserIdFromPending != null && (currentUser == null || !otherUserIdFromPending.equals(currentUser))) {
-                JSONObject joinReq = RequestFactory.createJoinGroupRequest(otherUserIdFromPending, groupId);
-                if (msgCtrl != null) msgCtrl.getSendMessageQueue().offer(joinReq);
+            for (UUID memberIdToInvite : membersToActuallyInviteAndRecord) {
+                if (!memberIdToInvite.equals(currentUser)) {
+                    JSONObject joinReq = RequestFactory.createJoinGroupRequest(memberIdToInvite, groupId);
+                    if (msgCtrl != null) msgCtrl.getSendMessageQueue().offer(joinReq);
+                }
             }
+
+            clearSinglePendingChatContext();
+            clearPendingMultiMemberGroupContext(); // Clears pendingMembersForNewGroup
 
             final UUID finalSelectGroupId = groupId;
             Platform.runLater(() -> {
                 getViewFactory().getClientSelectedChat().set(finalSelectGroupId.toString());
                 getViewFactory().getClientSelection().set("Chats");
             });
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
     // In Model.java
     public void handleIncomingChatMessage(JSONObject response) {
         UUID messageId = null;
@@ -373,6 +411,8 @@ public class Model {
             });
         });
     }
+
+    public record UserDisplay(UUID userId, String username) {}
 
     public void resetSessionState() {
         Platform.runLater(() -> chatCells.clear());

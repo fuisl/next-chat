@@ -27,3 +27,25 @@
     -fx-border-radius: 20;
     -fx-padding: 5 10;
 }
+#createGroup_btn {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 15px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+}
+#createGroup_btn:hover {
+    -fx-background-color:#e0e0e0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0.3, 0, 0);
+}
+
+#createGroup_btn:disabled {
+    -fx-background-color: #e8e8e8;
+    -fx-text-fill: #aaaaaa;
+    -fx-border-color: #dcdcdc;
+    -fx-opacity: 0.6;
+}
