@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 import java.util.UUID;
 
-// TODO: add username to the collection
 @Document(collection = "messages")
 public class Message {
 
@@ -62,6 +61,10 @@ public class Message {
         return timestamp;
     }
 
+    public String getSenderUsername() {
+        return senderUsername;
+    }
+
     // Setters (optional unless you plan to mutate values)
     public void setId(UUID id) {
         this.id = id;
@@ -81,5 +84,9 @@ public class Message {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public void setSenderUsername(String senderUsername) {
+        this.senderUsername = senderUsername;
     }
 }

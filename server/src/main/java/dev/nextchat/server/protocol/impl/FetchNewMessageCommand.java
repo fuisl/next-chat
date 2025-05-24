@@ -81,6 +81,7 @@ public class FetchNewMessageCommand implements Command {
             JSONObject msg = new JSONObject();
             msg.put("id", m.getId().toString());
             msg.put("senderId", m.getSenderId().toString());
+            msg.put("senderUsername", m.getSenderUsername());
             msg.put("content", m.getContent());
             msg.put("timestamp", m.getTimestamp().toString());
             jsonMessages.put(msg);
