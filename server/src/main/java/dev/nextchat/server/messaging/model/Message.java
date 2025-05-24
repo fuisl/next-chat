@@ -13,6 +13,7 @@ public class Message {
     @Id
     private UUID id;
     private UUID groupId;
+    private String senderUsername;
     private UUID senderId;
     private String content;
     private Instant timestamp;
@@ -21,8 +22,9 @@ public class Message {
         // Required by JPA
     }
 
-    public Message(UUID groupId, UUID senderId, String content) {
+    public Message(UUID groupId,String senderUsername, UUID senderId, String content) {
         this.groupId = groupId;
+        this.senderUsername = senderUsername;
         this.senderId = senderId;
         this.content = content;
         this.timestamp = Instant.now();
@@ -30,7 +32,8 @@ public class Message {
     }
 
     // test constructor for MessageServiceTest
-    public Message(UUID senderId, UUID groupId, String content, Instant timestamp) {
+    public Message(String senderUsername,UUID senderId, UUID groupId, String content, Instant timestamp) {
+        this.senderUsername = senderUsername;
         this.senderId = senderId;
         this.groupId = groupId;
         this.content = content;
