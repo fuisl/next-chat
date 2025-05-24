@@ -48,6 +48,7 @@ public class LoginController implements Initializable, ServerResponseHandler {
                 // 2) store it in the Model
                 Model.getInstance().setLoggedInUser(user);
                 Model.getInstance().setLoggedInUserId(id);
+                Model.getInstance().initializeUIData();
 
                 // 3) now you can safely call getLoggedInUser() elsewhere
                 System.out.println(">>> Logged in as: " + Model.getInstance().getLoggedInUserId());

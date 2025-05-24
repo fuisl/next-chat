@@ -45,22 +45,22 @@ public class NewMsgBoxController implements Initializable, ServerResponseHandler
             fusername.clear();
         });
         self_chat.setOnAction(e -> {
+            UUID loggedInId = Model.getInstance().getLoggedInUserId();
+            String loggedInUsername = Model.getInstance().getLoggedInUser(); // Get current user's name
 
-            String enteredUsername = Model.getInstance().getLoggedInUser();
-            if (!enteredUsername.isEmpty()) {
-               // Model.getInstance().findOrCreateChatCell(enteredUsername);
-                Model.getInstance().getViewFactory().getClientSelectedChat().set(enteredUsername);
-                Model.getInstance().getViewFactory().getClientSelection().set("Chats");
+            if (loggedInId != null && loggedInUsername != null) {
+                Model.getInstance().initiateNewOneOnOneChat(loggedInId, loggedInUsername);
+            } else {
+                error_lbl.setText("Error: Cannot initiate self-chat. Not logged in.");
             }
             fusername.clear();
+            this.pendingUsername = null;
         });
 
         chat_btn.setOnAction(e -> {
-            String enteredUsername = fusername.getText().trim(); // from input field
+            String enteredUsername = fusername.getText().trim();
             pendingUsername = enteredUsername;
-            JSONObject request = new JSONObject();
-            request.put("type", "check_user_existence");
-            request.put("username", enteredUsername);
+            JSONObject request = RequestFactory.checkIfUserExist(pendingUsername);
 
             MessageController msgCtrl = Model.getInstance().getMsgCtrl();
             msgCtrl.getSendMessageQueue().offer(request);
@@ -82,31 +82,11 @@ public class NewMsgBoxController implements Initializable, ServerResponseHandler
 
         Platform.runLater(() -> {
             if (exists) {
-                String userIdStr = response.getString("userId"); // This is User B's ID
-                UUID otherUserId = UUID.fromString(userIdStr);
+                UUID otherUserId = UUID.fromString(response.getString("userId"));
+                String canonicalOtherUsername = response.getString("username");
 
-                error_lbl.setText("User '" + pendingUsername + "' found. Creating chat session...");
+                Model.getInstance().initiateNewOneOnOneChat(otherUserId, canonicalOtherUsername);
 
-                UUID loggedInUserId = Model.getInstance().getLoggedInUserId(); // This is User A's ID
-
-                if (loggedInUserId != null) {
-                    Model.getInstance().setPendingInviteForNextGroup(otherUserId);
-
-                    // Create a generic group name for 1-on-1. Server might override or manage this.
-                    String groupNameFor1on1 = "Chat: " + Model.getInstance().getLoggedInUser() + " & " + pendingUsername;
-                    String groupDescription = "Direct chat";
-
-                    JSONObject createGroupReq = RequestFactory.createNewGroupRequest(
-                            loggedInUserId, // The user creating the group
-                            groupNameFor1on1,
-                            groupDescription
-                    );
-                    Model.getInstance().getMsgCtrl().getSendMessageQueue().offer(createGroupReq);
-                    // Flow continues in Model.handleCreateGroupResponse once server replies
-                } else {
-                    error_lbl.setText("Error: Could not initiate chat. Session issue.");
-                    Model.getInstance().setPendingInviteForNextGroup(null); // Ensure state is cleared if pre-check fails
-                }
             } else {
                 error_lbl.setText("Username '" + pendingUsername + "' not found.");
             }

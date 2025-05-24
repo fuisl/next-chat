@@ -98,9 +98,10 @@ public class MessagesController implements Initializable {
 
             UUID messageId = UUID.randomUUID(); // Generate unique ID for the message
             UUID senderId  = Model.getInstance().getLoggedInUserId();
+            String senderUsername = Model.getInstance().getLoggedInUser();
             UUID groupId   = currentChatCell.getGroupId();
             Instant timestamp = Instant.now();
-            Message newMessage = new Message(messageId, senderId, groupId, content, timestamp);
+            Message newMessage = new Message(messageId, senderId, senderUsername, groupId, content, timestamp);
             MessageController backendMsgCtrl = Model.getInstance().getMsgCtrl(); // Get the backend MessageController
             if (backendMsgCtrl != null) {
                 JSONObject messageJson = RequestFactory.createMessageRequest(newMessage);
@@ -111,13 +112,9 @@ public class MessagesController implements Initializable {
                 return;
             }
 
-            // 3. Persist locally (Optimistic Update)
             MessageQueueManager.saveMessage(newMessage);
             System.out.println("[MessagesController] Saved message locally: " + newMessage.getId());
 
-            // 4. Update UI (Optimistic Update)
-            // The Model's handleIncomingChatMessage will also call addMessage for messages from others
-            // or echos. The addMessage in ChatCell should handle potential duplicates if any.
             currentChatCell.addMessage(newMessage);
             msgListView.scrollTo(currentChatCell.getMessages().size() - 1); // Scroll to the new message
 

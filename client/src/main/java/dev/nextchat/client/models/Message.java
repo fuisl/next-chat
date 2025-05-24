@@ -1,14 +1,13 @@
 package dev.nextchat.client.models;
 
-import org.json.JSONObject;
-
 import java.time.Instant;
-import java.util.UUID;
+import java.util.*;
 
 public class Message {
 
     protected UUID id;
     private UUID senderId;
+    private String senderUsername;
     protected UUID groupId;
     protected String message;
     protected Instant timestamp;
@@ -16,9 +15,10 @@ public class Message {
     // Constructors
     public Message() {}
 
-    public Message(UUID id, UUID senderId, UUID groupId, String message, Instant timestamp) {
+    public Message(UUID id, UUID senderId, String senderUsername, UUID groupId, String message, Instant timestamp) {
         this.id = UUID.randomUUID();
         this.senderId = senderId;
+        this.senderUsername = senderUsername;
         this.groupId = groupId;
         this.message = message;
         this.timestamp = timestamp;
@@ -43,6 +43,14 @@ public class Message {
 
     public Instant getTimestamp() {
         return timestamp;
+    }
+
+    public String getSenderUsername() {
+        return senderUsername;
+    }
+
+    public void setSenderUsername(String username) {
+        this.senderUsername = username;
     }
 
     public void setId(UUID id) {

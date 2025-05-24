@@ -18,7 +18,6 @@ public class StageInit implements ApplicationListener<StageReadyEvent> {
     public void onApplicationEvent(StageReadyEvent event) {
         // 1) Show the login scene — this will load login.fxml and create LoginController
         Model.getInstance().getViewFactory().showLoginWindow();
-        Model.getInstance().initializeUIData();
         MessagesController msgsCtrl = new MessagesController();
         LoginController loginCtrl = Model.getInstance().getViewFactory().getLoginController();
 

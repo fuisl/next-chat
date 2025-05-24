@@ -78,7 +78,7 @@ public class RequestFactory {
     }
     public static JSONObject checkIfUserExist(String username) {
         JSONObject json = new JSONObject();
-        json.put("type", "checkUserExistence");
+        json.put("type", "check_user_existence");
         json.put("username", username);
         return json;
     }
