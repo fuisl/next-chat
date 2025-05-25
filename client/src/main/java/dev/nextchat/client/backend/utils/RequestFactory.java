@@ -83,4 +83,30 @@ public class RequestFactory {
         return json;
     }
 
+    public static JSONObject createFetchNewMessageRequest() {
+        JSONObject json = new JSONObject();
+        json.put("type", "fetch_new");
+        return json;
+    }
+
+    public static JSONObject createFetchLatestMessagesPerGroupRequest(Instant referenceTimestamp) {
+        JSONObject json = new JSONObject();
+        json.put("type", "fetch_per_group");
+        json.put("timestamp", referenceTimestamp.toString()); // Server command constructor expects this
+        return json;
+    }
+
+    public static JSONObject createFetchGroupInfoRequest(UUID groupId) {
+        JSONObject json = new JSONObject();
+        json.put("type", "fetch_group_info");
+        json.put("groupId", groupId.toString());
+        return json;
+    }
+
+    public static JSONObject createFetchGroupWithUserRequest(UUID otherMemberId) {
+        JSONObject json = new JSONObject();
+        json.put("type", "fetch_group_with_user");
+        json.put("memberId", otherMemberId.toString());
+        return json;
+    }
 }
