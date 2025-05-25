@@ -154,28 +154,53 @@ public class Model {
     }
 
 
+    // In Model.java
     public ChatCell findOrCreateChatCell(UUID groupId) {
         return chatCellsByGroup.computeIfAbsent(groupId, gid -> {
-            String initialDisplayName = "Loading..."; // Default placeholder
-            UUID currentUser = getLoggedInUserId();
+            String initialDisplayName = "Group " + gid.toString().substring(0, Math.min(gid.toString().length(), 4)); // Fallback
+            UUID otherUserIdToFetchNameFor = null; // Only for 1-on-1 if name not in GroupInfo
+            boolean isTrueOneOnOne = false;
 
             GroupInfo groupInfo = groupManager.getGroupInfo(gid);
-            if (groupInfo != null && groupInfo.getMembers() != null) {
-                if (groupInfo.getMembers().size() == 2 && currentUser != null) {
-                    // It's a 1-on-1 chat, name will be "Loading..." initially
-                    // unless set by handleIncomingChatMessage or loadAllChatHistories enhancement.
-                } else if (groupInfo.getGroupName() != null && !groupInfo.getGroupName().isEmpty()) {
-                    initialDisplayName = groupInfo.getGroupName(); // Use predefined group name
-                } else { // Not 1-on-1 or no specific group name
-                    initialDisplayName = "Group " + gid.toString().substring(0, 4);
+            UUID currentUser = getLoggedInUserId();
+
+            if (groupInfo != null) {
+                // Scenario 1: It's a 2-member group, likely a 1-on-1 chat.
+                // We prioritize fetching the other user's name.
+                if (groupInfo.getMembers() != null && groupInfo.getMembers().size() == 2 && currentUser != null) {
+                    isTrueOneOnOne = true;
+                    for (UUID memberId : groupInfo.getMembers()) {
+                        if (!memberId.equals(currentUser)) {
+                            otherUserIdToFetchNameFor = memberId;
+                            initialDisplayName = "Loading..."; // Placeholder for the other user's name
+                            break;
+                        }
+                    }
                 }
-            } else { // No GroupInfo, might be a very new group, or error.
-                initialDisplayName = "Unknown Chat " + gid.toString().substring(0, 4);
+                // Scenario 2: The group has an explicit name (could be a named 1-on-1 or a multi-user group)
+                // If it's not a 1-on-1 identified above, or if the 1-on-1 logic didn't set a name yet,
+                // use the group's stored name.
+                if (!isTrueOneOnOne && groupInfo.getGroupName() != null && !groupInfo.getGroupName().isEmpty()) {
+                    initialDisplayName = groupInfo.getGroupName();
+                }
+                // If it is a 1-on-1, initialDisplayName is already "Loading..."
+                // If it's a multi-member group without a specific name, it will use the fallback.
+            } else {
+                // No GroupInfo found, use fallback. Could indicate a new group just created
+                // for which local GroupInfo isn't fully populated yet from the server.
+                System.err.println("[Model.findOrCreateChatCell] No GroupInfo for group " + gid + ". Using default: " + initialDisplayName);
             }
 
             ChatCell cell = new ChatCell(initialDisplayName, gid);
             Platform.runLater(() -> { if (!chatCells.contains(cell)) chatCells.add(cell); });
-            // NO LONGER SENDS checkIfUserIdExist from here.
+
+            // If it was identified as a 1-on-1 and we need to fetch the name
+            if (isTrueOneOnOne && otherUserIdToFetchNameFor != null && initialDisplayName.equals("Loading...")) {
+                // As per your request, we are NOT calling RequestFactory.checkIfUserIdExist() here.
+                // The name will be filled by incoming messages or history load.
+                System.out.println("[Model.findOrCreateChatCell] Group " + gid + " is 1-on-1 with otherUserId " +
+                        otherUserIdToFetchNameFor + ". Set to 'Loading...'; name expected from messages/history.");
+            }
             return cell;
         });
     }
@@ -242,21 +267,17 @@ public class Model {
             e.printStackTrace();
         }
     }
-    // In Model.java
+
     public void handleIncomingChatMessage(JSONObject response) {
-        UUID messageId = null;
-        UUID senderId = null;
-        UUID groupId = null;
-        String content = null;
-        Instant timestamp = null;
-        String responseType = null;
+        UUID messageId;
+        UUID senderId;
+        UUID groupId;
+        String content;
+        Instant timestamp;
+        String responseType;
         String senderUsername = null;
 
         UUID loggedInUserIdForLog = getLoggedInUserId();
-        String currentUserForLog = (loggedInUserIdForLog != null ? loggedInUserIdForLog.toString().substring(0,Math.min(4, loggedInUserIdForLog.toString().length())) : "LOGGED_OUT_OR_NULL");
-
-        // System.out.println("[" + currentUserForLog + " - handleIncomingChatMessage] Processing: " + response.toString());
-
         try {
             responseType = response.getString("type");
             senderId = UUID.fromString(response.getString("senderId"));
@@ -266,110 +287,79 @@ public class Model {
 
             if (response.has("senderUsername")) {
                 senderUsername = response.getString("senderUsername");
-            } else {
-                System.err.println("[" + currentUserForLog + " - handleIncomingChatMessage] 'senderUsername' MISSING in " + responseType + " payload for group " + groupId);
-                // Name update from this message will not be possible.
             }
 
             if (response.has("messageId")) {
                 messageId = UUID.fromString(response.getString("messageId"));
             } else {
-                if (responseType.equals("message")) {
+                if (responseType.equals("message")) { // Only generate for "message" type if absolutely missing from server
                     messageId = UUID.randomUUID();
-                    System.err.println("[" + currentUserForLog + " - handleIncomingChatMessage] 'messageId' MISSING for type 'message'. Generated local ID: " + messageId);
+                    System.err.println("[Model.handleIncomingChatMessage] CRITICAL: 'messageId' MISSING for type 'message' from server. Generated local ID: " + messageId + " for group " + groupId);
+                } else if (responseType.equals("send_message_response")) {
+                    System.err.println("[Model.handleIncomingChatMessage] CRITICAL: 'messageId' MISSING for type 'send_message_response'. Cannot process ACK properly.");
+                    return; // Cannot proceed without messageId for an ACK
                 } else {
-                    System.err.println("[" + currentUserForLog + " - handleIncomingChatMessage] 'messageId' MISSING for type '" + responseType + "'. Cannot proceed without messageId for ACK.");
+                    System.err.println("[Model.handleIncomingChatMessage] 'messageId' MISSING for unknown type '" + responseType + "'.");
                     return;
                 }
             }
 
             Message receivedMessage = new Message(messageId, senderId, senderUsername, groupId, content, timestamp);
-            MessageQueueManager.saveMessage(receivedMessage);
+            MessageQueueManager.saveMessage(receivedMessage); // Save the message with all details
 
             boolean isThisClientTheOriginalSender = loggedInUserIdForLog != null && senderId.equals(loggedInUserIdForLog);
 
-            ChatCell relevantChatCell = findOrCreateChatCell(groupId); // Creates cell with placeholder if new
-            if (relevantChatCell == null) {
-                System.err.println("[" + currentUserForLog + " - handleIncomingChatMessage] CRITICAL: relevantChatCell is NULL for groupId: " + groupId);
-                return;
-            }
+            ChatCell relevantChatCell = findOrCreateChatCell(groupId);
 
-            // --- Attempt to update name and GroupInfo based on incoming message ---
-            if (!isThisClientTheOriginalSender && senderId != null && senderUsername != null && !senderUsername.isEmpty()) {
-                // This is Duong (receiver) getting a message from An (sender)
-                GroupInfo gi = groupManager.getGroupInfo(groupId);
-
-                // Check if GroupManager already knows this is a 2-member group with the sender
-                boolean needsGroupInfoUpdate = true;
-                if (gi != null && gi.getMembers() != null && gi.getMembers().size() == 2 &&
-                        gi.getMembers().contains(senderId) && gi.getMembers().contains(loggedInUserIdForLog)) {
-                    needsGroupInfoUpdate = false; // GroupManager is already up-to-date for this 1-on-1
-                }
-
-                if (needsGroupInfoUpdate && loggedInUserIdForLog != null) {
-                    // GroupManager doesn't have full info, or it's not a 2-member group yet.
-                    // Let's optimistically assume this is a 1-on-1 chat with the sender and update GroupManager.
-                    System.out.println("[" + currentUserForLog + " - handleIncomingChatMessage] GroupInfo for " + groupId +
-                            " is missing or not 2 members. Optimistically updating GroupManager with sender " +
-                            senderId + " and self " + loggedInUserIdForLog);
-
-                    // Ensure the group mapping exists with a default name if needed
-                    if (gi == null) {
-                        groupManager.addGroupMapping(groupId, loggedInUserIdForLog, "Chat with " + senderUsername); // Add current user
-                    }
-                    // Ensure both sender and current user (receiver) are members
-                    groupManager.addMemberToGroup(groupId, senderId);
-                    groupManager.addMemberToGroup(groupId, loggedInUserIdForLog); // Ensure self is also there
-
-                    // Re-fetch GroupInfo after update for the name setting logic below
-                    gi = groupManager.getGroupInfo(groupId);
-                }
-
-                // Now, attempt to set the ChatCell name using senderUsername
+            if (!isThisClientTheOriginalSender && senderUsername != null && !senderUsername.isEmpty()) {
+                GroupInfo gi = groupManager.getGroupInfo(relevantChatCell.getGroupId());
                 if (gi != null && gi.getMembers() != null && gi.getMembers().size() == 2) {
-                    // Check if the current cell name is a placeholder or different
-                    if (relevantChatCell.getOtherUsername().startsWith("Loading") ||
-                            relevantChatCell.getOtherUsername().startsWith("User ") ||
-                            relevantChatCell.getOtherUsername().startsWith("Chat ") || // Catch generic placeholders
-                            relevantChatCell.getOtherUsername().startsWith("Group ") ||
-                            relevantChatCell.getOtherUsername().startsWith("Unknown Chat") || // Catch other fallbacks
-                            !relevantChatCell.getOtherUsername().equals(senderUsername)) {
+                    boolean otherUserIsSender = false;
+                    for(UUID member : gi.getMembers()){
+                        if(member.equals(senderId) && !member.equals(loggedInUserIdForLog)){
+                            otherUserIsSender = true;
+                            break;
+                        }
+                    }
 
-                        final String finalSenderName = senderUsername; // This should be "An"
-                        Platform.runLater(() -> {
-                            relevantChatCell.setOtherUsername(finalSenderName);
-                        });
+                    if(otherUserIsSender) {
+                        // If cell name is still a placeholder or different, update it
+                        if (relevantChatCell.getOtherUsername().startsWith("Loading") ||
+                                relevantChatCell.getOtherUsername().startsWith("User ") ||
+                                relevantChatCell.getOtherUsername().startsWith("Chat ") ||
+                                relevantChatCell.getOtherUsername().startsWith("Group ") ||
+                                relevantChatCell.getOtherUsername().startsWith("Unknown Chat") || // Catch other fallbacks
+                                !relevantChatCell.getOtherUsername().equals(senderUsername)) {
+
+                            final String finalSenderName = senderUsername;
+                            Platform.runLater(() -> relevantChatCell.setOtherUsername(finalSenderName));
+                        }
                     }
                 }
             }
-
-            // Add the message to the ChatCell's list for UI display
             Platform.runLater(() -> {
                 relevantChatCell.addMessage(receivedMessage);
             });
 
         } catch (Exception e) {
-            System.err.println("[" + currentUserForLog + " - handleIncomingChatMessage] CRITICAL ERROR: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // --- Data Persistence ---
     private void loadAllChatHistories() {
         List<Message> allMessages = MessageQueueManager.loadMessages();
-        if (allMessages == null || allMessages.isEmpty()) return;
+        if (allMessages == null || allMessages.isEmpty()) {
+            // System.out.println("[Model.loadAllChatHistories] No chat history found.");
+            return;
+        }
         UUID currentUser = getLoggedInUserId();
-        if (currentUser == null) return;
 
         Map<UUID, List<Message>> messagesByGroup = allMessages.stream()
                 .filter(m -> m.getGroupId() != null)
                 .collect(Collectors.groupingBy(Message::getGroupId));
 
         messagesByGroup.forEach((groupId, messagesInGroup) -> {
-            // findOrCreateChatCell will set "Loading..." if it's a 1-on-1 and name isn't known
             ChatCell chatCell = findOrCreateChatCell(groupId);
-
-            // Try to set name from historical messages if cell is still "Loading..."
             if (chatCell.getOtherUsername().startsWith("Loading...")) {
                 GroupInfo groupInfo = groupManager.getGroupInfo(groupId);
                 if (groupInfo != null && groupInfo.getMembers() != null && groupInfo.getMembers().size() == 2) {
@@ -380,15 +370,16 @@ public class Model {
                             break;
                         }
                     }
+
                     if (otherUserInHistory != null) {
                         final UUID finalOtherUserInHistory = otherUserInHistory;
                         messagesInGroup.stream()
-                                .filter(m -> m.getSenderId().equals(finalOtherUserInHistory) && m.getSenderUsername() != null && !m.getSenderUsername().isEmpty())
-                                .findFirst() // Get username from the first available message from the other user in history
+                                .filter(m -> m.getSenderId() != null && m.getSenderId().equals(finalOtherUserInHistory) &&
+                                        m.getSenderUsername() != null && !m.getSenderUsername().isEmpty())
+                                .findFirst()
                                 .ifPresent(msgWithOtherUsername -> {
                                     final String nameFromHistory = msgWithOtherUsername.getSenderUsername();
                                     Platform.runLater(() -> {
-                                        // Only update if still loading, to respect any later, more definitive name
                                         if (chatCell.getOtherUsername().startsWith("Loading...")) {
                                             chatCell.setOtherUsername(nameFromHistory);
                                         }
@@ -397,16 +388,14 @@ public class Model {
                     }
                 }
             }
-
-            // Add messages to the cell
             Platform.runLater(() -> {
-                if(chatCell.getMessages().isEmpty()){
+                if(chatCell.getMessages().isEmpty()){ // Only add history if cell is currently empty
                     messagesInGroup.sort(Comparator.comparing(Message::getTimestamp, Comparator.nullsLast(Comparator.naturalOrder())));
                     for (Message msg : messagesInGroup) {
                         chatCell.addMessage(msg);
                     }
                 } else {
-                    chatCell.updateLastMessageDetails(); // Ensure last message details are up to date
+                    chatCell.updateLastMessageDetails();
                 }
             });
         });
