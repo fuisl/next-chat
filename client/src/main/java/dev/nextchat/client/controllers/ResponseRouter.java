@@ -58,6 +58,8 @@ public class ResponseRouter implements ServerResponseHandler {
             Model.getInstance().handleCreateGroupResponse(resp);
         } else if (type.equals("message")) {
             Model.getInstance().handleIncomingChatMessage(resp); // Sender also uses this
+        } else if (type.equals("fetch_group_info_response")) {
+            Model.getInstance().handleFetchGroupInfoResponse(resp);
         }
     }
 }

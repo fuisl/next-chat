@@ -62,7 +62,6 @@ public class NewGroupController implements Initializable, ServerResponseHandler 
 
     private void updateCreateGroupButtonState() {
         if (createGroup_btn != null) {
-            // Enable if at least one member is added (group name is auto-generated "Group XXXX")
             createGroup_btn.setDisable(selectedMembers.isEmpty());
         }
     }
@@ -172,6 +171,4 @@ public class NewGroupController implements Initializable, ServerResponseHandler 
         if (error_lbl != null) error_lbl.setText("");
         pendingUsernameSearch = null;
     }
-
-    // MemberListCell inner class is REMOVED from here
 }
