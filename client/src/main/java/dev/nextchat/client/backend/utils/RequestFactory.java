@@ -83,10 +83,4 @@ public class RequestFactory {
         return json;
     }
 
-    public static JSONObject requestUsername(UUID userId){
-        JSONObject json = new JSONObject();
-        json.put("type","get_username");
-        json.put("userId", userId);
-        return json;
-    }
 }
