@@ -31,6 +31,7 @@ public class Model {
     private final GroupManager groupManager;
     private final Map<UUID, ChatCell> chatCellsByGroup = new HashMap<>();
     private final Set<UUID> pendingFetches = Collections.synchronizedSet(new HashSet<>());
+    private final Set<UUID> pendingGroupInfoFetches = Collections.synchronizedSet(new HashSet<>());
     private ConnectionManager connMgr;
     private MessageController msgCtrl;
     private ResponseRouter respRouter;
@@ -369,6 +370,99 @@ public class Model {
             UUID groupIdToClear = null;
             try { groupIdToClear = UUID.fromString(res.optString("groupId")); } catch (Exception ignored) {}
             if (groupIdToClear != null) pendingFetches.remove(groupIdToClear);
+            e.printStackTrace();
+        }
+    }
+
+    public void initiatePostLoginSync() {
+        JSONObject request = RequestFactory.createFetchNewMessageRequest();
+        if (msgCtrl != null) msgCtrl.getSendMessageQueue().offer(request);
+    }
+
+    private void processReceivedMessageBatch(List<Message> messages, String batchSourceDebugName) {
+        if (messages == null || messages.isEmpty()) return;
+        Map<UUID, List<Message>> messagesByGroup = messages.stream()
+                .filter(Objects::nonNull)
+                .filter(m -> m.getGroupId() != null)
+                .collect(Collectors.groupingBy(Message::getGroupId));
+        messagesByGroup.forEach((groupId, messagesInGroup) -> {
+            ChatCell chatCell = findOrCreateChatCell(groupId);
+            for (Message msg : messagesInGroup) MessageQueueManager.saveMessage(msg);
+            Platform.runLater(() -> {
+                messagesInGroup.sort(Comparator.comparing(Message::getTimestamp));
+                for (Message msg : messagesInGroup) chatCell.addMessage(msg);
+            });
+            GroupInfo gi = groupManager.getGroupInfo(groupId);
+            if (gi == null && !pendingGroupInfoFetches.contains(groupId)) {
+                pendingGroupInfoFetches.add(groupId);
+                JSONObject fetchReq = RequestFactory.createFetchGroupInfoRequest(groupId);
+                if (msgCtrl != null && fetchReq != null) {
+                    msgCtrl.getSendMessageQueue().offer(fetchReq);
+                } else {
+                    pendingGroupInfoFetches.remove(groupId);
+                }
+            }
+        });
+    }
+
+    public void handleNewMessagesBatch(JSONObject serverResponse) {
+        try {
+            org.json.JSONArray messagesArray = serverResponse.getJSONArray("messages");
+            Set<UUID> groupIds = new HashSet<>();
+            List<Message> parsedMessages = new ArrayList<>();
+            for (int i = 0; i < messagesArray.length(); i++) {
+                JSONObject msgJson = messagesArray.getJSONObject(i);
+                try {
+                    if (!msgJson.has("groupId")) continue;
+                    UUID groupId = UUID.fromString(msgJson.getString("groupId"));
+                    groupIds.add(groupId);
+                    UUID messageId = msgJson.has("id") ?
+                            UUID.fromString(msgJson.getString("id")) :
+                            UUID.randomUUID();
+                    UUID senderId = UUID.fromString(msgJson.getString("senderId"));
+                    String senderUsername = msgJson.optString("senderUsername");
+                    String content = msgJson.getString("content");
+                    Instant timestamp = Instant.parse(msgJson.getString("timestamp"));
+                    Message message = new Message(messageId, senderId, senderUsername, groupId, content, timestamp);
+                    parsedMessages.add(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            processReceivedMessageBatch(parsedMessages, "NewMessagesBatch");
+            int groupCount = groupIds.size();
+            int displayCount = 10;
+            if (groupCount < displayCount) {
+                JSONObject fetchPerGroupRequest = RequestFactory.createFetchLatestMessagesPerGroupRequest(Instant.now());
+                if (msgCtrl != null) msgCtrl.getSendMessageQueue().offer(fetchPerGroupRequest);
+            }
+            loadAllChatHistories();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void handleFetchPerGroupBatch(JSONObject serverResponse) {
+        try {
+            org.json.JSONArray messagesArray = serverResponse.getJSONArray("messages");
+            List<Message> parsedMessages = new ArrayList<>();
+            for (int i = 0; i < messagesArray.length(); i++) {
+                JSONObject msgJson = messagesArray.getJSONObject(i);
+                try {
+                    UUID groupId = UUID.fromString(msgJson.getString("groupId"));
+                    UUID messageId = msgJson.has("messageId") ?
+                            UUID.fromString(msgJson.getString("messageId")) :
+                            UUID.randomUUID();
+                    UUID senderId = UUID.fromString(msgJson.getString("senderId"));
+                    String senderUsername = msgJson.optString("senderUsername");
+                    String content = msgJson.getString("content");
+                    Instant timestamp = Instant.parse(msgJson.getString("timestamp"));
+                    Message message = new Message(messageId, senderId, senderUsername, groupId, content, timestamp);
+                    parsedMessages.add(message);
+                } catch (Exception e) {}
+            }
+            processReceivedMessageBatch(parsedMessages, "FetchPerGroupBatch");
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

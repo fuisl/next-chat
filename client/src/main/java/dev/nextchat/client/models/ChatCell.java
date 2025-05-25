@@ -61,19 +61,36 @@ public class ChatCell {
         return timestamp;
     }
 
-    public void addMessage(Message msg) {
-        if (msg == null || msg.getId() == null) {
+    public void addMessage(Message newMessage) {
+        if (newMessage == null || newMessage.getGroupId() == null ||
+                newMessage.getSenderId() == null || newMessage.getTimestamp() == null ||
+                newMessage.getMessage() == null) { // Ensure all parts of our composite key are present
+            System.err.println("[ChatCell.addMessage] Received message with null key components, cannot de-duplicate or add. Client-gen ID: " +
+                    (newMessage != null ? newMessage.getId() : "null message object"));
             return;
         }
 
-        boolean messageExists = messages.stream().anyMatch(existingMsg -> existingMsg.getId().equals(msg.getId()));
+        boolean messageExists = false;
+        for (Message existingMessage : this.messages) { // 'this.messages' is your ObservableList in ChatCell
+            if (// No need to check groupId here as this method is on a specific ChatCell for a specific group
+                    existingMessage.getSenderId().equals(newMessage.getSenderId()) &&
+                            existingMessage.getTimestamp().equals(newMessage.getTimestamp()) && // Compare Instant objects
+                            existingMessage.getMessage().equals(newMessage.getMessage())) {
+                messageExists = true;
+                break;
+            }
+        }
 
         if (!messageExists) {
-            messages.add(msg);
+            this.messages.add(newMessage);
+            System.out.println("[ChatCell.addMessage] Added message (content: '" +
+                    newMessage.getMessage().substring(0, Math.min(20, newMessage.getMessage().length())).replace("\n", " ") +
+                    "...', client-gen ID: " + newMessage.getId() + ") to UI for group " + newMessage.getGroupId());
         } else {
-            // Optional: If message with same ID exists, you might want to update it if content/timestamp can change.
+            System.out.println("[ChatCell.addMessage] Duplicate message (sender/timestamp/content match) for group " +
+                    newMessage.getGroupId() + ". Not re-adding to UI list. Client-gen ID of current instance: " + newMessage.getId());
         }
-        updateLastMessageDetails(); // Update preview and sort after any potential change
+        updateLastMessageDetails();
     }
 
     public void updateLastMessageDetails() {

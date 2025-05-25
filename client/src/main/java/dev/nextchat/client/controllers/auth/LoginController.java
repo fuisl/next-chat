@@ -52,6 +52,7 @@ public class LoginController implements Initializable, ServerResponseHandler {
 
                 // 3) now you can safely call getLoggedInUser() elsewhere
                 System.out.println(">>> Logged in as: " + Model.getInstance().getLoggedInUserId());
+                Model.getInstance().initiatePostLoginSync();
             });
             case "fail" -> Platform.runLater(() ->{
                error_lbl.setText(resp.getString("message"));
