@@ -37,7 +37,7 @@ public class FetchGroupInfoCommand implements Command {
     public JSONObject execute(CommandContext context) {
         JSONObject response = new JSONObject();
         response.put("requestId", requestId);
-        response.put("status", "fetch_group_info_response");
+        response.put("type", "fetch_group_info_response");
 
         if (!context.isAuthenticated()) {
             response.put("status", "error");

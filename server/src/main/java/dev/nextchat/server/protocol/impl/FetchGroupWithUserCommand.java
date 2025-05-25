@@ -29,7 +29,7 @@ public class FetchGroupWithUserCommand implements Command {
         GroupService groupService = context.groupService();
         JSONObject response = new JSONObject();
         response.put("requestId", requestId);
-        response.put("status", "fetch_group_with_user_response");
+        response.put("type", "fetch_group_with_user_response");
 
         if (!context.isAuthenticated()) {
             response.put("status", "error");
