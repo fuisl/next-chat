@@ -37,6 +37,7 @@ public class FetchGroupInfoCommand implements Command {
     public JSONObject execute(CommandContext context) {
         JSONObject response = new JSONObject();
         response.put("requestId", requestId);
+        response.put("status", "fetch_group_info_response");
 
         if (!context.isAuthenticated()) {
             response.put("status", "error");
@@ -62,7 +63,6 @@ public class FetchGroupInfoCommand implements Command {
 
         List<UUID> groupMemberIds = groupService.getUserIdsInGroup(groupId);
         List<String> usernames = authenticator.getUsernameByUserIds(groupMemberIds);
-
         response.put("status", "ok");
         response.put("groupId", groupId.toString());
         response.put("name", group.get().getName());

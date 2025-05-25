@@ -39,6 +39,7 @@ public class FetchPerGroupCommand implements Command {
 
         JSONObject response = new JSONObject();
         response.put("requestId", requestId);
+        response.put("status", "fetch_per_group_response");
 
         if (!context.isAuthenticated()) {
             response.put("status", "error");
