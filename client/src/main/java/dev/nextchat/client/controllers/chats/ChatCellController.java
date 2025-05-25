@@ -54,7 +54,8 @@ public class ChatCellController implements Initializable {
         if (cell != null && cell.getGroupId() != null) {
             String groupIdStr = cell.getGroupId().toString();
             System.out.println("[ChatCellController] Selected chat with Group ID: " + groupIdStr + " (Name: " + cell.getOtherUsername() +")");
-            Model.getInstance().getViewFactory().getClientSelectedChat().set(groupIdStr); // Set the GROUP ID string
+            Model.getInstance().getViewFactory().getClientSelectedChat().set(groupIdStr);
+            Model.getInstance().fetchOlderMessagesForGroup(cell.getGroupId());
         } else {
             System.err.println("[ChatCellController] Cannot select chat: cell or groupId is null.");
         }

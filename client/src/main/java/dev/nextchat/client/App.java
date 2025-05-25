@@ -29,6 +29,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
+        stage.setOnCloseRequest(event -> {
+            Model.getInstance().resetSessionState();
+        });
         applicationContext.publishEvent(new StageReadyEvent(stage));
     }
 

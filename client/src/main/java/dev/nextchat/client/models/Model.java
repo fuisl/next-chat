@@ -32,6 +32,7 @@ public class Model {
     private final Map<UUID, ChatCell> chatCellsByGroup = new HashMap<>();
     private final Set<UUID> pendingFetches = Collections.synchronizedSet(new HashSet<>());
     private final Set<UUID> pendingGroupInfoFetches = Collections.synchronizedSet(new HashSet<>());
+    private final Set<UUID> pendingOlderMessagesFetches = Collections.synchronizedSet(new HashSet<>());
     private ConnectionManager connMgr;
     private MessageController msgCtrl;
     private ResponseRouter respRouter;
@@ -101,7 +102,6 @@ public class Model {
             String name;
             GroupInfo group = groupManager.getGroupInfo(gid);
             UUID user = getLoggedInUserId();
-
             if (group != null) {
                 if (group.getMembers() != null && group.getMembers().size() == 2 && user != null) {
                     boolean found = false;
@@ -120,7 +120,6 @@ public class Model {
             } else {
                 name = "Loading Group Info...";
             }
-
             ChatCell cell = new ChatCell(name, gid);
             Platform.runLater(() -> { if (!chatCells.contains(cell)) chatCells.add(cell); });
             return cell;
@@ -131,13 +130,10 @@ public class Model {
         try {
             UUID groupId = UUID.fromString(response.getString("groupId"));
             UUID user = getLoggedInUserId();
-
             boolean isMulti = (this.pendingMembers != null && !this.pendingMembers.isEmpty());
             boolean isSingle = (this.pendingOtherId != null && this.pendingOtherName != null);
-
             String cellName, mapName;
             List<UUID> inviteList = new ArrayList<>();
-
             if (isMulti) {
                 String srvName = response.optString("groupName", null);
                 if (srvName != null && !srvName.isEmpty()) {
@@ -150,22 +146,16 @@ public class Model {
             } else if (isSingle) {
                 cellName = this.pendingOtherName;
                 inviteList.add(this.pendingOtherId);
-                mapName = "DM_" + user.toString().substring(0, 4)
-                        + "_" + this.pendingOtherId.toString().substring(0, 4);
+                mapName = "DM_" + user.toString().substring(0, 4) + "_" + this.pendingOtherId.toString().substring(0, 4);
             } else {
                 String srvName = response.optString("groupName", null);
-                if (srvName != null && !srvName.isEmpty()) {
-                    cellName = srvName;
-                } else {
-                    cellName = "Unnamed Group " + groupId.toString().substring(0, 4);
-                }
+                if (srvName != null && !srvName.isEmpty()) cellName = srvName;
+                else cellName = "Unnamed Group " + groupId.toString().substring(0, 4);
                 mapName = cellName;
             }
-
             groupManager.addGroupMapping(groupId, user, mapName);
             groupManager.addMemberToGroup(groupId, user);
             for (UUID id : inviteList) groupManager.addMemberToGroup(groupId, id);
-
             ChatCell cell = chatCellsByGroup.computeIfAbsent(groupId, gid -> {
                 ChatCell c = new ChatCell(cellName, gid);
                 Platform.runLater(() -> { if (!chatCells.contains(c)) chatCells.add(c); });
@@ -187,9 +177,7 @@ public class Model {
                 getViewFactory().getClientSelectedChat().set(selectId.toString());
                 getViewFactory().getClientSelection().set("Chats");
             });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     public void handleIncomingChatMessage(JSONObject response) {
@@ -197,7 +185,6 @@ public class Model {
         String content, responseType, senderName = null;
         Instant timestamp;
         UUID currId = getLoggedInUserId();
-
         try {
             responseType = response.getString("type");
             senderId = UUID.fromString(response.getString("senderId"));
@@ -245,9 +232,7 @@ public class Model {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     private void loadAllChatHistories() {
@@ -425,9 +410,7 @@ public class Model {
                     Instant timestamp = Instant.parse(msgJson.getString("timestamp"));
                     Message message = new Message(messageId, senderId, senderUsername, groupId, content, timestamp);
                     parsedMessages.add(message);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                } catch (Exception e) { e.printStackTrace(); }
             }
             processReceivedMessageBatch(parsedMessages, "NewMessagesBatch");
             int groupCount = groupIds.size();
@@ -437,9 +420,7 @@ public class Model {
                 if (msgCtrl != null) msgCtrl.getSendMessageQueue().offer(fetchPerGroupRequest);
             }
             loadAllChatHistories();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     public void handleFetchPerGroupBatch(JSONObject serverResponse) {
@@ -462,15 +443,107 @@ public class Model {
                 } catch (Exception e) {}
             }
             processReceivedMessageBatch(parsedMessages, "FetchPerGroupBatch");
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public void fetchOlderMessagesForGroup(UUID groupId) {
+        if (groupId == null) return;
+        if (pendingOlderMessagesFetches.contains(groupId)) return;
+        ChatCell chatCell = chatCellsByGroup.get(groupId);
+        Instant referenceTimestamp;
+        if (chatCell != null && !chatCell.getMessages().isEmpty()) {
+            referenceTimestamp = chatCell.getMessages().get(0).getTimestamp();
+        } else {
+            referenceTimestamp = Instant.now();
+        }
+        JSONObject request = RequestFactory.createFetchBeforeTimeStampRequest(groupId, referenceTimestamp);
+        if (msgCtrl != null && request != null) {
+            pendingOlderMessagesFetches.add(groupId);
+            msgCtrl.getSendMessageQueue().offer(request);
+        } else {
+            pendingOlderMessagesFetches.remove(groupId);
         }
     }
 
+    public void handleOlderMessagesBatch(JSONObject serverResponse) {
+        UUID groupId = null;
+        try {
+            if (!serverResponse.has("messages")) return;
+            org.json.JSONArray messagesArray = serverResponse.getJSONArray("messages");
+            if (messagesArray.length() == 0) return;
+            JSONObject firstMsg = messagesArray.getJSONObject(0);
+            if (!firstMsg.has("groupId")) return;
+            groupId = UUID.fromString(firstMsg.getString("groupId"));
+            List<Message> parsed = new ArrayList<>();
+            for (int i = 0; i < messagesArray.length(); i++) {
+                JSONObject msgJson = messagesArray.getJSONObject(i);
+                try {
+                    UUID msgGroupId = UUID.fromString(msgJson.getString("groupId"));
+                    if (!msgGroupId.equals(groupId)) continue;
+                    UUID messageId = msgJson.has("id") ?
+                            UUID.fromString(msgJson.getString("id")) : UUID.randomUUID();
+                    UUID senderId = UUID.fromString(msgJson.getString("senderId"));
+                    String senderUsername = msgJson.optString("senderUsername");
+                    String content = msgJson.getString("content");
+                    Instant timestamp = Instant.parse(msgJson.getString("timestamp"));
+                    Message msg = new Message(messageId, senderId, senderUsername, groupId, content, timestamp);
+                    parsed.add(msg);
+                } catch (Exception e) { e.printStackTrace(); }
+            }
+            if (!parsed.isEmpty()) {
+                processAndPrependOlderMessages(groupId, parsed, "OlderMessagesBatch");
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        finally {
+            if (groupId != null) {
+                pendingOlderMessagesFetches.remove(groupId);
+            }
+        }
+    }
+
+    private void processAndPrependOlderMessages(UUID groupIdForBatch, List<Message> olderMessages, String batchSourceDebugName) {
+        if (olderMessages == null || olderMessages.isEmpty()) return;
+        ChatCell chatCell = chatCellsByGroup.get(groupIdForBatch);
+        if (chatCell == null) return;
+        for (Message msg : olderMessages) MessageQueueManager.saveMessage(msg);
+        Platform.runLater(() -> {
+            List<Message> addList = new ArrayList<>();
+            for (Message olderMsg : olderMessages) {
+                boolean exists = false;
+                for (Message existingMsg : chatCell.getMessages()) {
+                    if ((olderMsg.getId() != null && existingMsg.getId().equals(olderMsg.getId())) ||
+                            (olderMsg.getId() == null &&
+                                    existingMsg.getSenderId().equals(olderMsg.getSenderId()) &&
+                                    existingMsg.getTimestamp().equals(olderMsg.getTimestamp()) &&
+                                    existingMsg.getMessage().equals(olderMsg.getMessage()))
+                    ) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) addList.add(olderMsg);
+            }
+            if (!addList.isEmpty()) {
+                chatCell.getMessages().addAll(0, addList);
+                FXCollections.sort(chatCell.getMessages(), Comparator.comparing(Message::getTimestamp));
+            }
+        });
+    }
+
     public void resetSessionState() {
-        Platform.runLater(() -> chatCells.clear());
+        Platform.runLater(() -> {
+            chatCells.clear();
+            loggedInUser.set(null);
+        });
         chatCellsByGroup.clear();
-        loggedInUser.set(null);
         loggedInUserId = null;
+        pendingGroupInfoFetches.clear();
+        clearSinglePendingChatContext();
+        clearPendingMultiGroupContext();
+        MessageQueueManager.clearAllMessages();
+        if (this.groupManager != null) {
+            this.groupManager.clearAllGroups();
+        }
     }
 }
+
