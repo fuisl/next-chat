@@ -6,20 +6,17 @@ import dev.nextchat.client.database.MessageQueueManager;
 import dev.nextchat.client.models.ChatCell;
 import dev.nextchat.client.models.Model;
 import dev.nextchat.client.models.Message;
-
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.beans.value.ChangeListener;
 
 import org.json.JSONObject;
 
 import java.net.URL;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -31,6 +28,9 @@ public class MessagesController implements Initializable {
     public TextField msg_inp;
     public Button send_btn;
     public ListView<Message> msgListView;
+    public MenuItem rename;
+    public MenuItem leave;
+    private ChangeListener<String> currentChatNameListener;
 
     private ChatCell currChatCell;
 
@@ -101,14 +101,20 @@ public class MessagesController implements Initializable {
                 }
             }
         });
+
+        rename.setOnAction(e -> handleRenameGroup());
+        leave.setOnAction(e -> handleLeaveGroup());
     }
 
     private void loadChatByGroupId(UUID groupId) {
+        if (this.currChatCell != null && this.currentChatNameListener != null) {
+            this.currChatCell.otherUsernameProperty().removeListener(this.currentChatNameListener);
+            this.currentChatNameListener = null;
+        }
         if (groupId == null) {
             fid.setText("Error: Invalid Chat");
-            if (currChatCell != null) currChatCell.getMessages().clear();
-            currChatCell = null;
-            msgListView.setItems(null);
+            clearChatViewInternals();
+            updateMenuItemsState(false);
             return;
         }
         currChatCell = Model.getInstance().findOrCreateChatCell(groupId);
@@ -118,9 +124,57 @@ public class MessagesController implements Initializable {
             if (!currChatCell.getMessages().isEmpty()) {
                 Platform.runLater(() -> msgListView.scrollTo(currChatCell.getMessages().size() - 1));
             }
+            this.currentChatNameListener = (observable, oldValue, newValue) -> {
+                fid.setText(newValue); // Update fid label when chat name changes
+            };
+            this.currChatCell.otherUsernameProperty().addListener(this.currentChatNameListener);
+            updateMenuItemsState(true);
         } else {
             fid.setText("Chat not found");
             msgListView.setItems(null);
         }
     }
+
+    private void clearChatViewInternals() {
+        currChatCell = null;
+        msgListView.setItems(null);
+    }
+
+    private void updateMenuItemsState(boolean chatSelected) {
+        rename.setDisable(!chatSelected);
+        leave.setDisable(!chatSelected);
+    }
+
+    private void handleRenameGroup() {
+        if (currChatCell == null || currChatCell.getGroupId() == null) {
+            return;
+        }
+        TextInputDialog dialog = new TextInputDialog(currChatCell.getOtherUsername());
+        dialog.setTitle("Rename Group");
+        dialog.setHeaderText("Enter the new name for the group:");
+        dialog.setContentText("Name:");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(newName -> {
+            if (!newName.trim().isEmpty() && !newName.equals(currChatCell.getOtherUsername())) {
+                UUID groupId = currChatCell.getGroupId();
+                JSONObject renameRequest = RequestFactory.createRenameGroupRequest(groupId, newName.trim());
+                Model.getInstance().getMsgCtrl().getSendMessageQueue().offer(renameRequest);
+            }
+        });
+    }
+
+    private void handleLeaveGroup() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Leave Group");
+        alert.setHeaderText("Are you sure you want to leave the group \"" + currChatCell.getOtherUsername() + "\"?");
+        alert.setContentText("This action cannot be undone.");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            UUID groupId = currChatCell.getGroupId();
+            JSONObject leaveRequest = RequestFactory.createLeaveGroupRequest(groupId); // New call
+            Model.getInstance().getMsgCtrl().getSendMessageQueue().offer(leaveRequest);
+            System.out.println("Leave group request sent for group " + groupId);
+        }
+    }
 }
+

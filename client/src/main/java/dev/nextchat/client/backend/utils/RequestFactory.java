@@ -109,4 +109,33 @@ public class RequestFactory {
         json.put("memberId", otherMemberId.toString());
         return json;
     }
+
+    public static JSONObject createSearchConversationRequest(String searchTerm, String clientRequestId) {
+        JSONObject json = new JSONObject();
+        json.put("type", "search_conversation");
+        json.put("search", searchTerm);
+        return json;
+    }
+
+    public static JSONObject createDeleteUserRequest() {
+        JSONObject json = new JSONObject();
+        json.put("type", "delete_user");
+        return json;
+    }
+
+    public static JSONObject createLeaveGroupRequest(UUID groupId) {
+        JSONObject json = new JSONObject();
+        json.put("type", "leave_group");
+        json.put("groupId", groupId.toString());
+
+        return json;
+    }
+
+    public static JSONObject createRenameGroupRequest(UUID groupId, String name) {
+        JSONObject json = new JSONObject();
+        json.put("type", "rename_group");
+        json.put("groupId", groupId.toString());
+        json.put("name", name);
+        return json;
+    }
 }

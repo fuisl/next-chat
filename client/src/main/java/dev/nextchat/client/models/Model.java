@@ -10,6 +10,7 @@ import dev.nextchat.client.database.MessageQueueManager;
 import dev.nextchat.client.views.ViewFactory;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.scene.control.Alert;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -40,6 +41,34 @@ public class Model {
     private String pendingOtherName = null;
     private String pendingGroupName = null;
     private List<UserDisplay> pendingMembers = new ArrayList<>();
+
+    public enum SearchResultType {
+        USER,
+        GROUP
+    }
+    public record SearchResultItem(SearchResultType type, UUID id, String name, String description) {}
+
+    private final ObservableList<SearchResultItem> searchResults = FXCollections.observableArrayList();
+    private final StringProperty currentSearchQuery = new SimpleStringProperty(""); // For UI binding
+
+    /**
+     * @return An observable list of current search results.
+     */
+    public ObservableList<SearchResultItem> getSearchResults() {
+        return searchResults;
+    }
+
+    public String getCurrentSearchQuery() {
+        return currentSearchQuery.get();
+    }
+
+    public void setCurrentSearchQuery(String query) {
+        this.currentSearchQuery.set(query);
+    }
+
+    public StringProperty currentSearchQueryProperty() {
+        return currentSearchQuery;
+    }
 
     private Model() {
         this.viewFactory = new ViewFactory();
@@ -529,6 +558,228 @@ public class Model {
             }
         });
     }
+
+    public void performSearch(String query) {
+        final String trimmedQuery = (query != null) ? query.trim() : "";
+
+        if (trimmedQuery.isEmpty()) {
+            Platform.runLater(searchResults::clear);
+            return;
+        }
+        String clientRequestId = UUID.randomUUID().toString();
+        JSONObject searchRequest = RequestFactory.createSearchConversationRequest(trimmedQuery, clientRequestId);
+
+        if (msgCtrl != null && searchRequest != null) {
+            System.out.println("[Model.performSearch] Sending search request for query: '" + trimmedQuery + "'");
+            msgCtrl.getSendMessageQueue().offer(searchRequest);
+        } else {
+            System.err.println("[Model.performSearch] MessageController is null or searchRequest is null. Cannot send search request.");
+        }
+    }
+    public void handleSearchConversationResponse(JSONObject serverResponse) {
+        System.out.println("[Model.handleSearchConversationResponse] Received search response: " + serverResponse.toString(2));
+        Platform.runLater(searchResults::clear);
+
+        String status = serverResponse.optString("status");
+
+        if (!"ok".equalsIgnoreCase(status)) {
+            String message = serverResponse.optString("message", "Search failed.");
+            System.err.println("[Model.handleSearchConversationResponse] Search request failed. Status: " + status + ", Message: " + message);
+            return;
+        }
+
+        org.json.JSONArray resultsArray = serverResponse.optJSONArray("results");
+
+        List<SearchResultItem> newFoundItems = new ArrayList<>();
+        for (int i = 0; i < resultsArray.length(); i++) {
+            JSONObject itemJson = resultsArray.optJSONObject(i);
+            if (itemJson == null) continue;
+
+            try {
+                String typeStr = itemJson.getString("type");
+                UUID id = UUID.fromString(itemJson.getString("id"));
+                String name = itemJson.getString("name");
+
+                if ("user".equalsIgnoreCase(typeStr)) {
+                    if (getLoggedInUserId() != null && !id.equals(getLoggedInUserId())) {
+                        newFoundItems.add(new SearchResultItem(SearchResultType.USER, id, name, null));
+                    }
+                } else if ("group".equalsIgnoreCase(typeStr)) {
+                    String description = itemJson.optString("description", "");
+                    newFoundItems.add(new SearchResultItem(SearchResultType.GROUP, id, name, description));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!newFoundItems.isEmpty()) {
+            Platform.runLater(() -> searchResults.addAll(newFoundItems));
+        }
+        System.out.println("[Model.handleSearchConversationResponse] Processed and updated UI with " + newFoundItems.size() + " search results.");
+    }
+
+    public void findOrOpenOneOnOneChat(UUID otherUserId, String otherUsername) {
+        if (otherUserId == null || otherUsername == null || otherUsername.isEmpty()) {
+            System.err.println("Invalid otherUserId or otherUsername.");
+            return;
+        }
+
+        this.pendingOtherId = otherUserId;
+        this.pendingOtherName = otherUsername;
+
+        JSONObject request = RequestFactory.createFetchGroupWithUserRequest(otherUserId);
+        if (msgCtrl != null && request != null) {
+            msgCtrl.getSendMessageQueue().offer(request);
+        } else {
+            System.err.println("MessageController is null or request is null. Cannot send fetch_group_with_user request.");
+            clearSinglePendingChatContext();
+        }
+    }
+
+    public void handleSearchResultSelected(SearchResultItem selectedItem) {
+        if (selectedItem == null) {
+            return;
+        }
+
+        if (selectedItem.type() == SearchResultType.USER) {
+            findOrOpenOneOnOneChat(selectedItem.id(), selectedItem.name());
+        } else if (selectedItem.type() == SearchResultType.GROUP) {
+            ChatCell groupCell = findOrCreateChatCell(selectedItem.id());
+            UUID groupId = selectedItem.id();
+            Platform.runLater(() -> {
+                getViewFactory().getClientSelectedChat().set(groupId.toString());
+                getViewFactory().getClientSelection().set("Chats");
+            });
+        }
+
+        Platform.runLater(searchResults::clear);
+        setCurrentSearchQuery("");
+    }
+
+    public void handleFetchGroupWithUserResponse(JSONObject serverResponse) {
+        try {
+            String status = serverResponse.optString("status");
+            if (!"ok".equalsIgnoreCase(status)) {
+                clearSinglePendingChatContext();
+                return;
+            }
+
+            if (!serverResponse.has("groupId")) {
+                clearSinglePendingChatContext();
+                return;
+            }
+
+            UUID groupId = UUID.fromString(serverResponse.getString("groupId"));
+            String groupName = serverResponse.optString("groupName", "Direct Message");
+
+            UUID pendingId = this.pendingOtherId;
+            String pendingName = this.pendingOtherName;
+            if (pendingId == null || pendingName == null) {
+                return;
+            }
+
+            groupManager.addGroupMapping(groupId, getLoggedInUserId(), groupName);
+            groupManager.addMemberToGroup(groupId, getLoggedInUserId());
+            groupManager.addMemberToGroup(groupId, pendingId);
+
+            org.json.JSONArray members = serverResponse.optJSONArray("members");
+            if (members != null) {
+                for (int i = 0; i < members.length(); i++) {
+                    JSONObject member = members.getJSONObject(i);
+                    UUID memberId = UUID.fromString(member.getString("userId"));
+                    if (!memberId.equals(getLoggedInUserId()) && !memberId.equals(pendingId)) {
+                        groupManager.addMemberToGroup(groupId, memberId);
+                    }
+                }
+            }
+
+            ChatCell chatCell = findOrCreateChatCell(groupId);
+            Platform.runLater(() -> {
+                chatCell.setOtherUsername(pendingName);
+                getViewFactory().getClientSelectedChat().set(groupId.toString());
+                getViewFactory().getClientSelection().set("Chats");
+            });
+
+            clearSinglePendingChatContext();
+        } catch (Exception e) {
+            e.printStackTrace();
+            clearSinglePendingChatContext();
+        }
+    }
+
+    public void handleLeaveGroupResponse(JSONObject response) {
+        Platform.runLater(() -> {
+            String status = response.optString("status");
+            if ("ok".equalsIgnoreCase(status)) {
+                if (!response.has("groupId")) return;
+                UUID groupId = UUID.fromString(response.getString("groupId"));
+
+                ChatCell cellToRemove = chatCellsByGroup.remove(groupId);
+                if (cellToRemove != null) {
+                    chatCells.remove(cellToRemove);
+                } else {
+                    chatCells.removeIf(cell -> cell.getGroupId().equals(groupId));
+                }
+
+                groupManager.removeGroupLocally(groupId);
+
+                if (groupId.toString().equals(viewFactory.getClientSelectedChat().get())) {
+                    viewFactory.getClientSelectedChat().set(null);
+                }
+            } else {
+                String message = response.optString("message", "Failed to leave group.");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Leave Group Failed");
+                alert.setHeaderText(null);
+                alert.setContentText(message);
+                alert.showAndWait();
+            }
+        });
+    }
+
+    public void handleRenameGroupResponse(JSONObject response) {
+        Platform.runLater(() -> {
+            String status = response.optString("status");
+            if ("ok".equalsIgnoreCase(status)) {
+                if (!response.has("groupId") || !response.has("name")) return;
+                UUID groupId = UUID.fromString(response.getString("groupId"));
+                String newName = response.getString("name");
+
+                ChatCell cellToUpdate = chatCellsByGroup.get(groupId);
+                if (cellToUpdate != null) {
+                    cellToUpdate.setOtherUsername(newName);
+                }
+
+                groupManager.updateGroupNameLocally(groupId, newName);
+            } else {
+                String message = response.optString("message", "Failed to rename group.");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Rename Group Failed");
+                alert.setHeaderText(null);
+                alert.setContentText(message);
+                alert.showAndWait();
+            }
+        });
+    }
+
+    public void handleGroupRenameBroadcast(JSONObject response) {
+        Platform.runLater(() -> {
+            if (!response.has("groupId") || !response.has("name")) return;
+            UUID groupId = UUID.fromString(response.getString("groupId"));
+            String newName = response.getString("name");
+
+            if (newName.trim().isEmpty()) return;
+
+            ChatCell cellToUpdate = chatCellsByGroup.get(groupId);
+            if (cellToUpdate != null) {
+                cellToUpdate.setOtherUsername(newName);
+            }
+
+            groupManager.updateGroupNameLocally(groupId, newName);
+        });
+    }
+
 
     public void resetSessionState() {
         Platform.runLater(() -> {

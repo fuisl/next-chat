@@ -3,16 +3,20 @@
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
 
 <AnchorPane prefHeight="750.0" prefWidth="533.0" styleClass="chat_box" stylesheets="@../Styles/Messages.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.messages.MessagesController">
    <children>
       <Pane prefHeight="49.0" prefWidth="533.0" styleClass="header_ctn" AnchorPane.bottomAnchor="700.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox prefHeight="50.0" prefWidth="215.0" spacing="15.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="215.0" spacing="5.0">
                <children>
-                  <Circle fill="#eaecee" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
+                  <ImageView fitHeight="37.0" fitWidth="39.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../Images/profile.jpg" />
+                     </image>
+                  </ImageView>
                   <Label fx:id="fid" text="Fuisloy" />
                </children>
                <padding>
@@ -30,6 +34,14 @@
                      <graphic>
                         <FontAwesomeIconView glyphName="ELLIPSIS_V" size="20" />
                      </graphic>
+                     <contextMenu>
+                        <ContextMenu fx:id="contextMenu">
+                           <items>
+                              <MenuItem fx:id="rename" text="Rename Group" />
+                              <MenuItem fx:id="leave" text="Leave Group" />
+                           </items>
+                        </ContextMenu>
+                     </contextMenu>
                   </Button>
                </children>
                <opaqueInsets>
@@ -63,7 +75,6 @@
             </HBox>
          </children>
       </Pane>
-      <ListView fx:id="msgListView" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                AnchorPane.topAnchor="50.0" AnchorPane.bottomAnchor="62.0"/>
+      <ListView fx:id="msgListView" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0" />
    </children>
 </AnchorPane>
