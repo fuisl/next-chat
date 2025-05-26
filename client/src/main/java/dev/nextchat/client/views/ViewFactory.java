@@ -86,6 +86,7 @@ public class ViewFactory {
         stage.setScene(scene);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
         stage.setTitle("Signup");
+        stage.setResizable(false);
         stage.show();
     }
 
@@ -107,6 +108,7 @@ public class ViewFactory {
         stage.setScene(scene);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
         stage.setTitle("Login");
+        stage.setResizable(false);
         stage.show();
     }
 
@@ -132,6 +134,10 @@ public class ViewFactory {
         stage.setScene(scene);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/Images/logoButGreen.png")));
         stage.setTitle("Chats");
+        stage.setResizable(false);
+        stage.setOnCloseRequest(event -> {
+            Model.getInstance().resetSessionState();
+        });
         stage.show();
     }
 

@@ -788,6 +788,7 @@ public class Model {
         });
         chatCellsByGroup.clear();
         loggedInUserId = null;
+        //msgCtrl.stop();
         pendingGroupInfoFetches.clear();
         clearSinglePendingChatContext();
         clearPendingMultiGroupContext();
