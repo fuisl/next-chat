@@ -87,6 +87,7 @@ public class RenameGroupCommand implements Command {
 
         response.put("status", "ok");
         response.put("message", "Renamed group to " + name);
+        response.put("name", name);
         return response;
     }
 }
