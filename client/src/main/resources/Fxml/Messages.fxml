@@ -30,6 +30,14 @@
                      <graphic>
                         <FontAwesomeIconView glyphName="ELLIPSIS_V" size="20" />
                      </graphic>
+                     <contextMenu>
+                        <ContextMenu fx:id="contextMenu">
+                           <items>
+                              <MenuItem fx:id="rename" text="Rename Group" />
+                              <MenuItem fx:id="leave" text="Leave Group" />
+                           </items>
+                        </ContextMenu>
+                     </contextMenu>
                   </Button>
                </children>
                <opaqueInsets>

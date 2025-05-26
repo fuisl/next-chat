@@ -10,11 +10,7 @@ import dev.nextchat.client.models.Message;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import org.json.JSONObject;
 
@@ -31,6 +27,8 @@ public class MessagesController implements Initializable {
     public TextField msg_inp;
     public Button send_btn;
     public ListView<Message> msgListView;
+    public MenuItem rename;
+    public MenuItem leave;
 
     private ChatCell currChatCell;
 
