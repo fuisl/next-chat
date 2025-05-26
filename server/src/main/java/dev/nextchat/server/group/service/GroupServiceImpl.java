@@ -7,6 +7,7 @@ import dev.nextchat.server.group.repository.GroupRepository;
 import dev.nextchat.server.group.repository.GroupMemberRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.ByteBuffer;
 import java.time.Instant;
@@ -114,5 +115,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public int leaveGroup(UUID memberId, UUID groupId) {
         return groupMemberRepository.deleteByMemberIdAndGroupId(memberId, groupId);
+    }
+
+    @Transactional
+    @Override
+    public int renameGroup(String name, UUID groupId) {
+        return groupRepository.updateGroupName(name, groupId);
     }
 }

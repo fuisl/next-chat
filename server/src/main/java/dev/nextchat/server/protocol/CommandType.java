@@ -1,23 +1,24 @@
 package dev.nextchat.server.protocol;
 
 public enum CommandType {
-    DELETE_USER,
-    LOGIN,
-    SIGNUP,
-    SEND_MESSAGE,
-    FETCH_RECENT,
-    FETCH_BEFORE,
-    SEARCH_MESSAGES,
-    UNKNOWN,
-    CREATE_GROUP,
-    JOIN_GROUP,
     CHECK_USER_EXISTENCE,
+    CREATE_GROUP,
+    DELETE_USER,
+    FETCH_BEFORE,
     FETCH_GROUP_INFO,
     FETCH_GROUP_WITH_USER,
     FETCH_NEW,
     FETCH_PER_GROUP,
+    FETCH_RECENT,
+    JOIN_GROUP,
+    LEAVE_GROUP,
+    LOGIN,
+    RENAME_GROUP,
     SEARCH_CONVERSATION,
-    LEAVE_GROUP;
+    SEARCH_MESSAGES,
+    SEND_MESSAGE,
+    SIGNUP,
+    UNKNOWN;
 
     public static CommandType fromString(String type) {
         try {

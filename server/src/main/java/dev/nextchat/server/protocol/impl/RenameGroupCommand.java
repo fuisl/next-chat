@@ -8,19 +8,21 @@ import org.json.JSONObject;
 
 import java.util.UUID;
 
-public class LeaveGroupCommand implements Command {
+public class RenameGroupCommand implements Command {
 
     private final String requestId;
+    private final String name;
     private final UUID groupId;
 
-    public LeaveGroupCommand(String requestId, String groupId) {
+    public RenameGroupCommand(String requestId, String groupId, String name) {
         this.requestId = requestId;
         this.groupId = !groupId.equals("") ? UUID.fromString(groupId) : null;
+        this.name = name;
     }
 
     @Override
     public CommandType getType() {
-        return CommandType.LEAVE_GROUP;
+        return CommandType.RENAME_GROUP;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class LeaveGroupCommand implements Command {
         GroupService groupService = context.groupService();
         JSONObject response = new JSONObject();
         response.put("requestId", requestId);
-        response.put("type", "leave_group_response");
+        response.put("type", "rename_group_response");
         response.put("groupId", groupId);
 
         if (!context.isAuthenticated()) {
@@ -52,7 +54,7 @@ public class LeaveGroupCommand implements Command {
             return response;
         }
 
-        int status = groupService.leaveGroup(userId, groupId);
+        int status = groupService.renameGroup(name, groupId);
 
         if (status == 0) {
             response.put("status", "error");
@@ -67,7 +69,7 @@ public class LeaveGroupCommand implements Command {
         }
 
         response.put("status", "ok");
-        response.put("message", "Left group!");
+        response.put("message", "Renamed group to " + name);
         return response;
     }
 }

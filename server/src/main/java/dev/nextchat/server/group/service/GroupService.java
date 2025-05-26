@@ -33,4 +33,6 @@ public interface GroupService {
     Optional<UUID> getGroupWithTwoUsers(UUID userA, UUID userB);
 
     int leaveGroup(UUID memberId, UUID groupId);
+
+    int renameGroup(String name, UUID groupId);
 }
