@@ -41,6 +41,8 @@ public interface MessageService {
 
     List<Message> findLatestMessagePerGroup(List<UUID> groupIds, Instant timestamp);
 
+    void changeDeletedUserSenderName(UUID userId);
+
     /**
      * Searches messages in a group using a case-insensitive regex keyword.
      *

@@ -28,7 +28,8 @@ public class Authenticator {
     public boolean signIn(Credential credential) {
         Optional<User> userOpt = userRepository.findByUsername(credential.getUsername());
         return userOpt.isPresent() &&
-                passwordEncoder.matches(credential.getRawPassword(), userOpt.get().getPassword());
+                passwordEncoder.matches(credential.getRawPassword(), userOpt.get().getPassword()) &&
+                !userOpt.get().getDeleted();
     }
 
     @Transactional
@@ -68,5 +69,12 @@ public class Authenticator {
 
     public List<User> getUserByPattern(String search) {
         return userRepository.findUserByPattern(search);
+    }
+
+    @Transactional
+    public int deleteUser(UUID id) {
+        String name = id.toString();
+
+        return userRepository.deleteUserById(id, name);
     }
 }
