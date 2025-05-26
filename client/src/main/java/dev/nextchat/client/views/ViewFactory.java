@@ -21,6 +21,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class ViewFactory {
     private final StringProperty clientSelectedChat;
@@ -114,8 +115,10 @@ public class ViewFactory {
     }
 
     public void showClientWindow() {
-        //Model.getInstance().getResponseRouter().setNewMessagesController(null);
-        //Model.getInstance().getResponseRouter().setNewGroupController(null);
+        UUID id = Model.getInstance().getLoggedInUserId();
+        Model.getInstance().setLoggedInUserId(id);
+        Model.getInstance().getResponseRouter().setNewMessagesController(null);
+        Model.getInstance().getResponseRouter().setNewGroupController(null);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Client.fxml"));
         ClientController clientController = new ClientController();
         loader.setController(clientController);

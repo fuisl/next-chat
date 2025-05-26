@@ -116,4 +116,9 @@ public class RequestFactory {
         json.put("search", searchTerm);
         return json;
     }
+    public static JSONObject createDeleteUserRequest() {
+        JSONObject json = new JSONObject();
+        json.put("type", "delete_user");
+        return json;
+    }
 }

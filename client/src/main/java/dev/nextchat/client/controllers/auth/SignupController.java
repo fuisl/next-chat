@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 public class SignupController implements Initializable, ServerResponseHandler {
     public TextField username;
@@ -24,6 +25,7 @@ public class SignupController implements Initializable, ServerResponseHandler {
     public Button signin_btn;
     public Label error_lbl;
     public Button login_btn;
+    private String pendingUsername;
     
     private final MessageController msgCtrl = Model.getInstance().getMsgCtrl();
     private ResponseRouter router = Model.getInstance().getResponseRouter();
@@ -40,7 +42,7 @@ public class SignupController implements Initializable, ServerResponseHandler {
             case "ok" -> Platform.runLater(() ->{
                 Stage stage = (Stage) login_btn.getScene().getWindow();
                 Model.getInstance().getViewFactory().closeStage(stage);
-                Model.getInstance().getViewFactory().showClientWindow();
+                Model.getInstance().getViewFactory().showLoginWindow();
             });
             case "fail" -> Platform.runLater(() ->{
                 error_lbl.setText(resp.getString("message"));
@@ -51,9 +53,8 @@ public class SignupController implements Initializable, ServerResponseHandler {
     private void signup() {
         String user = username.getText();
         String pass = password.getText();
+        pendingUsername = user;
 
-        // build a JSON signup request, e.g.:
-        // { "type":"signup", "username":"…", "password":"…" }
         JSONObject req = RequestFactory.createSignupRequest(user, pass);
         msgCtrl.getSendMessageQueue().offer(req);
     }
