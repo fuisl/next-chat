@@ -40,8 +40,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     // Use JUnit Jupiter for testing.
-    testImplementation libs.junit.jupiter
-
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // This dependency is used by the application.
@@ -50,7 +51,9 @@ dependencies {
     implementation 'org.json:json:20240303'
 
     // pseudo database for dev TODO: remove this.
-    implementation 'com.h2database:h2'
+    // implementation 'com.h2database:h2'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
