@@ -30,7 +30,7 @@
                         </ContextMenu>
                      </contextMenu>
                   </Button>
-                  <ImageView fitHeight="43.0" fitWidth="44.0" layoutX="12.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="37.0" fitWidth="37.0" layoutX="12.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../Images/profile.jpg" />
                      </image>
