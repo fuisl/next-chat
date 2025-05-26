@@ -66,6 +66,10 @@ public class ResponseRouter implements ServerResponseHandler {
             Model.getInstance().handleFetchPerGroupBatch(resp);
         } else if (type.equals("fetch_message_response")) {
             Model.getInstance().handleOlderMessagesBatch(resp);
+        } else if (type.equals("search_conversation_response")) {
+            Model.getInstance().handleSearchConversationResponse(resp);
+        } else if (type.equals("fetch_group_with_user_response")) {
+            Model.getInstance().handleFetchGroupWithUserResponse(resp);
         }
     }
 }

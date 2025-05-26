@@ -109,4 +109,11 @@ public class RequestFactory {
         json.put("memberId", otherMemberId.toString());
         return json;
     }
+
+    public static JSONObject createSearchConversationRequest(String searchTerm, String clientRequestId) {
+        JSONObject json = new JSONObject();
+        json.put("type", "search_conversation");
+        json.put("search", searchTerm);
+        return json;
+    }
 }

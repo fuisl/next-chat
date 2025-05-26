@@ -43,7 +43,7 @@
                               <FontAwesomeIconView glyphName="SEARCH" size="15" strokeType="OUTSIDE" strokeWidth="0.0" />
                            </graphic>
                         </Button>
-                        <TextField prefHeight="25.0" prefWidth="253.0" />
+                        <TextField fx:id="searchTextField" prefHeight="25.0" prefWidth="253.0" />
                      </children>
                   </HBox>
                   <HBox prefHeight="72.0" prefWidth="317.0" styleClass="mid_ctn">
@@ -57,6 +57,13 @@
             </VBox>
          </children>
       </VBox>
-      <ListView fx:id="listChat" layoutY="162.0" prefHeight="588.0" prefWidth="317.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <StackPane AnchorPane.topAnchor="162.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <ListView fx:id="listChat" prefHeight="588.0" prefWidth="317.0" />
+
+            <ListView fx:id="searchResultsListView" prefHeight="588.0" prefWidth="317.0" visible="false" managed="false" />
+         </children>
+      </StackPane>
+
    </children>
 </AnchorPane>
