@@ -66,7 +66,7 @@ public class SearchConversationCommand implements Command {
             msg.put("description", group.getDescription());
             res.put(msg);
         }
-
+        response.put("type", "search_conversation_response");
         response.put("requestId", requestId);
         response.put("status", "ok");
         response.put("matched_count", res.length());
