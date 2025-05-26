@@ -712,33 +712,23 @@ public class Model {
         Platform.runLater(() -> {
             String status = response.optString("status");
             if ("ok".equalsIgnoreCase(status)) {
-                if (!response.has("groupId")) {
-                    System.err.println("Leave group response 'ok' but missing groupId.");
-                    return;
-                }
+                if (!response.has("groupId")) return;
                 UUID groupId = UUID.fromString(response.getString("groupId"));
 
                 ChatCell cellToRemove = chatCellsByGroup.remove(groupId);
                 if (cellToRemove != null) {
-                    chatCells.remove(cellToRemove); // This ObservableList change updates the ListView
-                    System.out.println("ChatCell removed from UI for groupId: " + groupId);
+                    chatCells.remove(cellToRemove);
                 } else {
-                    System.out.println("No ChatCell found in chatCellsByGroup to remove for groupId: " + groupId + ". It might have already been removed or never existed locally in the map.");
-                    // Fallback: iterate and remove from chatCells if not found in map but present in list
                     chatCells.removeIf(cell -> cell.getGroupId().equals(groupId));
                 }
 
-                groupManager.removeGroupLocally(groupId); // Ensure this method exists in GroupManager
+                groupManager.removeGroupLocally(groupId);
 
-                // If the currently selected chat is the one we just left, clear the view
                 if (groupId.toString().equals(viewFactory.getClientSelectedChat().get())) {
-                    viewFactory.getClientSelectedChat().set(null); // Triggers clearing of message view
-                    System.out.println("Active chat was the one left. Clearing message view.");
+                    viewFactory.getClientSelectedChat().set(null);
                 }
-                System.out.println("Successfully left group: " + groupId);
             } else {
                 String message = response.optString("message", "Failed to leave group.");
-                System.err.println("Leave group failed: " + message);
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Leave Group Failed");
                 alert.setHeaderText(null);
@@ -752,29 +742,18 @@ public class Model {
         Platform.runLater(() -> {
             String status = response.optString("status");
             if ("ok".equalsIgnoreCase(status)) {
-                if (!response.has("groupId") || !response.has("name")) { // Assuming server sends "newName"
-                    System.err.println("Rename group response 'ok' but missing groupId or newName.");
-                    return;
-                }
+                if (!response.has("groupId") || !response.has("name")) return;
                 UUID groupId = UUID.fromString(response.getString("groupId"));
-                String newName = response.getString("name"); // Assuming server sends "newName"
+                String newName = response.getString("name");
 
                 ChatCell cellToUpdate = chatCellsByGroup.get(groupId);
                 if (cellToUpdate != null) {
                     cellToUpdate.setOtherUsername(newName);
-                    System.out.println("ChatCell UI updated for groupId: " + groupId + " to new name: " + newName);
-                } else {
-                    System.out.println("No ChatCell found to update name for groupId: " + groupId);
                 }
 
                 groupManager.updateGroupNameLocally(groupId, newName);
-                if (groupId.toString().equals(viewFactory.getClientSelectedChat().get())) {
-                    System.out.println("Active chat was the one renamed. Name updated to: " + newName);
-                }
-                System.out.println("Group " + groupId + " renamed to: " + newName);
             } else {
                 String message = response.optString("message", "Failed to rename group.");
-                System.err.println("Rename group failed: " + message);
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Rename Group Failed");
                 alert.setHeaderText(null);
@@ -786,45 +765,21 @@ public class Model {
 
     public void handleGroupRenameBroadcast(JSONObject response) {
         Platform.runLater(() -> {
-            if (!response.has("groupId") || !response.has("name")) {
-                System.err.println("Group rename broadcast event missing groupId or new name ('name' field). Response: " + response.toString());
-                return;
-            }
-
+            if (!response.has("groupId") || !response.has("name")) return;
             UUID groupId = UUID.fromString(response.getString("groupId"));
-            String newName = response.getString("name"); // Server sends the new name in "name" field for this type
+            String newName = response.getString("name");
 
-            if (newName.trim().isEmpty()) {
-                System.err.println("Group rename broadcast event received an empty new name for groupId: " + groupId);
-                return; // Don't proceed with an empty name
-            }
+            if (newName.trim().isEmpty()) return;
 
             ChatCell cellToUpdate = chatCellsByGroup.get(groupId);
             if (cellToUpdate != null) {
-                cellToUpdate.setOtherUsername(newName); // This property change updates bound UI elements
-                System.out.println("[Broadcast] ChatCell UI updated for groupId: " + groupId + " to new name: " + newName);
-            } else {
-                // This could happen if the user just joined and the ChatCell isn't fully initialized yet,
-                // or if there's a race condition. findOrCreateChatCell might be safer.
-                // However, for a rename, the cell should typically exist if the user is a member.
-                System.out.println("[Broadcast] No local ChatCell found to update name for groupId: " + groupId + ". User might not have this chat active or loaded.");
-                // Optionally, if the cell MUST exist, you could try findOrCreate and then set name.
-                // ChatCell newOrExistingCell = findOrCreateChatCell(groupId);
-                // newOrExistingCell.setOtherUsername(newName);
+                cellToUpdate.setOtherUsername(newName);
             }
 
-            // Update the name in the local GroupManager as well
-            groupManager.updateGroupNameLocally(groupId, newName); //
-
-            // The UI update for MessagesController.fid (if this chat is open)
-            // is handled by the ChangeListener attached in MessagesController,
-            // which listens to currChatCell.otherUsernameProperty().
-            if (cellToUpdate != null && groupId.toString().equals(viewFactory.getClientSelectedChat().get())) {
-                System.out.println("[Broadcast] Active chat was the one renamed. UI should update. New name: " + newName);
-            }
-            System.out.println("[Broadcast] Group " + groupId + " name changed to: " + newName);
+            groupManager.updateGroupNameLocally(groupId, newName);
         });
     }
+
 
     public void resetSessionState() {
         Platform.runLater(() -> {
