@@ -27,4 +27,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query(value = "SELECT * FROM user_account WHERE LOWER(username) LIKE LOWER(CONCAT('%', ?1, '%')) LIMIT 30", nativeQuery = true)
     List<User> findUserByPattern(String search);
+
+    @Modifying
+    @Query(value = "UPDATE user_account acc SET acc.deleted = true, acc.username = :name WHERE acc.id = :id", nativeQuery = true)
+    int deleteUserById(@Param("id") UUID id, @Param("name") String name);
 }

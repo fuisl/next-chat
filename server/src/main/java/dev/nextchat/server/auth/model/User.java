@@ -26,6 +26,9 @@ public class User {
     @Column(nullable = false, updatable = false)
     private Instant created_at;
 
+    @Column(nullable = false, updatable = true)
+    private boolean deleted = false;
+
     // Constructors
     public User() {
     } // Required by JPA
@@ -54,6 +57,10 @@ public class User {
 
     public Instant getCreateTimeStamp() {
         return created_at;
+    }
+
+    public boolean getDeleted() {
+        return deleted;
     }
 
     // Setters

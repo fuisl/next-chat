@@ -8,4 +8,6 @@ import dev.nextchat.server.messaging.model.Message;
 
 public interface CustomMessageRepository {
     List<Message> findLatestMessagesPerGroupBeforeTimestamp(List<UUID> groupIds, Instant beforeTime);
+
+    void changeDeletedUserMessageUsername(UUID userId);
 }

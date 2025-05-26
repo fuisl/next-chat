@@ -8,6 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -37,5 +39,13 @@ public class CustomMessageRepositoryImpl implements CustomMessageRepository {
                 matchStage, sortStage, groupStage, replaceRootStage, limitStage);
 
         return mongoTemplate.aggregate(aggregation, "messages", Message.class).getMappedResults();
+    }
+
+    @Override
+    public void changeDeletedUserMessageUsername(UUID userId) {
+        Query query = new Query(Criteria.where("senderId").is(userId));
+        Update update = new Update().set("senderUsername", "Deleted User");
+
+        mongoTemplate.updateMulti(query, update, Message.class);
     }
 }

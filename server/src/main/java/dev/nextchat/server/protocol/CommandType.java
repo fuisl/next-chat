@@ -1,6 +1,7 @@
 package dev.nextchat.server.protocol;
 
 public enum CommandType {
+    DELETE_USER,
     LOGIN,
     SIGNUP,
     SEND_MESSAGE,

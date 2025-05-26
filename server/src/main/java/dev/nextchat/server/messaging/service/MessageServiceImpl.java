@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import dev.nextchat.server.messaging.model.Message;
 import dev.nextchat.server.messaging.repository.MessageRepository;
@@ -52,5 +53,11 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<Message> findLatestMessagePerGroup(List<UUID> groupIds, Instant timestamp) {
         return messageRepository.findLatestMessagesPerGroupBeforeTimestamp(groupIds, timestamp);
+    }
+
+    @Transactional
+    @Override
+    public void changeDeletedUserSenderName(UUID userId) {
+        messageRepository.changeDeletedUserMessageUsername(userId);
     }
 }
