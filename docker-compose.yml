@@ -16,17 +16,20 @@ services:
     volumes:
       - mongo_data:/data/db
 
-  # server:
-  #   build:
-  #     context: ./server
-  #   depends_on:
-  #     - mongodb
-  #     - mysql
-  #   environment:
-  #     MYSQL_HOST: mysql
-  #     MONGO_URI: mongodb://mongodb:27017
-  #   ports:
-  #     - "5001:5001"
+  server:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    depends_on:
+      - mongodb
+      - mysql
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+    ports:
+      - "5001:5001"
 
   # client:
   #   build:

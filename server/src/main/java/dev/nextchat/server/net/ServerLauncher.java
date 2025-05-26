@@ -9,6 +9,7 @@ import dev.nextchat.server.messaging.service.RelayService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -20,8 +21,7 @@ public class ServerLauncher implements CommandLineRunner {
     private static final int THREAD_POOL_SIZE = 64;
 
     private final ExecutorService threadPool = Executors.newFixedThreadPool(
-        THREAD_POOL_SIZE, new ClientThreadFactory()
-    );
+            THREAD_POOL_SIZE, new ClientThreadFactory());
 
     private final ProtocolDecoder decoder;
     private final Authenticator authenticator;
@@ -47,7 +47,7 @@ public class ServerLauncher implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT, 0, InetAddress.getByName("0.0.0.0"))) {
             System.out.printf("✅ MsgServer is listening on port %d%n", PORT);
 
             while (true) {
