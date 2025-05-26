@@ -131,11 +131,11 @@ public class RequestFactory {
         return json;
     }
 
-    public static JSONObject createRenameGroupRequest(UUID groupId, String newName) {
+    public static JSONObject createRenameGroupRequest(UUID groupId, String name) {
         JSONObject json = new JSONObject();
         json.put("type", "rename_group");
         json.put("groupId", groupId.toString());
-        json.put("newName", newName);
+        json.put("name", name);
         return json;
     }
 }

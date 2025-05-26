@@ -10,6 +10,7 @@ import dev.nextchat.client.database.MessageQueueManager;
 import dev.nextchat.client.views.ViewFactory;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.scene.control.Alert;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -705,6 +706,82 @@ public class Model {
             e.printStackTrace();
             clearSinglePendingChatContext();
         }
+    }
+
+    public void handleLeaveGroupResponse(JSONObject response) {
+        Platform.runLater(() -> {
+            String status = response.optString("status");
+            if ("ok".equalsIgnoreCase(status)) {
+                if (!response.has("groupId")) {
+                    System.err.println("Leave group response 'ok' but missing groupId.");
+                    return;
+                }
+                UUID groupId = UUID.fromString(response.getString("groupId"));
+
+                ChatCell cellToRemove = chatCellsByGroup.remove(groupId);
+                if (cellToRemove != null) {
+                    chatCells.remove(cellToRemove); // This ObservableList change updates the ListView
+                    System.out.println("ChatCell removed from UI for groupId: " + groupId);
+                } else {
+                    System.out.println("No ChatCell found in chatCellsByGroup to remove for groupId: " + groupId + ". It might have already been removed or never existed locally in the map.");
+                    // Fallback: iterate and remove from chatCells if not found in map but present in list
+                    chatCells.removeIf(cell -> cell.getGroupId().equals(groupId));
+                }
+
+                groupManager.removeGroupLocally(groupId); // Ensure this method exists in GroupManager
+
+                // If the currently selected chat is the one we just left, clear the view
+                if (groupId.toString().equals(viewFactory.getClientSelectedChat().get())) {
+                    viewFactory.getClientSelectedChat().set(null); // Triggers clearing of message view
+                    System.out.println("Active chat was the one left. Clearing message view.");
+                }
+                System.out.println("Successfully left group: " + groupId);
+            } else {
+                String message = response.optString("message", "Failed to leave group.");
+                System.err.println("Leave group failed: " + message);
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Leave Group Failed");
+                alert.setHeaderText(null);
+                alert.setContentText(message);
+                alert.showAndWait();
+            }
+        });
+    }
+
+    public void handleRenameGroupResponse(JSONObject response) {
+        Platform.runLater(() -> {
+            String status = response.optString("status");
+            if ("ok".equalsIgnoreCase(status)) {
+                if (!response.has("groupId") || !response.has("name")) { // Assuming server sends "newName"
+                    System.err.println("Rename group response 'ok' but missing groupId or newName.");
+                    return;
+                }
+                UUID groupId = UUID.fromString(response.getString("groupId"));
+                String newName = response.getString("name"); // Assuming server sends "newName"
+
+                ChatCell cellToUpdate = chatCellsByGroup.get(groupId);
+                if (cellToUpdate != null) {
+                    cellToUpdate.setOtherUsername(newName);
+                    System.out.println("ChatCell UI updated for groupId: " + groupId + " to new name: " + newName);
+                } else {
+                    System.out.println("No ChatCell found to update name for groupId: " + groupId);
+                }
+
+                groupManager.updateGroupNameLocally(groupId, newName);
+                if (groupId.toString().equals(viewFactory.getClientSelectedChat().get())) {
+                    System.out.println("Active chat was the one renamed. Name updated to: " + newName);
+                }
+                System.out.println("Group " + groupId + " renamed to: " + newName);
+            } else {
+                String message = response.optString("message", "Failed to rename group.");
+                System.err.println("Rename group failed: " + message);
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Rename Group Failed");
+                alert.setHeaderText(null);
+                alert.setContentText(message);
+                alert.showAndWait();
+            }
+        });
     }
 
     public void resetSessionState() {

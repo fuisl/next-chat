@@ -154,6 +154,33 @@ public class GroupManager {
             System.err.println("[GroupManager] Cannot add member: Group " + groupId + " not found.");
         }
     }
+
+    public synchronized void removeGroupLocally(UUID groupId) {
+        if (groupId == null) return;
+        boolean removed = this.groups.removeIf(group -> group.getGroupId().equals(groupId));
+        if (removed) {
+            saveGroups();
+            System.out.println("[GroupManager] Removed group locally: " + groupId);
+        } else {
+            System.out.println("[GroupManager] Group not found locally to remove: " + groupId);
+        }
+    }
+
+    public synchronized void updateGroupNameLocally(UUID groupId, String newName) {
+        if (groupId == null || newName == null || newName.trim().isEmpty()) return;
+        Optional<GroupInfo> groupOpt = this.groups.stream()
+                .filter(group -> group.getGroupId().equals(groupId))
+                .findFirst();
+
+        if (groupOpt.isPresent()) {
+            groupOpt.get().setGroupName(newName.trim()); //
+            saveGroups();
+            System.out.println("[GroupManager] Updated group name locally for " + groupId + " to: " + newName.trim());
+        } else {
+            System.out.println("[GroupManager] Group not found locally to update name: " + groupId);
+        }
+    }
+
     public synchronized void clearAllGroups() {
         this.groups.clear();
         saveGroups();

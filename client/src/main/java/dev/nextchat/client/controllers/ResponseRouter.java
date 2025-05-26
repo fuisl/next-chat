@@ -70,6 +70,10 @@ public class ResponseRouter implements ServerResponseHandler {
             Model.getInstance().handleSearchConversationResponse(resp);
         } else if (type.equals("fetch_group_with_user_response")) {
             Model.getInstance().handleFetchGroupWithUserResponse(resp);
+        } else if (type.equals("leave_group_response")) {
+            Model.getInstance().handleLeaveGroupResponse(resp);
+        } else if (type.equals("rename_group_response")) {
+            Model.getInstance().handleRenameGroupResponse(resp);
         }
     }
 }
