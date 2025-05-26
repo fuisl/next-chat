@@ -784,6 +784,48 @@ public class Model {
         });
     }
 
+    public void handleGroupRenameBroadcast(JSONObject response) {
+        Platform.runLater(() -> {
+            if (!response.has("groupId") || !response.has("name")) {
+                System.err.println("Group rename broadcast event missing groupId or new name ('name' field). Response: " + response.toString());
+                return;
+            }
+
+            UUID groupId = UUID.fromString(response.getString("groupId"));
+            String newName = response.getString("name"); // Server sends the new name in "name" field for this type
+
+            if (newName.trim().isEmpty()) {
+                System.err.println("Group rename broadcast event received an empty new name for groupId: " + groupId);
+                return; // Don't proceed with an empty name
+            }
+
+            ChatCell cellToUpdate = chatCellsByGroup.get(groupId);
+            if (cellToUpdate != null) {
+                cellToUpdate.setOtherUsername(newName); // This property change updates bound UI elements
+                System.out.println("[Broadcast] ChatCell UI updated for groupId: " + groupId + " to new name: " + newName);
+            } else {
+                // This could happen if the user just joined and the ChatCell isn't fully initialized yet,
+                // or if there's a race condition. findOrCreateChatCell might be safer.
+                // However, for a rename, the cell should typically exist if the user is a member.
+                System.out.println("[Broadcast] No local ChatCell found to update name for groupId: " + groupId + ". User might not have this chat active or loaded.");
+                // Optionally, if the cell MUST exist, you could try findOrCreate and then set name.
+                // ChatCell newOrExistingCell = findOrCreateChatCell(groupId);
+                // newOrExistingCell.setOtherUsername(newName);
+            }
+
+            // Update the name in the local GroupManager as well
+            groupManager.updateGroupNameLocally(groupId, newName); //
+
+            // The UI update for MessagesController.fid (if this chat is open)
+            // is handled by the ChangeListener attached in MessagesController,
+            // which listens to currChatCell.otherUsernameProperty().
+            if (cellToUpdate != null && groupId.toString().equals(viewFactory.getClientSelectedChat().get())) {
+                System.out.println("[Broadcast] Active chat was the one renamed. UI should update. New name: " + newName);
+            }
+            System.out.println("[Broadcast] Group " + groupId + " name changed to: " + newName);
+        });
+    }
+
     public void resetSessionState() {
         Platform.runLater(() -> {
             chatCells.clear();

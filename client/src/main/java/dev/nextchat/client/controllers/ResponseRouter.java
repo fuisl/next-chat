@@ -74,6 +74,8 @@ public class ResponseRouter implements ServerResponseHandler {
             Model.getInstance().handleLeaveGroupResponse(resp);
         } else if (type.equals("rename_group_response")) {
             Model.getInstance().handleRenameGroupResponse(resp);
+        } else if (type.equals("change_group_name")) {
+            Model.getInstance().handleGroupRenameBroadcast(resp);
         }
     }
 }
