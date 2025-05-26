@@ -110,4 +110,9 @@ public class GroupServiceImpl implements GroupService {
 
         return Optional.of(new UUID(high, low));
     }
+
+    @Override
+    public int leaveGroup(UUID memberId, UUID groupId) {
+        return groupMemberRepository.deleteByMemberIdAndGroupId(memberId, groupId);
+    }
 }

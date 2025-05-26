@@ -3,7 +3,10 @@ package dev.nextchat.server.group.repository;
 import dev.nextchat.server.group.model.GroupMember;
 import dev.nextchat.server.group.model.GroupMemberId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,4 +31,9 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, GroupM
             LIMIT 1;
             """, nativeQuery = true)
     Optional<byte[]> findGroupsWithExactlyTwoUsers(UUID userA, UUID userB);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM GroupMember gm WHERE gm.id.userId = :memberId AND gm.id.groupId = :groupId")
+    int deleteByMemberIdAndGroupId(@Param("memberId") UUID memberId, @Param("groupId") UUID groupId);
 }
