@@ -51,14 +51,17 @@ public class SignupController implements Initializable, ServerResponseHandler {
     }
 
     private void signup() {
-        String user = username.getText();
+        String user = username.getText().trim();
         String pass = password.getText();
         String passConfirm = passwordConfirm.getText();
         if (!pass.equals(passConfirm)) {
             error_lbl.setText("Passwords do not match");
+        } else if (user.isEmpty()) {
+            error_lbl.setText("Username is required");
+        } else{
+            JSONObject req = RequestFactory.createSignupRequest(user, pass);
+            msgCtrl.getSendMessageQueue().offer(req);
         }
-        JSONObject req = RequestFactory.createSignupRequest(user, pass);
-        msgCtrl.getSendMessageQueue().offer(req);
     }
 
     private void login() {
