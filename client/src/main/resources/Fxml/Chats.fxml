@@ -36,7 +36,16 @@
             <VBox prefHeight="81.0" prefWidth="317.0" styleClass="mid_ctn">
                <children>
                   <Label prefHeight="19.0" prefWidth="53.0" text="Chats" />
-                  <TextField prefHeight="26.0" prefWidth="258.0" />
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <Button fx:id="search" mnemonicParsing="false">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="SEARCH" size="15" strokeType="OUTSIDE" strokeWidth="0.0" />
+                           </graphic>
+                        </Button>
+                        <TextField prefHeight="25.0" prefWidth="253.0" />
+                     </children>
+                  </HBox>
                   <HBox prefHeight="72.0" prefWidth="317.0" styleClass="mid_ctn">
                      <children>
                         <Button fx:id="all_btn" mnemonicParsing="false" text="All" />

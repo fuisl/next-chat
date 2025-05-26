@@ -28,6 +28,7 @@ public class ChatsController implements Initializable {
     public MenuItem newGroup;
     public MenuItem newMess;
     public ListView<ChatCell> listChat;
+    public Button search;
     private ResponseRouter router = Model.getInstance().getResponseRouter();
 
 
