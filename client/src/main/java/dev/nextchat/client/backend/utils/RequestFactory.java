@@ -116,9 +116,26 @@ public class RequestFactory {
         json.put("search", searchTerm);
         return json;
     }
+
     public static JSONObject createDeleteUserRequest() {
         JSONObject json = new JSONObject();
         json.put("type", "delete_user");
+        return json;
+    }
+
+    public static JSONObject createLeaveGroupRequest(UUID groupId) {
+        JSONObject json = new JSONObject();
+        json.put("type", "leave_group");
+        json.put("groupId", groupId.toString());
+
+        return json;
+    }
+
+    public static JSONObject createRenameGroupRequest(UUID groupId, String newName) {
+        JSONObject json = new JSONObject();
+        json.put("type", "rename_group");
+        json.put("groupId", groupId.toString());
+        json.put("newName", newName);
         return json;
     }
 }
