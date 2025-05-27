@@ -30,8 +30,11 @@ public class MessagesController implements Initializable {
     public ListView<Message> msgListView;
     public MenuItem rename;
     public MenuItem leave;
+    public MenuItem invite;
     private ChangeListener<String> currentChatNameListener;
-
+    private UUID pendingInviteGroupId;
+    private UUID pendingInviteGroupIdForUserCheck;
+    private String pendingInviteUsernameForUserCheck;
     private ChatCell currChatCell;
 
     @Override
@@ -46,7 +49,6 @@ public class MessagesController implements Initializable {
                     currChatCell = null;
                 }
             } else {
-
                 if (currChatCell != null) currChatCell.getMessages().clear();
                 currChatCell = null;
                 msgListView.setItems(null);
@@ -104,6 +106,7 @@ public class MessagesController implements Initializable {
 
         rename.setOnAction(e -> handleRenameGroup());
         leave.setOnAction(e -> handleLeaveGroup());
+        invite.setOnAction(e -> handleInviteUser());
     }
 
     private void loadChatByGroupId(UUID groupId) {
@@ -124,9 +127,7 @@ public class MessagesController implements Initializable {
             if (!currChatCell.getMessages().isEmpty()) {
                 Platform.runLater(() -> msgListView.scrollTo(currChatCell.getMessages().size() - 1));
             }
-            this.currentChatNameListener = (observable, oldValue, newValue) -> {
-                fid.setText(newValue); // Update fid label when chat name changes
-            };
+            this.currentChatNameListener = (observable, oldValue, newValue) -> fid.setText(newValue);
             this.currChatCell.otherUsernameProperty().addListener(this.currentChatNameListener);
             updateMenuItemsState(true);
         } else {
@@ -146,9 +147,8 @@ public class MessagesController implements Initializable {
     }
 
     private void handleRenameGroup() {
-        if (currChatCell == null || currChatCell.getGroupId() == null) {
-            return;
-        }
+        if (currChatCell == null || currChatCell.getGroupId() == null) return;
+
         TextInputDialog dialog = new TextInputDialog(currChatCell.getOtherUsername());
         dialog.setTitle("Rename Group");
         dialog.setHeaderText("Enter the new name for the group:");
@@ -171,10 +171,97 @@ public class MessagesController implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             UUID groupId = currChatCell.getGroupId();
-            JSONObject leaveRequest = RequestFactory.createLeaveGroupRequest(groupId); // New call
+            JSONObject leaveRequest = RequestFactory.createLeaveGroupRequest(groupId);
             Model.getInstance().getMsgCtrl().getSendMessageQueue().offer(leaveRequest);
-            System.out.println("Leave group request sent for group " + groupId);
         }
     }
-}
 
+    private void handleInviteUser() {
+        if (currChatCell == null || currChatCell.getGroupId() == null) {
+            new Alert(Alert.AlertType.ERROR, "Please select a chat to invite a user to.", ButtonType.OK).showAndWait();
+            return;
+        }
+
+        this.pendingInviteGroupIdForUserCheck = currChatCell.getGroupId();
+
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Invite User to Group");
+        dialog.setHeaderText("Enter the username of the person you want to invite to '" + currChatCell.getOtherUsername() + "'.");
+        dialog.setContentText("Username:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(username -> {
+            if (!username.trim().isEmpty()) {
+                this.pendingInviteUsernameForUserCheck = username.trim();
+                JSONObject checkUserRequest = RequestFactory.checkIfUserExist(this.pendingInviteUsernameForUserCheck);
+
+                MessageController backend = Model.getInstance().getMsgCtrl();
+                if (backend != null) {
+                    backend.getSendMessageQueue().offer(checkUserRequest);
+                } else {
+                    this.pendingInviteGroupIdForUserCheck = null;
+                    this.pendingInviteUsernameForUserCheck = null;
+                    new Alert(Alert.AlertType.ERROR, "System error: Unable to connect to the server.", ButtonType.OK).showAndWait();
+                }
+            }
+        });
+    }
+
+    public void handleUserExistenceResponseForInvite(JSONObject responseJson) {
+        if (this.pendingInviteGroupIdForUserCheck == null || this.pendingInviteUsernameForUserCheck == null) return;
+
+        Platform.runLater(() -> {
+            if (responseJson == null) {
+                new Alert(Alert.AlertType.ERROR, "Received an empty response from server for user check.", ButtonType.OK).showAndWait();
+                clearPendingInviteState();
+                return;
+            }
+
+            String respondedUsername = responseJson.optString("username");
+            boolean exists = responseJson.optBoolean("exists", false);
+
+            if (responseJson.has("error")) {
+                new Alert(Alert.AlertType.ERROR, "Server could not verify user: " + responseJson.optString("error", "Unknown error"), ButtonType.OK).showAndWait();
+                clearPendingInviteState();
+                return;
+            }
+
+            if (exists) {
+                String userIdString = responseJson.optString("userId");
+                if (userIdString == null || userIdString.isEmpty()) {
+                    new Alert(Alert.AlertType.ERROR, "User exists but server did not provide User ID.", ButtonType.OK).showAndWait();
+                    clearPendingInviteState();
+                    return;
+                }
+
+                try {
+                    UUID userIdToInvite = UUID.fromString(userIdString);
+                    if (userIdToInvite.equals(Model.getInstance().getLoggedInUserId())) {
+                        new Alert(Alert.AlertType.WARNING, "Cannot invite yourself to the group.", ButtonType.OK).showAndWait();
+                        clearPendingInviteState();
+                        return;
+                    }
+
+                    JSONObject joinGroupRequest = RequestFactory.createJoinGroupRequest(userIdToInvite, this.pendingInviteGroupIdForUserCheck);
+                    MessageController backend = Model.getInstance().getMsgCtrl();
+                    if (backend != null) {
+                        backend.getSendMessageQueue().offer(joinGroupRequest);
+                        new Alert(Alert.AlertType.INFORMATION, "Invitation sent for user '" + respondedUsername + "'.", ButtonType.OK).showAndWait();
+                    } else {
+                        new Alert(Alert.AlertType.ERROR, "System error: Unable to connect to the server for step 2.", ButtonType.OK).showAndWait();
+                    }
+                } catch (IllegalArgumentException e) {
+                    new Alert(Alert.AlertType.ERROR, "Server provided an invalid User ID format for '" + respondedUsername + "'.", ButtonType.OK).showAndWait();
+                }
+            } else {
+                new Alert(Alert.AlertType.INFORMATION, "User '" + respondedUsername + "' not found.", ButtonType.OK).showAndWait();
+            }
+            clearPendingInviteState();
+        });
+    }
+
+    private void clearPendingInviteState() {
+        this.pendingInviteGroupIdForUserCheck = null;
+        this.pendingInviteUsernameForUserCheck = null;
+    }
+}

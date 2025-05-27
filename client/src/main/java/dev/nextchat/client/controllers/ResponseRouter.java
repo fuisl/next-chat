@@ -51,8 +51,9 @@ public class ResponseRouter implements ServerResponseHandler {
             }
             if (newGroupController != null) {
                 newGroupController.onServerResponse(resp);
-            }else{
-                System.out.println("!!! [ResponseRouter] NEW GROUP response but newGroup is null");
+            }
+            if (messagesController != null) {
+                messagesController.handleUserExistenceResponseForInvite(resp);
             }
         } else if (type.equals("create_group_response") || type.equals("createGroupResponse")) {
             Model.getInstance().handleCreateGroupResponse(resp);

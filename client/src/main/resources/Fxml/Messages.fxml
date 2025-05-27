@@ -38,6 +38,7 @@
                         <ContextMenu fx:id="contextMenu">
                            <items>
                               <MenuItem fx:id="rename" text="Rename Group" />
+                              <MenuItem fx:id="invite" text="Invite" />
                               <MenuItem fx:id="leave" text="Leave Group" />
                            </items>
                         </ContextMenu>

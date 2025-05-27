@@ -33,7 +33,7 @@ public class ViewFactory {
     private LoginController loginController;
     private SignupController signUpController;
     private NewMsgBoxController newMsgController;
-    private MessagesController messageController;
+    private MessagesController messagesController;
     private NewGroupController newGroupViewController;
 
     public ViewFactory() {
@@ -63,14 +63,21 @@ public class ViewFactory {
     public AnchorPane getMsgView() {
         if (msgView == null) {
             try{
-                msgView = new FXMLLoader(getClass().getResource("/Fxml/Messages.fxml")).load();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Messages.fxml"));
+                msgView = loader.load();
+                messagesController = loader.getController();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         return msgView;
     }
-
+    public MessagesController getMessagesController() {
+        if (messagesController == null) {
+            getMsgView(); // Ensures view and controller are loaded
+        }
+        return messagesController;
+    }
 
     public void showSignupWindow(){
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Signup.fxml"));
@@ -160,8 +167,8 @@ public class ViewFactory {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/NewGroup.fxml"));
                 newGroupView = loader.load();
                 newGroupViewController = loader.getController();
-                Model.getInstance().getResponseRouter().setNewGroupController(newGroupViewController); // Set it
-                Model.getInstance().getResponseRouter().setNewMessagesController(null); // Clear the other
+//                Model.getInstance().getResponseRouter().setNewGroupController(newGroupViewController); // Set it
+//                Model.getInstance().getResponseRouter().setNewMessagesController(null); // Clear the other
             } catch (IOException e) {
                 e.printStackTrace();
             }
