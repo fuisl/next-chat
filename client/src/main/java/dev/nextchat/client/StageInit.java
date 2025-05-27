@@ -17,12 +17,12 @@ public class StageInit implements ApplicationListener<StageReadyEvent> {
     @Override
     public void onApplicationEvent(StageReadyEvent event) {
         Model.getInstance().getViewFactory().showLoginWindow();
-        MessagesController msgsCtrl = new MessagesController();
+        MessagesController actualMessagesController = Model.getInstance().getViewFactory().getMessagesController();
         LoginController loginCtrl = Model.getInstance().getViewFactory().getLoginController();
 
         ResponseRouter router = Model.getInstance().getResponseRouter();
         router.setLoginController(loginCtrl);
-        router.setMessagesController(msgsCtrl);
+        router.setMessagesController(actualMessagesController);
         MessageController mc = Model.getInstance().getMsgCtrl();
         Thread listener = new Thread(
                 new ServerResponseListener(mc, router),
