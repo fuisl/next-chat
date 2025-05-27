@@ -3,7 +3,7 @@ services:
     image: mysql:8
     environment:
       MYSQL_ROOT_PASSWORD: 1123
-      MYSQL_DATABASE: chatdb
+      MYSQL_DATABASE: nextchat
     ports:
       - "3306:3306"
     volumes:
