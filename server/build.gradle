@@ -8,6 +8,8 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 repositories {
@@ -16,13 +18,42 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation libs.junit.jupiter
+    // Spring Boot Core
+    implementation 'org.springframework.boot:spring-boot-starter'
+    
+    // Spring Boot Web (for REST APIs)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // Spring Boot with MongoDB
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0'
+    
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Use JUnit Jupiter for testing.
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // This dependency is used by the application.
     implementation libs.guava
+
+    implementation 'org.json:json:20240303'
+
+    // pseudo database for dev TODO: remove this.
+    // implementation 'com.h2database:h2'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -34,10 +65,15 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'dev.nextchat.server.App'
+    mainClass = 'dev.nextchat.server.Server'
 }
 
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
+bootRun {
+    systemProperty "server.port", "9090"
+}
+

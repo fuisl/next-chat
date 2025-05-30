@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="550.0" prefWidth="317.0" stylesheets="@../Styles/NewMsgBox.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.nextchat.client.controllers.chats.NewGroupController">
+   <children>
+      <VBox prefHeight="100.0" prefWidth="317.0" styleClass="main_ctn" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0" styleClass="additional_HBox">
+               <children>
+                  <Button fx:id="return_btn" mnemonicParsing="false">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="ARROW_LEFT" size="16" />
+                     </graphic>
+                  </Button>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Add Group Members">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+             <HBox prefHeight="42.0" prefWidth="324.0" styleClass="additional_HBox">
+                 <children>
+                     <Button fx:id="search_btn" mnemonicParsing="false" prefHeight="24.0" prefWidth="17.0">
+                         <graphic>
+                             <FontAwesomeIconView glyphName="SEARCH" />
+                         </graphic>
+                     </Button>
+                     <TextField fx:id="fusername" prefHeight="29.0" prefWidth="254.0" promptText="Search Username" styleClass="search-bar" />
+                 </children>
+             </HBox>
+            <StackPane prefHeight="30.0" prefWidth="318.0">
+               <children>
+                  <Label fx:id="error_lbl" textFill="#ff0606" />
+               </children>
+               <padding>
+                  <Insets left="10.0" right="10.0" />
+               </padding>
+            </StackPane>
+         </children>
+      </VBox>
+      <ListView fx:id="membersListView" prefHeight="350.0" prefWidth="317.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0" />
+      <Button fx:id="createGroup_btn" layoutX="11.0" layoutY="511.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" text="Create Group" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
